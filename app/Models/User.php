@@ -59,6 +59,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Consultation::class, 'expert_id');
     }
+
+    public function expertTips()
+    {
+        return $this->hasMany(ExpertTip::class);
+    }
     public function products()
     {
         return $this->hasMany(Product::class);

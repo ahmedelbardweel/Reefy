@@ -9,13 +9,29 @@ use App\Models\Crop;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
+/**
+ * كونترولر المهام API - Task API Controller
+ * 
+ * العلاقات:
+ * - Task: belongsTo Crop (المحصول)
+ * - Crop: belongsTo User (المزارع)
+ * 
+ * هذا الكونترولر يدير المهام المرتبطة بالمحاصيل عبر API
+ */
 class TaskController extends ApiController
 {
     /**
-     * Display a listing of tasks for a specific crop.
-     *
-     * @param  int  $cropId
-     * @return \Illuminate\Http\Response
+     * عرض قائمة مهام محصول معين
+     * 
+     * تقوم هذه الدالة بـ:
+     * - التحقق من وجود المحصول
+     * - التحقق من ملكية المحصول للمستخدم الحالي
+     * - جلب جميع مهام المحصول
+     * - ترتيب المهام من الأحدث للأقدم
+     * - إرجاع المهام في JSON response
+     * 
+     * @param int $cropId رقم المحصول
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index($cropId)
     {
@@ -25,6 +41,7 @@ class TaskController extends ApiController
             return $this->errorResponse('Crop not found.');
         }
 
+        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) {
             return $this->errorResponse('Unauthorized.', [], 403);
         }
@@ -35,11 +52,36 @@ class TaskController extends ApiController
     }
 
     /**
-     * Store a newly created task in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $cropId
-     * @return \Illuminate\Http\Response
+     * إضافة مهمة جديدة لمحصول
+     * 
+     * تقوم هذه الدالة بـ:
+     * - التحقق من وجود المحصول وملكيته
+     * - التحقق من صحة البيانات المدخلة
+     * - إنشاء مهمة جديدة مرتبطة بالمحصول
+     * - تعيين حالة المهمة إلى 'pending' (قيد الانتظار)
+     * - إرجاع المهمة المنشأة في JSON response
+     * 
+     * أنواع المهام:
+     * - water: ري
+     * - fertilizer: تسميد
+     * - pest: مكافحة آفات
+     * - harvest: حصاد
+     * - general: عامة
+     * 
+     * الأولويات:
+     * - low: منخفضة
+     * - medium: متوسطة
+     * - high: عالية
+     * 
+     * البيانات التفصيلية حسب نوع المهمة:
+     * - water: water_amount (كمية الماء), duration (المدة)
+     * - fertilizer: material_name (اسم المادة), dosage (الجرعة), dosage_unit (وحدة القياس)
+     * - pest: material_name, dosage, dosage_unit
+     * - harvest: harvest_quantity (كمية الحصاد), harvest_unit (وحدة القياس)
+     * 
+     * @param Request $request
+     * @param int $cropId رقم المحصول
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request, $cropId)
     {
@@ -49,16 +91,18 @@ class TaskController extends ApiController
             return $this->errorResponse('Crop not found.');
         }
 
+        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) {
             return $this->errorResponse('Unauthorized.', [], 403);
         }
 
+        // التحقق من البيانات
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:water,fertilizer,pest,harvest,general',
             'title' => 'required|string|max:255',
             'due_date' => 'required|date',
             'priority' => 'required|in:low,medium,high',
-            // Specialized fields validation
+            // حقول متخصصة حسب نوع المهمة
             'water_amount' => 'nullable|numeric',
             'duration' => 'nullable|numeric',
             'material_name' => 'nullable|string',
@@ -72,6 +116,7 @@ class TaskController extends ApiController
             return $this->errorResponse('Validation Error.', $validator->errors(), 422);
         }
 
+        // إنشاء المهمة
         $input = $request->all();
         $input['crop_id'] = $cropId;
         $input['status'] = 'pending';
@@ -82,11 +127,21 @@ class TaskController extends ApiController
     }
 
     /**
-     * Mark task as complete.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $taskId
-     * @return \Illuminate\Http\Response
+     * تحديد مهمة كمكتملة
+     * 
+     * تقوم هذه الدالة بـ:
+     * - التحقق من وجود المهمة
+     * - التحقق من ملكية المحصول المرتبط بالمهمة
+     * - تحديث حالة المهمة إلى 'completed'
+     * - إذا كانت المهمة من نوع حصاد (harvest):
+     *   * تحديث حالة المحصول إلى 'harvested'
+     * - إرجاع المهمة المحدثة في JSON response
+     * 
+     * ملاحظة: يمكن إضافة منطق تحديث نسبة النمو هنا (مبسط في API)
+     * 
+     * @param Request $request
+     * @param int $taskId رقم المهمة
+     * @return \Illuminate\Http\JsonResponse
      */
     public function complete(Request $request, $taskId)
     {
@@ -96,17 +151,18 @@ class TaskController extends ApiController
             return $this->errorResponse('Task not found.');
         }
 
-        // Check ownership through crop relationship
+        // التحقق من الملكية عبر المحصول
         if ($task->crop->user_id !== auth()->id()) {
             return $this->errorResponse('Unauthorized.', [], 403);
         }
 
+        // تحديث حالة المهمة
         $task->status = 'completed';
         $task->save();
 
-        // Update crop growth if logic exists (simplified here for API)
+        // يمكن تحديث نسبة نمو المحصول هنا (منطق مبسط للـ API)
         
-        // If harvest task, update crop status
+        // إذا كانت مهمة حصاد، تحديث حالة المحصول
         if ($task->type === 'harvest') {
             $task->crop->status = 'harvested';
             $task->crop->save();

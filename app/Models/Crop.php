@@ -23,14 +23,25 @@ class Crop extends Model
         'status',
         'growth_percentage',
         'notes',
+        'image_path',
+        'growth_stage',
+        'health_status',
+        'variety',
+        'description',
     ];
 
-    protected $appends = ['growth_stage_label', 'status_label', 'status_color'];
+    protected $appends = ['growth_stage_label', 'status_label', 'status_color', 'image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
 
     public function getStatusLabelAttribute()
     {
         switch ($this->status) {
-            case 'growing': return 'قيد النمو';
+            case 'growing':
+            case 'active': return 'قيد النمو';
             case 'harvested': return 'تم الحصاد';
             case 'dormant': return 'خامل';
             default: return 'غير محدد';
@@ -40,7 +51,8 @@ class Crop extends Model
     public function getStatusColorAttribute()
     {
         switch ($this->status) {
-            case 'growing': return 'primary';
+            case 'growing':
+            case 'active': return 'primary';
             case 'harvested': return 'success';
             default: return 'secondary';
         }

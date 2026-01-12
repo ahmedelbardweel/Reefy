@@ -37,22 +37,22 @@
         </div>
 
         <!-- Right Section: Register Form -->
-        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4 p-md-5 overflow-y-auto" style="max-height: 100vh;">
+        <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-md-5 overflow-y-auto" style="max-height: 100vh; background-color: var(--bg-secondary);">
             <div class="w-100" style="max-width: 480px; padding: 2rem 0;">
                 
                 <!-- Brand Mobile -->
                 <div class="d-flex justify-content-center mb-5 d-lg-none">
                     <div class="d-flex align-items-center gap-2">
                         <span class="fs-2 fw-bold text-dark">ريفي</span>
-                        <div class="bg-success text-white rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #2d6a4f, #1b4332) !important;">
+                        <div class="bg-success text-white rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #84cc16, #3f6212) !important;">
                             <i class="bi bi-layers-half fs-4"></i>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-5 text-end">
-                    <h1 class="fw-bold mb-3 h2" style="color: var(--reefy-primary); font-family: 'Cairo', sans-serif;">انضم إلينا</h1>
-                    <p class="text-muted">كن جزءاً من مستقبل الزراعة الذكية في المنطقة. خطوات بسيطة تفصلك عن البداية.</p>
+                    <h1 class="fw-bold mb-3 h2" style="color: var(--heading-color) !important; font-family: 'Cairo', sans-serif;">انضم إلينا</h1>
+                    <p class="text-muted" style="color: var(--text-secondary) !important;">كن جزءاً من مستقبل الزراعة الذكية في المنطقة. خطوات بسيطة تفصلك عن البداية.</p>
                 </div>
 
                 <form method="POST" action="{{ route('register') }}" class="needs-validation">
@@ -61,17 +61,17 @@
                     <div class="row">
                         <!-- Name -->
                         <div class="col-md-6 mb-4">
-                            <label for="name" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">الاسم بالكامل</label>
+                            <label for="name" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">الاسم بالكامل</label>
                             <div class="position-relative">
                                 <input type="text" 
-                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5" 
+                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
                                        id="name" 
                                        name="name" 
                                        value="{{ old('name') }}" 
                                        required 
                                        autofocus 
                                        placeholder="أحمد محمد"
-                                       style="background: #f1f8f5; border-radius: 12px; height: 50px; font-size: 0.9rem; border: 1.5px solid transparent !important; transition: all 0.2s ease;">
+                                       style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 50px; font-size: 0.9rem; border: 1.5px solid var(--border-color) !important; transition: all 0.2s ease;">
                                 <i class="bi bi-person position-absolute top-50 translate-middle-y end-0 me-3 text-muted"></i>
                             </div>
                             <x-input-error :messages="$errors->get('name')" class="mt-2 text-danger small text-end" />
@@ -79,10 +79,10 @@
 
                         <!-- Role -->
                         <div class="col-md-6 mb-4">
-                            <label for="role" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">أقوم بالتسجيل كـ</label>
+                            <label for="role" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">أقوم بالتسجيل كـ</label>
                             <div class="position-relative">
-                                <select id="role" name="role" class="form-select form-control-lg text-end border-0 ps-4 pe-5" 
-                                        style="background: #f1f8f5; border-radius: 12px; height: 50px; font-size: 0.9rem; border: 1.5px solid transparent !important; appearance: none; -webkit-appearance: none;">
+                                <select id="role" name="role" class="form-select form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
+                                        style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 50px; font-size: 0.9rem; border: 1.5px solid var(--border-color) !important; appearance: none; -webkit-appearance: none;">
                                     <option value="farmer">مزارع (Farmer)</option>
                                     <option value="expert">خبير زراعي (Expert)</option>
                                 </select>
@@ -92,18 +92,17 @@
                         </div>
                     </div>
 
-                    <!-- Email Address -->
                     <div class="mb-4">
-                        <label for="email" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">البريد الإلكتروني</label>
+                        <label for="email" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">البريد الإلكتروني</label>
                         <div class="position-relative">
                             <input type="email" 
-                                   class="form-control form-control-lg text-end border-0 ps-4 pe-5" 
+                                   class="form-control form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
                                    id="email" 
                                    name="email" 
                                    value="{{ old('email') }}" 
                                    required 
                                    placeholder="name@example.com"
-                                   style="background: #f1f8f5; border-radius: 12px; height: 50px; font-size: 0.9rem; border: 1.5px solid transparent !important; transition: all 0.2s ease;">
+                                   style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 50px; font-size: 0.9rem; border: 1.5px solid var(--border-color) !important; transition: all 0.2s ease;">
                             <i class="bi bi-envelope position-absolute top-50 translate-middle-y end-0 me-3 text-muted"></i>
                         </div>
                         <x-input-error :messages="$errors->get('email')" class="mt-2 text-danger small text-end" />
@@ -112,16 +111,16 @@
                     <div class="row">
                         <!-- Password -->
                         <div class="col-md-6 mb-4">
-                            <label for="password" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">كلمة المرور</label>
+                            <label for="password" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">كلمة المرور</label>
                             <div class="position-relative">
                                 <input type="password" 
-                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5" 
+                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
                                        id="password" 
                                        name="password" 
                                        required 
                                        autocomplete="new-password" 
                                        placeholder="••••••••"
-                                       style="background: #f1f8f5; border-radius: 12px; height: 50px; font-size: 0.9rem; border: 1.5px solid transparent !important; transition: all 0.2s ease;">
+                                       style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 50px; font-size: 0.9rem; border: 1.5px solid var(--border-color) !important; transition: all 0.2s ease;">
                                 <i class="bi bi-shield-lock position-absolute top-50 translate-middle-y end-0 me-3 text-muted"></i>
                             </div>
                             <x-input-error :messages="$errors->get('password')" class="mt-2 text-danger small text-end" />
@@ -129,16 +128,16 @@
 
                         <!-- Confirm Password -->
                         <div class="col-md-6 mb-4">
-                            <label for="password_confirmation" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">تأكيد الكلمة</label>
+                            <label for="password_confirmation" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">تأكيد الكلمة</label>
                             <div class="position-relative">
                                 <input type="password" 
-                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5" 
+                                       class="form-control form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
                                        id="password_confirmation" 
                                        name="password_confirmation" 
                                        required 
                                        autocomplete="new-password" 
                                        placeholder="••••••••"
-                                       style="background: #f1f8f5; border-radius: 12px; height: 50px; font-size: 0.9rem; border: 1.5px solid transparent !important; transition: all 0.2s ease;">
+                                       style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 50px; font-size: 0.9rem; border: 1.5px solid var(--border-color) !important; transition: all 0.2s ease;">
                                 <i class="bi bi-shield-check position-absolute top-50 translate-middle-y end-0 me-3 text-muted"></i>
                             </div>
                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2 text-danger small text-end" />
@@ -150,8 +149,8 @@
                         <input class="form-check-input ms-0 me-2" type="checkbox" id="terms" required style="width: 18px; height: 18px;">
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold rounded-3 shadow-sm border-0 mb-4" 
-                            style="height: 56px; font-size: 1.1rem; border-radius: 14px !important;">
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm border-0 mb-4" 
+                            style="height: 56px; font-size: 1.1rem; border-radius: 0px !important; background: var(--reefy-primary) !important; color: white !important;">
                         إنشاء حساب جديد
                     </button>
                     
@@ -189,16 +188,22 @@
     <!-- Micro-interactions Style -->
     <style>
         input:focus {
-            background: #ffffff !important;
-            border-color: #2d6a4f !important;
-            box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.1) !important;
+            background: var(--bg-secondary) !important;
+            border-color: var(--reefy-success) !important;
+            box-shadow: 0 0 0 4px rgba(132, 204, 22, 0.1) !important;
             outline: none;
+            color: var(--text-primary) !important;
         }
         select:focus {
-            background: #ffffff !important;
-            border-color: #2d6a4f !important;
-            box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.1) !important;
+            background: var(--bg-secondary) !important;
+            border-color: var(--reefy-success) !important;
+            box-shadow: 0 0 0 4px rgba(132, 204, 22, 0.1) !important;
             outline: none;
+            color: var(--text-primary) !important;
+        }
+        .theme-input option {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
         }
         .backdrop-blur { backdrop-filter: blur(10px); }
         .text-mint { color: #8ef9d5; }

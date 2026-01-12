@@ -2,12 +2,12 @@
     <x-slot name="header">
         <div class="d-flex justify-content-between align-items-center" style="direction: rtl;">
             <div>
-                <h2 class="h4 text-dark mb-0 font-weight-bold">
+                <h2 class="h4 mb-0 font-weight-bold" style="color: var(--heading-color) !important;">
                     <i class="bi bi-people-fill me-2 text-success"></i>مجتمع ريفي
                 </h2>
                 <p class="text-muted small mb-0">تواصل مع المزارعين وشارك خبراتك في الأرض</p>
             </div>
-            <div class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill fw-bold" style="font-size: 0.8rem;">
+            <div class="badge bg-success bg-opacity-10 text-success px-3 py-2 fw-bold" style="font-size: 0.8rem; border-radius: 0;">
                 <i class="bi bi-broadcast me-1"></i> مباشر الآن
             </div>
         </div>
@@ -17,11 +17,11 @@
         <div class="row justify-content-center">
             <div class="col-lg-7">
                 <!-- Create Post Card -->
-                <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 15px;">
+                <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 0; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
                     <div class="card-body p-4">
                         <div class="d-flex gap-3 mb-3" style="direction: rtl;">
                             <div class="flex-shrink-0">
-                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white fw-bold" style="width: 48px; height: 48px; font-size: 1.2rem;">
+                                <div class="d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px; font-size: 1.2rem; border-radius: 0; background-color: var(--reefy-success); color: white;">
                                     @auth
                                         {{ mb_substr(auth()->user()->name, 0, 1) }}
                                     @else
@@ -33,32 +33,44 @@
                                 <form action="{{ route('community.store') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
-                                        <select name="type" class="form-select border-0 bg-light rounded-pill px-3 mb-2" style="width: auto; font-size: 0.85rem; color: var(--reefy-success); font-weight: 600;">
-                                            <option value="post">منشور عادي</option>
-                                            <option value="question">سؤال</option>
-                                            <option value="inquiry">استفسار</option>
-                                            <option value="tip">نصيحة</option>
-                                            <option value="poll">استفتاء</option>
-                                        </select>
-                                        <textarea name="content" class="form-control border-0 bg-light p-3" rows="3" placeholder="{{ auth()->check() ? 'ما الجديد في مزرعتك اليوم يا ' . auth()->user()->name . '؟' : 'شارك خبرتك مع المجتمع الآن...' }}" style="border-radius: 12px; resize: none; direction: rtl;"></textarea>
+                                        <input type="hidden" name="type" id="postTypeInput" value="post">
+                                        <textarea name="content" class="form-control border-0 p-3" rows="3" placeholder="{{ auth()->check() ? 'ما الجديد في مزرعتك اليوم يا ' . auth()->user()->name . '؟' : 'شارك خبرتك مع المجتمع الآن...' }}" style="border-radius: 0; resize: none; direction: rtl; background: var(--bg-primary) !important; color: var(--text-primary) !important;"></textarea>
                                     </div>
                                     
                                     <div id="imagePreviewContainer" class="mt-3 d-none">
-                                        <img id="imagePreview" src="#" alt="Preview" class="img-fluid rounded-3 shadow-sm" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                        <img id="imagePreview" src="#" alt="Preview" class="img-fluid shadow-sm" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 0;">
                                         <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeImage()">حذف الصورة</button>
                                     </div>
 
                                     <div class="d-flex justify-content-between align-items-center mt-3" style="direction: rtl;">
-                                        <div class="d-flex gap-2">
-                                            <label class="btn btn-light rounded-pill px-3 py-2 mb-0" style="cursor: pointer; color: var(--reefy-success); border: 1px solid #e2eee8;">
-                                                <i class="bi bi-image me-1"></i> صورة
+                                        <div class="d-flex gap-2 flex-wrap">
+                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn active shadow-sm" onclick="selectPostType('post', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-chat-left-text me-1 text-secondary"></i> منشور
+                                            </button>
+                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('question', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-question-circle me-1 text-primary"></i> سؤال
+                                            </button>
+                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('inquiry', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-info-circle me-1 text-info"></i> استفسار
+                                            </button>
+                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('tip', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-lightbulb-fill me-1 text-warning"></i> نصيحة
+                                            </button>
+                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('poll', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-bar-chart-line me-1 text-danger"></i> استفتاء
+                                            </button>
+                                            
+                                            <div class="vr mx-1 my-1 text-muted opacity-25"></div>
+
+                                            <label class="btn rounded-0 px-3 py-1 mb-0 border-0 shadow-sm" style="cursor: pointer; background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
+                                                <i class="bi bi-image me-1 text-success"></i> صورة
                                                 <input type="file" name="image" id="postImage" class="d-none" accept="image/*" onchange="previewImage(this)">
                                             </label>
-                                            <button type="button" class="btn btn-light rounded-pill px-3 py-2 mb-0" style="color: #00aeef; border: 1px solid #e2eee8;">
+                                            <button type="button" class="btn rounded-0 px-3 py-1 mb-0 border-0 shadow-sm" style="background: var(--bg-primary); color: #00aeef; border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
                                                 <i class="bi bi-geo-alt me-1"></i> الموقع
                                             </button>
                                         </div>
-                                        <button type="submit" class="btn btn-success rounded-pill px-5 fw-bold">نشر الآن</button>
+                                        <button type="submit" class="btn btn-success rounded-0 px-5 fw-bold">نشر الآن</button>
                                     </div>
                                 </form>
                             </div>
@@ -68,16 +80,16 @@
 
                 <!-- Posts Feed -->
                 @forelse($posts as $post)
-                    <div class="card border-0 shadow-sm mb-4 p-0" style="border-radius: 15px; direction: rtl;">
-                        <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                    <div class="card border-0 shadow-sm mb-4 p-0" style="border-radius: 0; direction: rtl; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
+                        <div class="card-header border-0 pt-4 px-4 pb-0" style="background: var(--bg-secondary) !important;">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-success fw-bold border" style="width: 45px; height: 45px;">
+                                    <div class="d-flex align-items-center justify-content-center text-success fw-bold border" style="width: 45px; height: 45px; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
                                         {{ $post->user ? mb_substr($post->user->name, 0, 1) : 'ز' }}
                                     </div>
                                     <div>
                                         <div class="d-flex align-items-center gap-2">
-                                            <h6 class="mb-0 fw-bold text-dark">{{ $post->user ? $post->user->name : 'زائر ريفي' }}</h6>
+                                            <h6 class="mb-0 fw-bold" style="color: var(--heading-color) !important;">{{ $post->user ? $post->user->name : 'زائر ريفي' }}</h6>
                                             @php
                                                 $badgeClass = [
                                                     'post' => 'bg-secondary',
@@ -95,7 +107,7 @@
                                                     'poll' => 'استفتاء'
                                                 ][$post->type] ?? 'منشور';
                                             @endphp
-                                            <span class="badge {{ $badgeClass }} bg-opacity-10 text-{{ str_replace('bg-', '', $badgeClass) }} very-small rounded-pill">{{ $badgeText }}</span>
+                                            <span class="badge {{ $badgeClass }} bg-opacity-10 text-{{ str_replace('bg-', '', $badgeClass) }} very-small" style="border-radius: 0;">{{ $badgeText }}</span>
                                         </div>
                                         <div class="very-small text-muted">{{ $post->created_at->diffForHumans() }}</div>
                                     </div>
@@ -107,11 +119,11 @@
                                                 <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
                                                     <i class="bi bi-three-dots-vertical"></i>
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 10px;">
+                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 0; background: var(--bg-secondary); border: 1px solid var(--border-color) !important;">
                                                     <li>
                                                         <form action="{{ route('community.destroy', $post) }}" method="POST">
                                                             @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger d-flex align-items-center gap-2">
+                                                            <button type="submit" class="dropdown-item d-flex align-items-center gap-2" style="color: #dc3545;">
                                                                 <i class="bi bi-trash"></i> حذف المنشور
                                                             </button>
                                                         </form>
@@ -125,10 +137,10 @@
                         </div>
 
                         <div class="card-body px-4 pt-3">
-                            <p class="text-dark mb-3" style="line-height: 1.6;">{{ $post->content }}</p>
+                            <p class="mb-3" style="line-height: 1.6; color: var(--text-primary) !important;">{{ $post->content }}</p>
                             
                             @if($post->image_path)
-                                <div class="rounded-3 overflow-hidden mb-3 border shadow-sm">
+                                <div class="overflow-hidden mb-3 border shadow-sm" style="border-radius: 0;">
                                     <img src="{{ asset('storage/' . $post->image_path) }}" class="w-100" style="max-height: 400px; object-fit: cover;" alt="Post content">
                                 </div>
                             @endif
@@ -149,16 +161,16 @@
                                 <button type="button" 
                                     onclick="toggleLike({{ $post->id }})"
                                     id="likeBtn{{ $post->id }}"
-                                    class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 {{ $post->isLikedBy(auth()->user()) ? 'text-danger fw-bold bg-danger bg-opacity-10' : 'text-muted hover-bg-light' }}" style="border-radius: 10px; transition: all 0.2s;">
+                                    class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 {{ $post->isLikedBy(auth()->user()) ? 'text-danger fw-bold bg-danger bg-opacity-10' : 'hover-bg-light' }}" style="border-radius: 0; transition: all 0.2s; color: var(--text-secondary);">
                                     <i class="bi {{ $post->isLikedBy(auth()->user()) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                                     إعجاب
                                 </button>
                                 
-                                <button type="button" class="btn flex-grow-1 py-2 border-0 text-muted d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 10px;" onclick="openComments({{ $post->id }})">
+                                <button type="button" class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 0; color: var(--text-secondary);" onclick="openComments({{ $post->id }})">
                                     <i class="bi bi-chat-left-text"></i>
                                     تعليق
                                 </button>
-                                <button type="button" class="btn flex-grow-1 py-2 border-0 text-muted d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 10px;" onclick="sharePost({{ $post->id }}, '{{ url('/community/post/' . $post->id) }}')">
+                                <button type="button" class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 0; color: var(--text-secondary);" onclick="sharePost({{ $post->id }}, '{{ url('/community/post/' . $post->id) }}')">
                                     <i class="bi bi-share"></i>
                                     مشاركة
                                 </button>
@@ -180,25 +192,25 @@
 
             <!-- Sidebar Info (Trends/Suggestions) -->
             <div class="col-lg-3 d-none d-lg-block" style="direction: rtl;">
-                <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 0; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
                     <div class="card-body">
-                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>نصائح المجتمع</h6>
+                        <h6 class="fw-bold mb-3" style="color: var(--heading-color) !important;"><i class="bi bi-lightbulb text-warning me-2"></i>نصائح المجتمع</h6>
                         <ul class="list-unstyled mb-0">
                             <li class="mb-3">
                                 <a href="#" class="text-decoration-none d-flex gap-2 align-items-start">
-                                    <div class="badge bg-success bg-opacity-10 text-success rounded-circle p-2"><i class="bi bi-droplets"></i></div>
+                                    <div class="badge bg-success bg-opacity-10 text-success p-2" style="border-radius: 0;"><i class="bi bi-droplets"></i></div>
                                     <div>
-                                        <div class="small fw-bold text-dark">أفضل وقت للري اليوم</div>
-                                        <div class="very-small text-muted">بناءً على التفاعل الأخير</div>
+                                        <div class="small fw-bold" style="color: var(--text-primary);">أفضل وقت للري اليوم</div>
+                                        <div class="very-small" style="color: var(--text-secondary);">بناءً على التفاعل الأخير</div>
                                     </div>
                                 </a>
                             </li>
                             <li class="mb-0">
                                 <a href="#" class="text-decoration-none d-flex gap-2 align-items-start">
-                                    <div class="badge bg-warning bg-opacity-10 text-warning rounded-circle p-2"><i class="bi bi-bug"></i></div>
+                                    <div class="badge bg-warning bg-opacity-10 text-warning p-2" style="border-radius: 0;"><i class="bi bi-bug"></i></div>
                                     <div>
-                                        <div class="small fw-bold text-dark">مكافحة دودة الطماطم</div>
-                                        <div class="very-small text-muted">نقاش نشط حالياً</div>
+                                        <div class="small fw-bold" style="color: var(--text-primary);">مكافحة دودة الطماطم</div>
+                                        <div class="very-small" style="color: var(--text-secondary);">نقاش نشط حالياً</div>
                                     </div>
                                 </a>
                             </li>
@@ -206,7 +218,7 @@
                     </div>
                 </div>
 
-                <div class="card border-0 shadow-sm sticky-top" style="border-radius: 12px; top: 120px;">
+                <div class="card border-0 shadow-sm sticky-top" style="border-radius: 0; top: 120px; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
                     <div class="card-body text-center p-4">
                         <img src="{{ asset('logo.png') }}" alt="Reefy" class="mb-3 opacity-50" style="height: 40px; filter: grayscale(1);">
                         <p class="very-small text-muted mb-0">جميع حقوق النشر محفوظة لـ ريفي 2026 &copy;</p>
@@ -231,10 +243,10 @@
                     <button class="btn btn-link text-dark p-0" onclick="closeComments()"><i class="bi bi-x-lg"></i></button>
                 </div>
             </div>
-            <div class="sheet-body p-3" id="commentsList" style="direction: rtl;">
+            <div class="sheet-body p-3" id="commentsList" style="direction: rtl; background-color: var(--bg-secondary);">
                 <!-- Comments will be loaded here -->
             </div>
-            <div class="sheet-footer border-top p-3 bg-white">
+            <div class="sheet-footer border-top p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important;">
                 <form onsubmit="postComment(event)" id="commentForm" style="direction: rtl;">
                     @csrf
                     <input type="hidden" name="post_id" id="sheetPostId">
@@ -244,8 +256,8 @@
                         <button type="button" class="btn btn-link very-small text-danger p-0 ms-2" onclick="cancelReply()">إلغاء</button>
                     </div>
                     <div class="d-flex gap-2">
-                        <textarea name="content" id="commentInput" class="form-control rounded-4 px-3 py-2 border-0 bg-light" rows="1" placeholder="أضف تعليقاً..." required style="resize: none;"></textarea>
-                        <button type="submit" class="btn btn-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <textarea name="content" id="commentInput" class="form-control px-3 py-2 border-0" rows="1" placeholder="أضف تعليقاً..." required style="resize: none; border-radius: 0; background-color: var(--bg-primary); color: var(--text-primary);"></textarea>
+                        <button type="submit" class="btn btn-success d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 0;">
                             <i class="bi bi-send-fill fs-6" style="transform: rotate(180deg);"></i>
                         </button>
                     </div>
@@ -260,6 +272,14 @@
         .last-child-mb-0:last-child { margin-bottom: 0 !important; }
         .card { transition: transform 0.2s ease-in-out; }
         .text-info { color: #00aeef !important; }
+        
+        .dropdown-item:hover { background-color: #f0f7f4; color: var(--reefy-success); }
+        .type-btn.active {
+            background-color: #e2eee8 !important;
+            border-color: var(--reefy-success) !important;
+            font-weight: bold;
+        }
+        .type-btn.active i { color: var(--reefy-primary) !important; }
         
         /* Bottom Sheet Styles */
         .comment-bottom-sheet {
@@ -298,8 +318,8 @@
             left: 0;
             width: 100%;
             height: 70%;
-            background: white;
-            border-radius: 20px 20px 0 0;
+            background: var(--bg-secondary);
+            border-radius: 0;
             transition: bottom 0.3s ease-out;
             display: flex;
             flex-direction: column;
@@ -313,7 +333,7 @@
             width: 40px;
             height: 5px;
             background: #e0e0e0;
-            border-radius: 10px;
+            border-radius: 0;
             margin: 10px auto;
         }
 
@@ -328,7 +348,7 @@
                 width: 50%;
                 left: 25%;
                 height: 80%;
-                border-radius: 20px 20px 0 0;
+                border-radius: 0;
             }
         }
     </style>
@@ -348,6 +368,14 @@
         function removeImage() {
             document.getElementById('postImage').value = "";
             document.getElementById('imagePreviewContainer').classList.add('d-none');
+        }
+
+        function selectPostType(type, element) {
+            document.getElementById('postTypeInput').value = type;
+            
+            // Update active state in buttons
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
         }
 
         // Like Functionality
@@ -371,13 +399,13 @@
                 const icon = btn.querySelector('i');
                 const countSpan = document.getElementById(`likesCount${postId}`);
 
-                if (data.status === 'liked') {
-                    btn.classList.add('text-danger', 'fw-bold', 'bg-danger', 'bg-opacity-10');
+                    btn.classList.add('fw-bold', 'bg-opacity-10');
                     btn.classList.remove('text-muted');
                     icon.classList.replace('bi-heart', 'bi-heart-fill');
                 } else {
                     btn.classList.remove('text-danger', 'fw-bold', 'bg-danger', 'bg-opacity-10');
-                    btn.classList.add('text-muted');
+                    btn.style.color = 'var(--text-secondary)';
+                    btn.classList.add('text-muted'); // We are removing this in next line if theme aware but let's just keep strict color
                     icon.classList.replace('bi-heart-fill', 'bi-heart');
                 }
                 countSpan.innerText = data.likes_count;
@@ -423,24 +451,24 @@
                 html += `
                     <div class="d-flex gap-2 mb-3">
                         <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem;">
+                            <div class="border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
                                 ${comment.user ? comment.user.name.charAt(0) : 'ز'}
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="bg-light p-2 rounded-3 shadow-sm px-3">
+                            <div class="p-2 shadow-sm px-3" style="border-radius: 0; background-color: var(--bg-primary);">
                                 <div class="d-flex justify-content-between">
-                                    <span class="fw-bold small">${comment.user ? comment.user.name : 'زائر ريفي'}</span>
+                                    <span class="fw-bold small" style="color: var(--heading-color);">${comment.user ? comment.user.name : 'زائر ريفي'}</span>
                                 </div>
-                                <p class="mb-0 small text-dark mt-1">${comment.content}</p>
+                                <p class="mb-0 small mt-1" style="color: var(--text-primary);">${comment.content}</p>
                             </div>
                             <div class="d-flex gap-2 mt-1 px-2">
-                                <button onclick="setReply(${comment.id}, '${comment.user.name}')" class="btn btn-link p-0 text-muted very-small text-decoration-none">رد</button>
-                                <span class="very-small text-muted opacity-50">منذ فترة</span>
+                                <button onclick="setReply(${comment.id}, '${comment.user.name}')" class="btn btn-link p-0 very-small text-decoration-none" style="color: var(--text-secondary);">رد</button>
+                                <span class="very-small opacity-50" style="color: var(--text-secondary);">منذ فترة</span>
                             </div>
                             
                             <!-- Replies -->
-                            <div class="replies-container ms-4 mt-2 border-end pe-3" style="border-right-width: 2px !important;">
+                            <div class="replies-container ms-4 mt-2 border-end pe-3" style="border-right-width: 2px !important; border-color: var(--border-color) !important;">
                                 ${renderReplies(comment.replies || [])}
                             </div>
                         </div>
@@ -456,14 +484,14 @@
                 html += `
                     <div class="d-flex gap-2 mb-2">
                         <div class="flex-shrink-0">
-                            <div class="rounded-circle bg-white border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 25px; height: 25px; font-size: 0.7rem;">
+                            <div class="border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 25px; height: 25px; font-size: 0.7rem; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
                                 ${reply.user ? reply.user.name.charAt(0) : 'ز'}
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <div class="bg-white border p-2 rounded-3 px-3">
-                                <span class="fw-bold small" style="font-size: 0.75rem;">${reply.user ? reply.user.name : 'زائر ريفي'}</span>
-                                <p class="mb-0 very-small text-dark mt-1">${reply.content}</p>
+                            <div class="border p-2 px-3" style="border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
+                                <span class="fw-bold small" style="font-size: 0.75rem; color: var(--heading-color);">${reply.user ? reply.user.name : 'زائر ريفي'}</span>
+                                <p class="mb-0 very-small mt-1" style="color: var(--text-primary);">${reply.content}</p>
                             </div>
                         </div>
                     </div>

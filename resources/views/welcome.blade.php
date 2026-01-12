@@ -1,1 +1,260 @@
-<!DOCTYPE html> <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl"> <head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1"> <title>Reefy - Smart Agriculture</title> <!-- Bootstrap 5 CSS --> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css"> <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"> <!-- Fonts --> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet"> <style> :root { --soil-primary: #795548; /* Brown 500 */ --soil-dark: #3E2723; /* Brown 900 */ --soil-light: #D7CCC8; /* Brown 100 */ --plant-green: #2E7D32; /* Green 800 */ } html { scroll-behavior: smooth; scroll-snap-type: y mandatory; } body { font-family: 'Cairo', sans-serif; background-color: #faf9f6; /* Off-white / Eggshell */ margin: 0; } .text-soil { color: var(--soil-primary) !important; } .bg-soil { background-color: var(--soil-primary) !important; } .btn-soil { background-color: var(--soil-primary); border-color: var(--soil-primary); color: white; } .btn-soil:hover { background-color: var(--soil-dark); border-color: var(--soil-dark); color: white; } .navbar-brand { font-weight: 700; color: #ffffff !important; /* White logo to pop on brown */ } /* Navbar Transitions */ .navbar { transition: all 0.3s ease-in-out; padding-top: 1.5rem; padding-bottom: 1.5rem; } /* Transparent State (Default) */ .navbar-transparent { background-color: transparent !important; border-bottom: none; } .navbar-transparent .nav-link { color: rgba(255, 255, 255, 0.95); font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.4); } .navbar-transparent .nav-link:hover { color: #ffffff; } .navbar-transparent .navbar-brand { color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.4); } .navbar-transparent .btn-outline-light { border-color: rgba(255,255,255,0.8); color: white; } /* Scrolled State (White Background) */ .navbar-scrolled { background-color: #ffffff !important; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important; padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; } .navbar-scrolled .nav-link { color: var(--soil-primary) !important; /* Brown Text */ text-shadow: none; } .navbar-scrolled .nav-link:hover { color: var(--soil-dark) !important; } .navbar-scrolled .navbar-brand { color: var(--plant-green) !important; /* Green Logo */ text-shadow: none; } .navbar-scrolled .btn-outline-light { border-color: var(--plant-green); color: var(--plant-green); } .navbar-scrolled .btn-outline-light:hover { background-color: var(--plant-green); color: white; } /* Hero Section Overlay */ .hero-section { height: 100vh; /* Full viewport height */ /* High Quality Image + Top Gradient for Navbar Readability */ background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 40%), /* Stronger top gradient for text */ linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), /* General overlay */ url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=95'); background-size: cover; background-position: center; background-attachment: fixed; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; border-bottom: none; margin-bottom: 0 !important; } /* Flip Cards */ .flip-card { background-color: transparent; height: 450px; /* Taller card */ perspective: 1000px; /* Remove if you don't want the 3D effect */ cursor: pointer; } .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.8s; transform-style: preserve-3d; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.1); border-radius: 15px; } /* Flip on Hover */ .flip-card:hover .flip-card-inner { transform: rotateY(180deg); } .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; /* Safari */ backface-visibility: hidden; border-radius: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; } .flip-card-front { background-color: white; color: black; } .flip-card-back { background-color: var(--soil-primary); color: white; transform: rotateY(180deg); background-size: cover; background-position: center; position: relative; } /* Dark overlay for text readability on back */ .flip-card-back::before { content: ""; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); border-radius: 15px; z-index: 0; } .flip-card-back * { position: relative; z-index: 1; } /* Main Features Section */ .features-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #faf9f6; padding: 4rem 0; } </style> </head> <body class="antialiased"> <nav class="navbar navbar-expand-lg navbar-dark navbar-transparent fixed-top"> <div class="container"> <a class="navbar-brand fs-3" href="#"> <i class="bi bi-tree-fill text-white"></i> Reefy </a> <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"> <span class="navbar-toggler-icon"></span> </button> <div class="collapse navbar-collapse" id="navbarNav"> <ul class="navbar-nav ms-auto gap-2"> @if (Route::has('login')) @auth <li class="nav-item"> <a href="{{ url('/dashboard') }}" class="btn btn-outline-light">Dashboard</a> </li> @else <li class="nav-item"> <a href="{{ route('login') }}" class="nav-link">Log in</a> </li> @if (Route::has('register')) <li class="nav-item"> <a href="{{ route('register') }}" class="btn btn-light text-soil fw-bold">Register</a> </li> @endif @endauth @endif </ul> </div> </div> </nav> <header class="hero-section text-center"> <div class="container"> <h1 class="display-3 fw-bold mb-3">Welcome to Reefy</h1> <p class="lead mb-4 fs-4">The Smart Agricultural Platform for Modern Farming</p> <p class="mb-4">Connect, Grow, and Thrive with technology designed for your field.</p> @if (Route::has('register')) <a href="{{ route('register') }}" class="btn btn-light btn-lg px-5 fw-bold text-success shadow-lg">Join the Community</a> @endif </div> </header> <section class="features-section"> <div class="container"> <div class="row g-5 text-center px-4"> <!-- Card 1: Crop Management --> <div class="col-md-4"> <div class="flip-card"> <div class="flip-card-inner"> <div class="flip-card-front shadow-sm"> <div class="mb-4 text-success"> <i class="bi bi-flower1 display-1"></i> </div> <h3 class="card-title h3 fw-bold mb-3">Crop Management</h3> <p class="text-muted fs-5 px-3">Advanced tracking for your soil and harvest.</p> </div> <div class="flip-card-back" style="background-image: url('https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"> <h3 class="fw-bold mb-3">Smart Monitoring</h3> <p class="fs-5">Track growth stages, irrigation schedules, and get AI-driven insights for maximum yield.</p> <i class="bi bi-arrow-right-circle fs-1 mt-3"></i> </div> </div> </div> </div> <!-- Card 2: Marketplace --> <div class="col-md-4"> <div class="flip-card"> <div class="flip-card-inner"> <div class="flip-card-front shadow-sm"> <div class="mb-4 text-warning"> <i class="bi bi-basket display-1"></i> </div> <h3 class="card-title h3 fw-bold mb-3">Marketplace</h3> <p class="text-muted fs-5 px-3">Direct sales. zero intermediaries.</p> </div> <div class="flip-card-back" style="background-image: url('https://images.unsplash.com/photo-1488459716781-31db52582fe9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"> <h3 class="fw-bold mb-3">Sell Directly</h3> <p class="fs-5">Connect with buyers instantly. List your fresh produce and secure the best market prices.</p> <i class="bi bi-shop fs-1 mt-3"></i> </div> </div> </div> </div> <!-- Card 3: Expert Advice --> <div class="col-md-4"> <div class="flip-card"> <div class="flip-card-inner"> <div class="flip-card-front shadow-sm"> <div class="mb-4 text-info"> <i class="bi bi-mortarboard display-1"></i> </div> <h3 class="card-title h3 fw-bold mb-3">Expert Advice</h3> <p class="text-muted fs-5 px-3">Professional guidance at your fingertips.</p> </div> <div class="flip-card-back" style="background-image: url('https://images.unsplash.com/photo-1556740714-a8395b3bf3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"> <h3 class="fw-bold mb-3">Expert Support</h3> <p class="fs-5">Chat with certified agronomists to diagnose diseases and optimize your farming strategy.</p> <i class="bi bi-chat-dots fs-1 mt-3"></i> </div> </div> </div> </div> </div> </div> </section> <footer class="text-white text-center py-4" style="background-color: var(--soil-dark);"> <div class="container"> <p class="mb-0">&copy; {{ date('Y') }} Reefy. All rights reserved.</p> <small class="text-white-50">Designed for Farmers, Built with Love.</small> </div> </footer> <!-- Navbar Scroll Script --> <script> window.addEventListener('scroll', function() { const navbar = document.querySelector('.navbar'); const brandIcon = document.querySelector('.navbar-brand i'); const btnSoil = document.querySelector('.btn-light.text-soil, .btn-soil'); // Flexible selector if (window.scrollY > 50) { // SCROLLED STATE navbar.classList.add('navbar-scrolled', 'navbar-light'); navbar.classList.remove('navbar-transparent', 'navbar-dark'); if(brandIcon) { brandIcon.classList.remove('text-white'); brandIcon.classList.add('text-success'); } // Register Button: White -> Brown if(btnSoil) { btnSoil.classList.remove('btn-light', 'text-soil'); btnSoil.classList.add('btn-soil'); } } else { // TOP STATE navbar.classList.add('navbar-transparent', 'navbar-dark'); navbar.classList.remove('navbar-scrolled', 'navbar-light'); if(brandIcon) { brandIcon.classList.remove('text-success'); brandIcon.classList.add('text-white'); } // Register Button: Brown -> White if(btnSoil) { btnSoil.classList.remove('btn-soil'); btnSoil.classList.add('btn-light', 'text-soil'); } } }); </script> <!-- Bootstrap 5 JS --> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> </body> </html>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reefy - Smart Agriculture</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        // Theme Initialization
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+    </script>
+    <style>
+            :root {
+                --reefy-primary: #3f6212;       /* Deep Olive */
+                --reefy-success: #84cc16;       /* Vibrant Lime */
+                --reefy-accent: #a3e635;        /* Bright Leaf */
+                --reefy-soft: #f7fee7;
+                --bg-primary: #ffffff;
+                --text-primary: #333333;
+                --card-bg: #ffffff;
+                --border-color: #f1f5f9;
+            }
+
+            [data-bs-theme="dark"] {
+                --reefy-primary: #ecfccb;
+                --reefy-success: #84cc16;
+                --reefy-soft: #1a2e05;
+                --bg-primary: #0a0f02;
+                --text-primary: #ecfccb;
+                --card-bg: #141d05;
+                --border-color: rgba(255,255,255,0.1);
+            }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Outfit', 'Cairo', sans-serif;
+            background-color: var(--bg-primary);
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .text-reefy { color: var(--reefy-primary) !important; }
+        .bg-reefy { background-color: var(--reefy-primary) !important; }
+        
+        .btn-reefy {
+            background: var(--reefy-success);
+            border: none;
+            color: white;
+            font-weight: 700;
+            padding: 0.8rem 2rem;
+            border-radius: 0px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 0px #3f6212;
+        }
+        .btn-reefy:hover {
+            transform: translateY(1px);
+            box-shadow: 0 3px 0px #3f6212;
+            color: white;
+            filter: brightness(110%);
+        }
+
+        .navbar {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        .navbar-transparent .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+        .navbar-scrolled {
+            background: var(--bg-primary) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
+        .navbar-scrolled .nav-link { color: var(--reefy-primary) !important; }
+        .navbar-scrolled .navbar-brand { color: var(--reefy-success) !important; }
+
+        .hero-section {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.2)),
+                        url('https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .feature-card {
+            border: 1px solid var(--border-color);
+            border-radius: 0px;
+            padding: 2.5rem;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+            border-color: var(--reefy-success);
+        }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--reefy-soft);
+            color: var(--reefy-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0px;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-transparent fixed-top">
+        <div class="container">
+            <a class="navbar-brand fs-3 fw-bold d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-intersect"></i> Reefy
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="bi bi-list fs-2 text-white"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-3 align-items-center">
+                    @if (Route::has('login'))
+                        @auth
+                            <li class="nav-item">
+                                <a href="{{ url('/dashboard') }}" class="btn btn-reefy py-2 px-4 shadow">لوحة التحكم</a>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a href="{{ route('login') }}" class="nav-link px-3">تسجيل الدخول</a>
+                            </li>
+                            @if (Route::has('register'))
+                                <li class="nav-item">
+                                    <a href="{{ route('register') }}" class="btn btn-light text-success fw-bold py-2 px-4 rounded-3 shadow">انضم إلينا</a>
+                                </li>
+                            @endif
+                        @endauth
+                    @endif
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <h1 class="hero-title">مستقبل الزراعة بين يديك</h1>
+                    <p class="lead mb-5 fs-4 opacity-90">منصة "ريفي" هي شريكك الذكي لإدارة مزرعتك بفعالية، التواصل مع الخبراء، والنمو بمحاصيلك إلى آفاق جديدة.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ route('register') }}" class="btn btn-reefy btn-lg px-5 py-3 shadow-lg">ابدأ رحلتك الآن</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-5 py-3 border-2">اكتشف المميزات</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="py-5" style="background-color: var(--bg-primary);">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold" style="color: var(--text-primary);">لماذا تختار ريفي؟</h2>
+                <p class="text-muted">نقدم حلولاً تقنية متكاملة صممت خصيصاً للمزارع العربي</p>
+            </div>
+            <div class="row g-4 text-end">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">تتبع ذكي للنمو</h4>
+                        <p class="text-muted small">راقب مراحل نمو محاصيلك بدقة واحصل على تنبيهات ذكية لمواعيد الري والتسميد.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">استشارات الخبراء</h4>
+                        <p class="text-muted small">تواصل مباشرة مع نخبة من الخبراء الزراعيين للحصول على نصائح دقيقة لمشكلات مزرعتك.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <h4 class="fw-bold mb-3">مجتمع تعاوني</h4>
+                        <p class="text-muted small">شارك تجاربك مع مزارعين آخرين، وتبادل المعرفة والخبرات في أكبر مجتمع زراعي رقمي.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer or Final CTA -->
+    <section class="py-5" style="background: var(--reefy-soft);">
+        <div class="container text-center py-4">
+            <h3 class="fw-bold mb-4">هل أنت جاهز لتطوير مزرعتك؟</h3>
+            <a href="{{ route('register') }}" class="btn btn-reefy btn-lg px-5 shadow">سجل مجاناً اليوم</a>
+        </div>
+    </section>
+
+    <!-- Navbar Scroll Script -->
+    <script>
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            const navBtn = document.querySelector('.navbar .btn-light');
+
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+                navbar.classList.remove('navbar-transparent', 'navbar-dark');
+                navbar.classList.add('navbar-light');
+                if(navBtn) {
+                    navBtn.classList.remove('btn-light');
+                    navBtn.classList.add('btn-reefy');
+                    navBtn.classList.remove('text-success');
+                }
+            } else {
+                navbar.classList.add('navbar-transparent', 'navbar-dark');
+                navbar.classList.remove('navbar-scrolled', 'navbar-light');
+                if(navBtn) {
+                    navBtn.classList.add('btn-light');
+                    navBtn.classList.remove('btn-reefy');
+                    navBtn.classList.add('text-success');
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl" data-bs-theme="light">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +12,15 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
         
+        <script>
+            // Theme Initialization
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+        </script>
+        
         <!-- Icons -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
         
@@ -23,53 +32,68 @@
 
         <style>
             :root {
-                /* Premium Agricultural Palette */
-                --reefy-primary: #1b4332;       /* Deep Forest */
-                --reefy-success: #2d6a4f;       /* Emerald Forest */
-                --reefy-accent: #40916c;        /* Vibrant Leaf Green */
-                --reefy-primary-soft: #f0f7f4;
-                --reefy-border: rgba(0,0,0,0.06);
+                /* Vibrant Leaf Green Palette (Inspired by Image) */
+                --reefy-primary: #3f6212;       /* Deep Olive */
+                --reefy-success: #84cc16;       /* Vibrant Lime */
+                --reefy-accent: #a3e635;        /* Bright Leaf */
+                --reefy-primary-soft: var(--brand-soft);
+                --reefy-border: var(--border-color);
             }
 
-            body { font-family: 'Outfit', 'Cairo', sans-serif; background-color: #fcfdfc; color: #333; }
+            [data-bs-theme="dark"] {
+                --reefy-primary: #ecfccb;
+                --reefy-border: rgba(255,255,255,0.1);
+                --reefy-primary-soft: #1a2e05;
+            }
 
-            /* Premium Action Button (Revisited) */
+            body { font-family: 'Outfit', 'Cairo', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); }
+
+            /* Sharp & Solid Buttons */
             .btn-success { 
-                background: linear-gradient(135deg, var(--reefy-success), var(--reefy-primary)) !important;
+                background: var(--reefy-success) !important;
                 border: none !important;
                 color: white !important;
                 font-weight: 700;
                 letter-spacing: 0.02em;
-                box-shadow: 0 4px 12px rgba(45, 106, 79, 0.25);
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                border-radius: 12px !important;
+                box-shadow: 0 4px 0px #3f6212; /* Unique flat thick shadow style */
+                transition: all 0.2s ease;
+                border-radius: 0px !important;
             }
             
             .btn-success:hover { 
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(45, 106, 79, 0.35);
+                transform: translateY(1px);
+                box-shadow: 0 3px 0px #3f6212;
                 filter: brightness(110%);
             }
 
             .btn-success:active {
-                transform: translateY(0);
+                transform: translateY(4px);
+                box-shadow: none;
             }
 
             .btn-outline-success { 
                 color: var(--reefy-success) !important; 
                 border: 2px solid var(--reefy-success) !important;
                 font-weight: 700;
-                border-radius: 12px !important;
+                border-radius: 0px !important;
             }
             .btn-outline-success:hover { 
                 background: var(--reefy-success) !important; 
                 color: white !important; 
             }
 
+            .alert { border-radius: 0px !important; border: 1px solid rgba(0,0,0,0.1); }
+            .card { border-radius: 0px !important; }
+            .modal-content { border-radius: 0px !important; }
+
             /* Text & Background Utilities */
             .text-success { color: var(--reefy-success) !important; }
             .bg-success { background-color: var(--reefy-success) !important; }
-            .bg-light { background-color: #f8faf9 !important; }
+            .bg-light { background-color: var(--bg-primary) !important; }
+            .card { background-color: var(--card-bg) !important; border-color: var(--border-color) !important; }
+            .bg-white { background-color: var(--bg-secondary) !important; }
+            .text-dark { color: var(--heading-color) !important; }
+            .text-muted { color: var(--text-secondary) !important; }
 
             /* Micro-animations */
             @keyframes pulse-status {
@@ -86,21 +110,21 @@
             /* Custom Scrollbar for better UX */
             ::-webkit-scrollbar { width: 8px; }
             ::-webkit-scrollbar-track { background: #f1f1f1; }
-            ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+            ::-webkit-scrollbar-thumb { background: #888; border-radius: 0px; }
             ::-webkit-scrollbar-thumb:hover { background: #555; }
         </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="d-flex min-vh-100 bg-light flex-column flex-lg-row">
+        <div class="d-flex min-vh-100 flex-column flex-lg-row" style="background-color: var(--bg-primary);">
             <!-- Sidebar Navigation -->
             @include('layouts.navigation')
 
             <!-- Main Content Area -->
             <div class="flex-grow-1 overflow-hidden d-flex flex-column">
                 <!-- Mobile Header (Visible only on mobile) -->
-                <header class="d-lg-none bg-white shadow-sm p-3 d-flex justify-content-between align-items-center sticky-top" style="z-index: 1040;">
-                    <button class="btn btn-light border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
-                        <i class="bi bi-list fs-3"></i>
+                <header class="d-lg-none shadow-sm p-3 d-flex justify-content-between align-items-center sticky-top" style="z-index: 1040; background-color: var(--bg-secondary);">
+                    <button class="btn border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" style="background-color: var(--bg-primary);">
+                        <i class="bi bi-list fs-3" style="color: var(--text-primary);"></i>
                     </button>
                     <div class="fw-bold fs-4 text-success d-flex align-items-center gap-2">
                         <i class="bi bi-intersect"></i> Reefy
@@ -110,7 +134,7 @@
 
                 <!-- Page Heading (Desktop/Global Header) -->
                 @if (isset($header))
-                    <header class="bg-white shadow-sm py-4 px-4 sticky-top d-none d-lg-block" style="z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(10px); background: rgba(255,255,255,0.8) !important;">
+                    <header class="bg-white shadow-sm py-4 px-4 sticky-top d-none d-lg-block" style="z-index: 1000; border-bottom: 1px solid var(--reefy-border); backdrop-filter: blur(10px); background: var(--bg-secondary) !important;">
                         <div class="container-fluid">
                             {{ $header }}
                         </div>
@@ -120,8 +144,8 @@
                 <!-- Content Area -->
                 <main class="container-fluid py-4 px-4 flex-grow-1">
                     @if(session('success'))
-                        <div class="alert alert-success d-flex align-items-center mb-4 shadow-sm border-0 rounded-4" role="alert">
-                            <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+                        <div class="alert alert-success d-flex align-items-center mb-4 shadow-sm border-0" role="alert" style="background: var(--bg-secondary); border-right: 5px solid var(--reefy-success) !important;">
+                            <i class="bi bi-check-circle-fill fs-4 me-2 text-success"></i>
                             <div>
                                 {{ session('success') }}
                             </div>
@@ -129,8 +153,8 @@
                     @endif
 
                     @if(session('error'))
-                        <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm border-0 rounded-4" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+                        <div class="alert alert-danger d-flex align-items-center mb-4 shadow-sm border-0" role="alert" style="background: var(--bg-secondary); border-right: 5px solid #dc2626 !important;">
+                            <i class="bi bi-exclamation-triangle-fill fs-4 me-2 text-danger"></i>
                             <div>
                                 {{ session('error') }}
                             </div>
@@ -153,14 +177,14 @@
         <!-- Notification Permission Modal -->
         <div class="modal fade" id="notificationPermissionModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg relative rounded-4 overflow-hidden">
+                <div class="modal-content border-0 shadow-lg relative overflow-hidden">
                      <div class="modal-header bg-success text-white border-0 py-4 justify-content-center flex-column align-items-center">
                         <i class="bi bi-bell-fill display-4 mb-2"></i>
                         <h5 class="modal-title fw-bold">نظام التذكير الذكي</h5>
                     </div>
                     <div class="modal-body p-4 text-center">
                         <p class="lead mb-4 text-muted">لا تفوت مهامك الزراعية!</p>
-                        <p class="mb-4 text-start bg-light p-3 rounded-3 border">
+                        <p class="mb-4 text-start p-3 rounded-0 border" style="background-color: var(--bg-primary);">
                             نحتاج إذنك لإرسال <strong>إشعارات تذكير</strong> لك عند:
                             <br>
                             <i class="bi bi-check-circle-fill text-success ms-2"></i> موعد المهمة المحدد.
@@ -202,9 +226,9 @@
                 const icon = isOverdue ? 'bi-exclamation-triangle-fill' : 'bi-stars';
                 
                 const toastHtml = `
-                    <div id="${toastId}" class="toast border-0 shadow-lg mb-3 overflow-hidden rounded-4" role="alert" aria-live="assertive" aria-atomic="true" style="pointer-events: auto; background: ${bgColor}; backdrop-filter: blur(10px); min-width: 320px;">
+                    <div id="${toastId}" class="toast border-0 shadow-lg mb-3 overflow-hidden" role="alert" aria-live="assertive" aria-atomic="true" style="pointer-events: auto; background: ${bgColor}; backdrop-filter: blur(10px); min-width: 320px; border-radius: 0;">
                         <div class="d-flex align-items-center p-3 text-white">
-                            <div class="bg-white bg-opacity-20 rounded-circle p-2 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                            <div class="bg-white bg-opacity-20 rounded-0 p-2 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
                                 <i class="bi ${icon} fs-4"></i>
                             </div>
                             <div class="flex-grow-1">
@@ -303,7 +327,7 @@
                                     html += `
                                         <a href="{{ url('/notifications') }}" class="list-group-item list-group-item-action p-3 border-0 border-bottom">
                                             <div class="d-flex align-items-start gap-3">
-                                                <div class="bg-light rounded-circle p-2">
+                                                <div class="bg-light rounded-0 p-2">
                                                     <i class="bi ${icon} ${color}"></i>
                                                 </div>
                                                 <div class="flex-grow-1">

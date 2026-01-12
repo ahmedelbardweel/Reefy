@@ -9,15 +9,43 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * كونترولر المصادقة API - Auth Controller
+ * 
+ * هذا الكونترولر مسؤول عن عمليات المصادقة لـ API (للتطبيق الأندرويد):
+ * - التسجيل (register)
+ * - تسجيل الدخول (login)
+ * - تسجيل الخروج (logout)
+ * - الحصول على معلومات الملف الشخصي (profile)
+ * 
+ * العلاقات:
+ * - User: hasOne FarmerProfile أو ExpertProfile حسب الدور
+ * 
+ * يستخدم Laravel Sanctum للتوكنات (API tokens)
+ */
 class AuthController extends ApiController
 {
     /**
-     * Register api
-     *
-     * @return \Illuminate\Http\Response
+     * تسجيل مستخدم جديد API
+     * 
+     * تقوم هذه الدالة بـ:
+     * - التحقق من صحة البيانات (الاسم، البريد، كلمة المرور، الدور)
+     * - تشفير كلمة المرور
+     * - تعيين حالة المستخدم إلى 'pending' (بانتظار إكمال الملف الشخصي)
+     * - إنشاء المستخدم في قاعدة البيانات
+     * - إنشاء ملف شخصي فارغ حسب الدور (FarmerProfile أو ExpertProfile)
+     * - إنشاء توكن للمستخدم (API token)
+     * - إرجاع استجابة JSON تحتوي على: التوكن، الاسم، الدور
+     * 
+     * الأدوار المتاحة: farmer, expert
+     * حالات المستخدم: pending (بانتظار إكمال الملف), active (نشط)
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
+        // التحقق من البيانات
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
@@ -33,18 +61,19 @@ class AuthController extends ApiController
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
         
-        // Default status
-        $input['status'] = 'pending'; // Default pending until profile completion
+        // الحالة الافتراضية: pending حتى يكمل الملف الشخصي
+        $input['status'] = 'pending';
 
         $user = User::create($input);
         
-        // Initialize appropriate profile based on role
+        // إنشاء ملف شخصي حسب الدور
         if ($user->role === 'farmer') {
             $user->farmerProfile()->create();
         } elseif ($user->role === 'expert') {
             $user->expertProfile()->create();
         }
 
+        // إنشاء توكن API
         $success['token'] =  $user->createToken('ReefyApp')->plainTextToken;
         $success['name'] =  $user->name;
         $success['role'] =  $user->role;
@@ -53,14 +82,26 @@ class AuthController extends ApiController
     }
 
     /**
-     * Login api
-     *
-     * @return \Illuminate\Http\Response
+     * تسجيل دخول المستخدم API
+     * 
+     * تقوم هذه الدالة بـ:
+     * - محاولة المصادقة باستخدام البريد الإلكتروني وكلمة المرور
+     * - في حالة النجاح:
+     *   * إنشاء توكن API جديد للمستخدم
+     *   * إرجاع: التوكن، الاسم، الدور، رقم المستخدم
+     * - في حالة الفشل:
+     *   * إرجاع خطأ Unauthorised مع HTTP code 401
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
+        // محاولة تسجيل الدخول
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
             $user = Auth::user(); 
+            
+            // إنشاء توكن جديد
             $success['token'] =  $user->createToken('ReefyApp')->plainTextToken; 
             $success['name'] =  $user->name;
             $success['role'] =  $user->role;
@@ -74,23 +115,40 @@ class AuthController extends ApiController
     }
 
     /**
-     * Logout api
-     *
-     * @return \Illuminate\Http\Response
+     * تسجيل خروج المستخدم API
+     * 
+     * تقوم هذه الدالة بـ:
+     * - حذف التوكن الحالي للمستخدم (تسجيل الخروج)
+     * - إرجاع استجابة نجاح
+     * 
+     * ملاحظة: يتم المصادقة عبر التوكن في الـ header
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request) {
+        // حذف التوكن الحالي
         $request->user()->currentAccessToken()->delete();
         return $this->successResponse([], 'User logged out successfully.');
     }
 
     /**
-     * Get authenticated user profile
-     *
-     * @return \Illuminate\Http\Response
+     * الحصول على معلومات المستخدم الحالي
+     * 
+     * تقوم هذه الدالة بـ:
+     * - جلب بيانات المستخدم المصادق عليه (عبر التوكن)
+     * - تحميل الملف الشخصي (FarmerProfile أو ExpertProfile)
+     * - إرجاع كامل بيانات المستخدم مع ملفه الشخصي
+     * 
+     * العلاقات: User hasOne FarmerProfile, User hasOne ExpertProfile
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function profile(Request $request) {
         $user = $request->user();
-        $user->load(['farmerProfile', 'expertProfile']); // Eager load profile data
+        // تحميل الملف الشخصي
+        $user->load(['farmerProfile', 'expertProfile']);
         return $this->successResponse($user, 'User profile retrieved successfully.');
     }
 }

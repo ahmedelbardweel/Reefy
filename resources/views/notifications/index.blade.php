@@ -32,15 +32,15 @@
                             <div class="d-flex align-items-start">
                                 <div class="flex-shrink-0 me-3">
                                     @if($notification->type === 'task_due')
-                                        <div class="bg-warning bg-opacity-10 rounded-circle p-2">
+                                        <div class="bg-warning bg-opacity-10 p-2" style="border-radius: 0;">
                                             <i class="bi bi-exclamation-triangle-fill text-warning fs-4"></i>
                                         </div>
                                     @elseif($notification->type === 'task_overdue')
-                                        <div class="bg-danger bg-opacity-10 rounded-circle p-2">
+                                        <div class="bg-danger bg-opacity-10 p-2" style="border-radius: 0;">
                                             <i class="bi bi-clock-history text-danger fs-4"></i>
                                         </div>
                                     @else
-                                        <div class="bg-info bg-opacity-10 rounded-circle p-2">
+                                        <div class="bg-info bg-opacity-10 p-2" style="border-radius: 0;">
                                             <i class="bi bi-info-circle-fill text-info fs-4"></i>
                                         </div>
                                     @endif

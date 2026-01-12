@@ -77,6 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:expert')->group(function () {
         Route::get('/expert/consultations', [App\Http\Controllers\ConsultationController::class, 'expertIndex'])->name('expert.consultations.index');
         Route::post('/consultations/{consultation}/answer', [App\Http\Controllers\ConsultationController::class, 'answer'])->name('consultations.answer');
+        
+        // Expert Tips
+        Route::post('/expert/tips', [App\Http\Controllers\ExpertTipController::class, 'store'])->name('expert.tips.store');
+        Route::put('/expert/tips/{expertTip}', [App\Http\Controllers\ExpertTipController::class, 'update'])->name('expert.tips.update');
+        Route::delete('/expert/tips/{expertTip}', [App\Http\Controllers\ExpertTipController::class, 'destroy'])->name('expert.tips.destroy');
     });
 });
 

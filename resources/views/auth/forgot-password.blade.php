@@ -25,22 +25,22 @@
         </div>
 
         <!-- Right Section: Form -->
-        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-white p-4 p-md-5">
+        <div class="col-lg-6 d-flex align-items-center justify-content-center p-4 p-md-5" style="background-color: var(--bg-secondary);">
             <div class="w-100" style="max-width: 440px;">
                 
                 <!-- Brand Mobile -->
                 <div class="d-flex justify-content-center mb-5 d-lg-none">
                     <div class="d-flex align-items-center gap-2">
                         <span class="fs-2 fw-bold text-dark">ريفي</span>
-                        <div class="bg-success text-white rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #2d6a4f, #1b4332) !important;">
+                        <div class="bg-success text-white rounded-3 p-1 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: linear-gradient(135deg, #84cc16, #3f6212) !important;">
                             <i class="bi bi-layers-half fs-4"></i>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-5 text-end">
-                    <h1 class="fw-bold mb-3 h2" style="color: var(--reefy-primary); font-family: 'Cairo', sans-serif;">نسيت كلمة المرور؟</h1>
-                    <p class="text-muted">لا مشكلة. أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور فوراً.</p>
+                    <h1 class="fw-bold mb-3 h2" style="color: var(--heading-color) !important; font-family: 'Cairo', sans-serif;">نسيت كلمة المرور؟</h1>
+                    <p class="text-muted" style="color: var(--text-secondary) !important;">لا مشكلة. أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور فوراً.</p>
                 </div>
 
                 <!-- Session Status -->
@@ -51,24 +51,24 @@
                     
                     <!-- Email -->
                     <div class="mb-5">
-                        <label for="email" class="form-label fw-semibold mb-2 text-end d-block" style="color: #495057;">البريد الإلكتروني</label>
+                        <label for="email" class="form-label fw-semibold mb-2 text-end d-block" style="color: var(--text-secondary);">البريد الإلكتروني</label>
                         <div class="position-relative">
                             <input type="email" 
-                                   class="form-control form-control-lg text-end border-0 ps-4 pe-5" 
+                                   class="form-control form-control-lg text-end border-0 ps-4 pe-5 theme-input" 
                                    id="email" 
                                    name="email" 
                                    value="{{ old('email') }}" 
                                    required 
                                    autofocus 
                                    placeholder="name@example.com"
-                                   style="background: #f1f8f5; border-radius: 12px; height: 56px; font-size: 0.95rem; border: 1.5px solid transparent !important; transition: all 0.2s ease;">
+                                   style="background: var(--bg-primary); color: var(--text-primary); border-radius: 0px !important; height: 56px; font-size: 0.95rem; border: 1.5px solid var(--border-color) !important; transition: all 0.2s ease;">
                             <i class="bi bi-envelope position-absolute top-50 translate-middle-y end-0 me-3 text-muted"></i>
                         </div>
                         <x-input-error :messages="$errors->get('email')" class="mt-2 text-danger small text-end" />
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold rounded-3 shadow-sm border-0 mb-4" 
-                            style="height: 56px; font-size: 1.1rem; border-radius: 14px !important;">
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow-sm border-0 mb-4" 
+                            style="height: 56px; font-size: 1.1rem; border-radius: 0px !important; background: var(--reefy-primary) !important; color: white !important;">
                         إرسال رابط إعادة التعيين
                     </button>
                     
@@ -85,10 +85,11 @@
     <!-- Micro-interactions Style -->
     <style>
         input:focus {
-            background: #ffffff !important;
-            border-color: #2d6a4f !important;
-            box-shadow: 0 0 0 4px rgba(45, 106, 79, 0.1) !important;
+            background: var(--bg-secondary) !important;
+            border-color: var(--reefy-success) !important;
+            box-shadow: 0 0 0 4px rgba(132, 204, 22, 0.1) !important;
             outline: none;
+            color: var(--text-primary) !important;
         }
         .backdrop-blur { backdrop-filter: blur(10px); }
         .text-mint { color: #8ef9d5; }
