@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\FarmerSystemController;
 use App\Http\Controllers\Api\ExpertDashboardController;
 use App\Http\Controllers\Api\ExpertTipController;
 use App\Http\Controllers\Api\FarmerProfileController;
+use App\Http\Controllers\Api\ProfileController;
 
 // Public Routes (Auth)
 Route::controller(AuthController::class)->group(function(){
@@ -36,16 +37,25 @@ Route::controller(AuthController::class)->group(function(){
 Route::middleware('auth:sanctum')->group( function () {
     // Auth & Profile
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::get('profile', [AuthController::class, 'profile']);
+    
+    // User Profile API
+    Route::get('profile', [ProfileController::class, 'index']);
+    Route::put('profile', [ProfileController::class, 'update']);
+    Route::post('profile/images', [ProfileController::class, 'updateImages']);
+    
+    Route::post('profile/fcm-token', [AuthController::class, 'updateFcmToken']);
     
     // Farmer Profile Update
     Route::post('farmer/profile/update', [FarmerProfileController::class, 'update']);
 
     // --- Farmer Core Features ---
     Route::apiResource('crops', CropController::class);
+    Route::post('crops/{id}/logs', [CropController::class, 'recordLog']);
     
     // Tasks (Linked to Crops)
     Route::get('crops/{crop}/tasks', [TaskController::class, 'index']);
+    Route::get('tasks/upcoming', [TaskController::class, 'upcoming']);
+    Route::get('/tasks/overdue', [TaskController::class, 'overdue']);
     Route::post('crops/{crop}/tasks', [TaskController::class, 'store']);
     Route::post('tasks/{task}/complete', [TaskController::class, 'complete']);
 
@@ -53,6 +63,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::get('community/posts', [CommunityController::class, 'index']);
     Route::post('community/posts', [CommunityController::class, 'store']);
     Route::get('community/posts/{id}', [CommunityController::class, 'show']);
+    Route::get('community/posts/{id}/comments', [CommunityController::class, 'getComments']);
     Route::post('community/posts/{id}/like', [CommunityController::class, 'like']);
     Route::post('community/posts/{id}/comment', [CommunityController::class, 'comment']);
 

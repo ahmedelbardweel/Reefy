@@ -23,7 +23,10 @@ class NotificationController extends ApiController
      */
     public function index()
     {
-        $notifications = auth()->user()->notifications()->latest()->paginate(15);
+        $notifications = auth()->user()->notifications()
+            ->with('task.crop')
+            ->latest()
+            ->paginate(15);
         
         return $this->successResponse($notifications, 'Notifications retrieved successfully.');
     }

@@ -30,7 +30,17 @@ class Crop extends Model
         'description',
     ];
 
-    protected $appends = ['growth_stage_label', 'status_label', 'status_color', 'image_url'];
+    protected $appends = ['growth_stage_label', 'status_label', 'status_color', 'image_url', 'growth_progress', 'area_size'];
+
+    public function getGrowthProgressAttribute()
+    {
+        return $this->growth_percentage;
+    }
+
+    public function getAreaSizeAttribute()
+    {
+        return $this->area;
+    }
 
     public function getImageUrlAttribute()
     {

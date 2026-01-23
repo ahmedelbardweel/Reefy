@@ -241,4 +241,74 @@ class CropController extends ApiController
 
         return $this->successResponse([], 'Crop deleted successfully.');
     }
+
+    /**
+     * تسجيل عملية زراعية (ري، معالجة، حصاد، نمو)
+     * 
+     * @param Request $request
+     * @param int $id رقم المحصول
+     */
+    public function recordLog(Request $request, $id)
+    {
+        $crop = Crop::find($id);
+
+        if (is_null($crop)) {
+            return $this->errorResponse('Crop not found.');
+        }
+
+        if ($crop->user_id !== auth()->id()) {
+            return $this->errorResponse('Unauthorized.', [], 403);
+        }
+
+        $type = $request->input('type'); 
+        $notes = $request->input('notes');
+
+        $taskType = 'general';
+        $titlePrefix = 'Action: ';
+        
+        switch ($type) {
+            case 'IRRIGATION':
+                $taskType = 'water';
+                $titlePrefix = 'عملية ري: ';
+                break;
+            case 'TREATMENT':
+                $taskType = 'fertilizer';
+                $titlePrefix = 'معالجة: ';
+                break;
+            case 'HARVEST':
+                $taskType = 'harvest';
+                $titlePrefix = 'حصاد: ';
+                $crop->status = 'harvested';
+                break;
+            case 'GROWTH':
+                $taskType = 'general';
+                $titlePrefix = 'تحديث نمو: ';
+                $stage = $request->input('stage');
+                if ($stage === 'stage1') $crop->growth_percentage = 25;
+                elseif ($stage === 'stage2') $crop->growth_percentage = 60;
+                elseif ($stage === 'stage3') $crop->growth_percentage = 100;
+                break;
+        }
+
+        $crop->save();
+
+        // إنشاء مهمة مكتملة للسجل
+        $crop->tasks()->create([
+            'title' => $titlePrefix . ($notes ?: 'Agricultural Action'),
+            'type' => $taskType,
+            'status' => 'completed',
+            'due_date' => $request->input('due_date') ?: now(),
+            'priority' => 'medium',
+            'notes' => $notes,
+            'water_amount' => $request->input('water_amount'),
+            'duration_minutes' => $request->input('duration'),
+            'material_name' => $request->input('material_name'),
+            'dosage' => $request->input('dose'),
+            'dosage_unit' => $request->input('unit'),
+            'harvest_quantity' => $request->input('quantity'),
+            'harvest_unit' => $request->input('unit'),
+        ]);
+
+        return $this->successResponse([], 'Log recorded successfully.');
+    }
 }

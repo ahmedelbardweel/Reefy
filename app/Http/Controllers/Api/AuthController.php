@@ -52,6 +52,7 @@ class AuthController extends ApiController
             'password' => 'required',
             'c_password' => 'required|same:password',
             'role' => 'required|in:farmer,expert',
+            'specialization' => 'required_if:role,expert',
         ]);
 
         if($validator->fails()){
@@ -70,13 +71,14 @@ class AuthController extends ApiController
         if ($user->role === 'farmer') {
             $user->farmerProfile()->create();
         } elseif ($user->role === 'expert') {
-            $user->expertProfile()->create();
+            $user->expertProfile()->create([
+                'specialization' => $request->specialization
+            ]);
         }
 
         // إنشاء توكن API
         $success['token'] =  $user->createToken('ReefyApp')->plainTextToken;
-        $success['name'] =  $user->name;
-        $success['role'] =  $user->role;
+        $success['user'] =  $user;
 
         return $this->successResponse($success, 'User register successfully.');
     }
@@ -103,9 +105,7 @@ class AuthController extends ApiController
             
             // إنشاء توكن جديد
             $success['token'] =  $user->createToken('ReefyApp')->plainTextToken; 
-            $success['name'] =  $user->name;
-            $success['role'] =  $user->role;
-            $success['id'] = $user->id;
+            $success['user'] =  $user;
    
             return $this->successResponse($success, 'User login successfully.');
         } 
@@ -150,5 +150,24 @@ class AuthController extends ApiController
         // تحميل الملف الشخصي
         $user->load(['farmerProfile', 'expertProfile']);
         return $this->successResponse($user, 'User profile retrieved successfully.');
+    }
+
+    /**
+     * تحديث توكن FCM للمستخدم
+     */
+    public function updateFcmToken(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'fcm_token' => 'required|string',
+        ]);
+
+        if($validator->fails()){
+            return $this->errorResponse('Validation Error.', $validator->errors(), 422);
+        }
+
+        $user = $request->user();
+        $user->fcm_token = $request->fcm_token;
+        $user->save();
+
+        return $this->successResponse([], 'FCM token updated successfully.');
     }
 }

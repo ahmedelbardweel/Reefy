@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApiController as ApiController;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Models\Crop;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -123,6 +124,15 @@ class TaskController extends ApiController
 
         $task = Task::create($input);
 
+        // إنشاء إشعار للمزارع
+        Notification::create([
+            'user_id' => auth()->id(),
+            'task_id' => $task->id,
+            'type' => 'task_created',
+            'title' => 'مهمة جديدة',
+            'message' => 'تم إضافة مهمة جديدة: ' . $task->title,
+        ]);
+
         return $this->successResponse($task, 'Task created successfully.');
     }
 
@@ -169,5 +179,52 @@ class TaskController extends ApiController
         }
 
         return $this->successResponse($task, 'Task marked as completed.');
+    }
+
+    /**
+     * جلب المهام القادمة للمستخدم الحالي (لجدولة الإشعارات محلياً)
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function upcoming()
+    {
+        $userId = auth()->id();
+
+        $tasks = Task::whereHas('crop', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('status', '!=', 'completed')
+            ->whereDate('due_date', '>=', Carbon::now()->toDateString())
+            ->with('crop:id,name') // نحتاج اسم المحصول للإشعار
+            ->get(['id', 'crop_id', 'title', 'due_date', 'due_time', 'type']);
+
+        return $this->successResponse($tasks, 'Upcoming tasks retrieved successfully.');
+    }
+
+    /**
+     * جلب المهام المتأخرة للمستخدم الحالي
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function overdue()
+    {
+        $userId = auth()->id();
+        $now = Carbon::now();
+
+        $tasks = Task::whereHas('crop', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->where('status', '!=', 'completed')
+            ->where(function ($query) use ($now) {
+                $query->whereDate('due_date', '<', $now->toDateString())
+                      ->orWhere(function ($q) use ($now) {
+                          $q->whereDate('due_date', '=', $now->toDateString())
+                            ->whereTime('due_time', '<', $now->toTimeString());
+                      });
+            })
+            ->with('crop:id,name')
+            ->get(['id', 'crop_id', 'title', 'due_date', 'due_time', 'type']);
+
+        return $this->successResponse($tasks, 'Overdue tasks retrieved successfully.');
     }
 }

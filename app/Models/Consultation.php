@@ -25,6 +25,11 @@ class Consultation extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function farmer()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function expert()
     {
         return $this->belongsTo(User::class, 'expert_id');

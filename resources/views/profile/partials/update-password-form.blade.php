@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium" style="color: var(--heading-color);">
-            {{ __('Update Password') }}
+            {{ __('تحديث كلمة المرور') }}
         </h2>
 
         <p class="mt-1 text-sm" style="color: var(--text-secondary);">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
+            {{ __('تأكد من استخدام كلمة مرور طويلة وعشوائية للحفاظ على أمان حسابك.') }}
         </p>
     </header>
 
@@ -13,26 +13,26 @@
         @csrf
         @method('put')
 
-        <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
+        <div class="mb-4">
+            <x-input-label for="update_password_current_password" :value="__('كلمة المرور الحالية')" />
             <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
-        <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
+        <div class="mb-4">
+            <x-input-label for="update_password_password" :value="__('كلمة المرور الجديدة')" />
             <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
+        <div class="mb-4">
+            <x-input-label for="update_password_password_confirmation" :value="__('تأكيد كلمة المرور الجديدة')" />
             <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <div class="flex items-center gap-4 pt-3 border-top">
+            <x-primary-button class="btn btn-success px-5">{{ __('تحديث كلمة المرور') }}</x-primary-button>
 
             @if (session('status') === 'password-updated')
                 <p
@@ -40,8 +40,8 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm" style="color: var(--text-secondary);"
-                >{{ __('Saved.') }}</p>
+                    class="text-sm text-success"
+                ><i class="bi bi-check-circle-fill me-1"></i> {{ __('تم الحفظ.') }}</p>
             @endif
         </div>
     </form>

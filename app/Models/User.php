@@ -23,6 +23,9 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'fcm_token',
+        'avatar',
+        'cover_image',
     ];
 
     public function farmerProfile()

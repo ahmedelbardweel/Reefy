@@ -14,6 +14,9 @@ class Kernel extends ConsoleKernel
     {
         // Check for due tasks every minute (for real-time notifications)
         $schedule->command('tasks:check-due')->everyMinute();
+        
+        // Send task reminders daily at 9 AM
+        $schedule->command('reminders:tasks')->dailyAt('09:00');
     }
 
     /**

@@ -53,18 +53,46 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        // تعبئة البيانات المحققة
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        
+        // Handle Avatar Upload
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar && file_exists(public_path($user->avatar))) {
+                @unlink(public_path($user->avatar));
+            }
+            
+            $file = $request->file('avatar');
+            $filename = time() . '_avatar_' . $user->id . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('profiles/avatars'), $filename);
+            $user->avatar = 'profiles/avatars/' . $filename;
+        }
+
+        // Handle Cover Image Upload
+        if ($request->hasFile('cover_image')) {
+            // Delete old cover if exists
+            if ($user->cover_image && file_exists(public_path($user->cover_image))) {
+                @unlink(public_path($user->cover_image));
+            }
+            
+            $file = $request->file('cover_image');
+            $filename = time() . '_cover_' . $user->id . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('profiles/covers'), $filename);
+            $user->cover_image = 'profiles/covers/' . $filename;
+        }
+
+        // تعبئة البيانات المحققة (Name and Email)
+        $user->fill($request->safe()->only(['name', 'email']));
 
         // إذا تم تغيير البريد الإلكتروني، إعادة تعيين التحقق
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
         // حفظ التغييرات
-        $request->user()->save();
+        $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('success', 'تم تحديث الملف الشخصي بنجاح');
     }
 
     /**

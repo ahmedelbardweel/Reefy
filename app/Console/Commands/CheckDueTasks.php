@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\Notification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use App\Services\FcmService;
 
 class CheckDueTasks extends Command
 {
@@ -54,6 +55,16 @@ class CheckDueTasks extends Command
                     'message' => "المهمة '{$task->title}' للمحصول '{$task->crop->name}' موعدها اليوم الساعة {$task->reminder_time}.",
                     'type' => 'task_due',
                 ]);
+
+                // Send Push Notification
+                if ($task->crop->user->fcm_token) {
+                    FcmService::sendPushNotification(
+                        $task->crop->user->fcm_token,
+                        'مهمة تحتاج انتباهك الآن! ⏰',
+                        "المهمة '{$task->title}' للمحصول '{$task->crop->name}' موعدها اليوم."
+                    );
+                }
+
                 $notificationsCreated++;
             }
         }
@@ -87,6 +98,16 @@ class CheckDueTasks extends Command
                     'message' => "أنت متأخر عن المهمة '{$task->title}' للمحصول '{$task->crop->name}'! يرجى التنفيذ فوراً.",
                     'type' => 'task_overdue',
                 ]);
+
+                // Send Push Notification
+                if ($task->crop->user->fcm_token) {
+                    FcmService::sendPushNotification(
+                        $task->crop->user->fcm_token,
+                        '⚠️ مهمة متأخرة!',
+                        "أنت متأخر عن المهمة '{$task->title}' للمحصول '{$task->crop->name}'!"
+                    );
+                }
+
                 $overdueNotificationsCreated++;
             }
         }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('task_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('message');
-            $table->enum('type', ['task_due', 'task_overdue', 'general'])->default('general');
+            $table->enum('type', ['task_created', 'task_due', 'task_overdue', 'general'])->default('general');
             $table->boolean('is_read')->default(false);
             $table->timestamps();
         });

@@ -48,7 +48,7 @@ class CommunityController extends ApiController
             return $post;
         });
 
-        return $this->successResponse($posts, 'Posts retrieved successfully.');
+        return $this->successResponse($posts->items(), 'Posts retrieved successfully.');
     }
 
     /**
@@ -106,9 +106,30 @@ class CommunityController extends ApiController
             return $this->errorResponse('Post not found.');
         }
 
+        $post->load(['user:id,name,role', 'comments.user:id,name,role']);
+        $post->comments_count = $post->comments()->count();
+        $post->likes_count = $post->likes()->count();
         $post->is_liked = $post->likes()->where('user_id', auth()->id())->exists();
 
         return $this->successResponse($post, 'Post retrieved successfully.');
+    }
+
+    /**
+     * Get all comments for a specific post.
+     */
+    public function getComments($id)
+    {
+        $post = Post::find($id);
+        if (is_null($post)) {
+            return $this->errorResponse('Post not found.');
+        }
+
+        $comments = $post->comments()
+            ->with('user:id,name,role')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        return $this->successResponse($comments, 'Comments retrieved successfully.');
     }
 
     /**
@@ -129,14 +150,14 @@ class CommunityController extends ApiController
         }
 
         $user = auth()->user();
-        $existingLike = $post->likes()->where('user_id', $user->id())->first();
+        $existingLike = $post->likes()->where('user_id', $user->id)->first();
 
         if ($existingLike) {
             $existingLike->delete();
             $message = 'Post unliked successfully.';
             $isLiked = false;
         } else {
-            $post->likes()->create(['user_id' => $user->id()]);
+            $post->likes()->create(['user_id' => $user->id]);
             $message = 'Post liked successfully.';
             $isLiked = true;
         }
@@ -161,6 +182,7 @@ class CommunityController extends ApiController
 
         $validator = Validator::make($request->all(), [
             'content' => 'required|string',
+            'parent_id' => 'nullable|integer|exists:comments,id',
         ]);
 
         if ($validator->fails()) {
@@ -170,6 +192,7 @@ class CommunityController extends ApiController
         $comment = $post->comments()->create([
             'user_id' => auth()->id(),
             'content' => $request->content,
+            'parent_id' => $request->parent_id,
         ]);
         
         $comment->load('user:id,name,role');

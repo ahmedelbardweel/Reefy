@@ -12,6 +12,7 @@ class Task extends Model
         'title',
         'type',
         'due_date',
+        'priority',
         'reminder_time',
         'status',
         'notes',
