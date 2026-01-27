@@ -92,4 +92,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get user initials (First letter of first and last name)
+     */
+    public function getInitialsAttribute()
+    {
+        $words = explode(' ', $this->name);
+        if (count($words) >= 2) {
+            return mb_strtoupper(mb_substr($words[0], 0, 1) . mb_substr(end($words), 0, 1));
+        }
+        return mb_strtoupper(mb_substr($words[0], 0, 1));
+    }
 }

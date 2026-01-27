@@ -51,10 +51,10 @@ class Crop extends Model
     {
         switch ($this->status) {
             case 'growing':
-            case 'active': return 'قيد النمو';
-            case 'harvested': return 'تم الحصاد';
-            case 'dormant': return 'خامل';
-            default: return 'غير محدد';
+            case 'active': return 'Growing';
+            case 'harvested': return 'Harvested';
+            case 'dormant': return 'Dormant';
+            default: return 'Not Specified';
         }
     }
 
@@ -91,11 +91,11 @@ class Crop extends Model
     public function getGrowthStageLabelAttribute()
     {
         $p = $this->growth_percentage;
-        if ($p <= 10) return 'بادرة';
-        if ($p <= 40) return 'نمو خضري';
-        if ($p <= 70) return 'إزهار';
-        if ($p < 100) return 'ثمر';
-        return 'جاهز للحصاد';
+        if ($p <= 10) return 'Seedling';
+        if ($p <= 40) return 'Vegetative Growth';
+        if ($p <= 70) return 'Flowering';
+        if ($p < 100) return 'Fruiting';
+        return 'Ready for Harvest';
     }
 
     public function getDaysUntilHarvestAttribute()

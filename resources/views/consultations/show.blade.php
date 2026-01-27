@@ -1,82 +1,83 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="h4 font-weight-bold mb-0" style="color: var(--heading-color);">
-            تفاصيل الاستشارة
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Consultation Details') }}
         </h2>
     </x-slot>
 
-    <div class="py-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <!-- Question Section -->
-                <div class="card border-0 shadow-sm rounded-0 mb-4">
-                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between">
-                        <span class="badge {{ $consultation->status == 'answered' ? 'bg-success' : 'bg-warning' }} rounded-0 px-3">
-                            {{ $consultation->status == 'answered' ? 'تم الرد' : 'بانتظار خبير' }}
+    <div class="py-8 px-4">
+        <div class="max-w-3xl mx-auto space-y-6">
+            
+            <!-- Question Card -->
+            <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $consultation->status == 'answered' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' }}">
+                            {{ $consultation->status == 'answered' ? __('Answered') : __('Waiting for Expert') }}
                         </span>
-                <!-- Question Section -->
-                <div class="card border-0 shadow-sm rounded-0 mb-4" style="background-color: var(--bg-secondary);">
-                    <div class="card-header border-bottom-0 pt-4 px-4 d-flex justify-content-between" style="background-color: var(--bg-secondary);">
-                    <div class="card-body px-4 pb-4">
-                        <h3 class="fw-bold mb-3" style="color: var(--reefy-success);">{{ $consultation->subject }}</h3>
-                        <div class="p-3 rounded-0 mb-3" style="background-color: var(--bg-primary);">
-                            <p class="mb-0" style="color: var(--text-primary); white-space: pre-wrap;">{{ $consultation->question }}</p>
-                        </div>
-                        <div class="d-flex gap-3 small" style="color: var(--text-secondary);">
-                            <span><i class="bi bi-tag-fill me-1"></i> {{ $consultation->category }}</span>
-                            @if($consultation->crop)
-                                <span><i class="bi bi-flower1 me-1"></i> {{ $consultation->crop->name }}</span>
-                            @endif
-                        </div>
+                        <span class="text-xs text-gray-400">{{ $consultation->created_at->diffForHumans() }}</span>
                     </div>
-                </div>
 
-                <!-- Response Section -->
-                @if($consultation->status == 'answered')
-                    <div class="card border-0 shadow rounded-0 overflow-hidden border-start border-success border-4" style="background-color: var(--bg-secondary);">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-success rounded-0 p-2 me-3">
-                                    <i class="bi bi-person-badge text-white fs-4"></i>
-                                </div>
-                                <div>
-                                    <h6 class="mb-0 fw-bold" style="color: var(--heading-color);">رد الخبير: {{ $consultation->expert->name }}</h6>
-                                    <small style="color: var(--text-secondary);">{{ $consultation->updated_at->diffForHumans() }}</small>
-                                </div>
-                            </div>
-                            <div class="p-3 rounded-0 border border-success border-opacity-10" style="background-color: rgba(20, 164, 77, 0.1);">
-                                <p class="mb-0" style="color: var(--text-primary); white-space: pre-wrap; font-size: 1.1rem;">{{ $consultation->response }}</p>
-                            </div>
-                        </div>
+                    <h3 class="text-xl font-bold text-green-700 dark:text-green-400 mb-4">{{ $consultation->subject }}</h3>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-4 text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{{ $consultation->question }}</div>
+
+                    <div class="flex gap-4 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-700 pt-3">
+                         <span class="flex items-center gap-1"><i class="bi bi-tag-fill text-gray-400"></i> {{ $consultation->category }}</span>
+                        @if($consultation->crop)
+                            <span class="flex items-center gap-1"><i class="bi bi-flower1 text-gray-400"></i> {{ $consultation->crop->name }}</span>
+                        @endif
                     </div>
-                @else
-                    @if(auth()->user()->role === 'expert')
-                        <div class="card border-0 shadow-sm rounded-0 p-4" style="background-color: var(--bg-secondary);">
-                            <h5 class="fw-bold mb-3" style="color: var(--heading-color);">إعطاء نصيحة الخبير (Expert Advice)</h5>
-                            <form action="{{ route('consultations.answer', $consultation) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <textarea name="response" class="form-control" rows="5" placeholder="اكتب ردك هنا بمصداقية وعلم..." style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-success w-100 rounded-0 fw-bold">
-                                    إرسال الرد للمزارع
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <div class="alert border-0 shadow-sm rounded-0 text-center" style="background-color: rgba(255, 193, 7, 0.1); color: #856404;">
-                            <i class="bi bi-hourglass-split fs-3 d-block mb-2"></i>
-                            طلبك قيد المراجعة من قبل خبرائنا. سيتم إشعارك فور الرد.
-                        </div>
-                    @endif
-                @endif
-
-                <div class="text-center mt-4">
-                    <a href="{{ auth()->user()->role === 'expert' ? route('expert.consultations.index') : route('consultations.index') }}" class="btn btn-link text-decoration-none" style="color: var(--text-secondary);">
-                        <i class="bi bi-arrow-right"></i> العودة للقائمة
-                    </a>
                 </div>
             </div>
+
+            <!-- Response Section -->
+            @if($consultation->status == 'answered')
+                <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-l-4 border-gray-100 dark:border-gray-700 border-l-green-500 overflow-hidden relative">
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white shadow-md">
+                                <i class="bi bi-person-badge text-lg"></i>
+                            </div>
+                            <div>
+                                <h6 class="font-bold text-sm text-gray-900 dark:text-white">{{ __('Expert Response: :name', ['name' => $consultation->expert->name]) }}</h6>
+                                <span class="text-xs text-gray-400">{{ $consultation->updated_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50/50 dark:bg-green-900/10 p-4 rounded-lg border border-green-100 dark:border-green-800/30 text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+                            {{ $consultation->response }}
+                        </div>
+                    </div>
+                </div>
+            @else
+                @if(auth()->user()->role === 'expert')
+                    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-100 dark:border-gray-700 p-6">
+                        <h5 class="font-bold text-lg text-gray-900 dark:text-white mb-4">{{ __('Provide Expert Advice') }}</h5>
+                        <form action="{{ route('consultations.answer', $consultation) }}" method="POST">
+                            @csrf
+                            <textarea name="response" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg shadow-sm focus:border-green-500 focus:ring-green-500 mb-4 text-sm" rows="6" placeholder="{{ __('Write your response here with integrity and knowledge...') }}" required></textarea>
+                            <x-primary-button class="w-full justify-center bg-green-600 hover:bg-green-700">
+                                {{ __('Send Response to Farmer') }}
+                            </x-primary-button>
+                        </form>
+                    </div>
+                @else
+                    <div class="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-100 dark:border-yellow-900/30 rounded-xl p-6 text-center">
+                        <div class="inline-flex p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 mb-3">
+                            <i class="bi bi-hourglass-split text-xl"></i>
+                        </div>
+                        <p class="text-sm font-medium text-yellow-800 dark:text-yellow-400">{{ __('Your request is under review by our experts. You will be notified once answered.') }}</p>
+                    </div>
+                @endif
+            @endif
+
+            <div class="text-center pt-2">
+                <a href="{{ auth()->user()->role === 'expert' ? route('expert.consultations.index') : route('consultations.index') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition flex items-center justify-center gap-1">
+                    <i class="bi bi-arrow-right"></i> {{ __('Back to List') }}
+                </a>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

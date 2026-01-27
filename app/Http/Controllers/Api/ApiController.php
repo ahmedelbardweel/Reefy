@@ -30,7 +30,7 @@ class ApiController extends Controller
         $response = [
             'success' => true,
             'data'    => $result,
-            'message' => $message,
+            'message' => __($message),
         ];
 
         return response()->json($response, 200);
@@ -53,11 +53,11 @@ class ApiController extends Controller
     {
         $response = [
             'success' => false,
-            'message' => $error,
+            'message' => __($error),
         ];
 
         if (!empty($errorMessages)) {
-            $response['data'] = $errorMessages;
+            $response['errors'] = $errorMessages; // Changed data to errors for clarity
         }
 
         return response()->json($response, $code);

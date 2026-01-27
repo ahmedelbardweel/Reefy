@@ -102,6 +102,7 @@ class TaskController extends ApiController
             'type' => 'required|in:water,fertilizer,pest,harvest,general',
             'title' => 'required|string|max:255',
             'due_date' => 'required|date',
+            'due_time' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
             // حقول متخصصة حسب نوع المهمة
             'water_amount' => 'nullable|numeric',
@@ -121,6 +122,11 @@ class TaskController extends ApiController
         $input = $request->all();
         $input['crop_id'] = $cropId;
         $input['status'] = 'pending';
+        
+        // Use provided time or default to current time
+        if (!isset($input['due_time']) || empty($input['due_time'])) {
+            $input['due_time'] = now()->format('H:i:s');
+        }
 
         $task = Task::create($input);
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FarmerProfileController;
 use App\Http\Controllers\CropController;
+use App\Http\Controllers\LanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,8 @@ use App\Http\Controllers\CropController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/farmer/profile/verification', [FarmerProfileController::class, 'edit'])->name('farmer.profile.edit');
         Route::patch('/farmer/profile/verification', [FarmerProfileController::class, 'update'])->name('farmer.profile.update');
         
+        Route::get('crops/suggestions-data', [CropController::class, 'suggestionsData'])->name('crops.suggestions.data');
         Route::resource('crops', CropController::class);
         Route::post('/crops/{crop}/tasks', [CropController::class, 'storeTask'])->name('crops.tasks.store');
         Route::post('/crops/{crop}/update-growth', [CropController::class, 'updateGrowth'])->name('crops.updateGrowth');
@@ -46,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/farmer/systems/irrigation', 'irrigation')->name('farmer.systems.irrigation');
             Route::get('/farmer/systems/treatment', 'treatment')->name('farmer.systems.treatment');
             Route::get('/farmer/systems/harvesting', 'harvesting')->name('farmer.systems.harvesting');
+            Route::get('/farmer/systems/harvesting/export', 'exportHarvesting')->name('farmer.systems.harvesting.export');
         });
     });
 

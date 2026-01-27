@@ -1,144 +1,120 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="h4 mb-0 font-weight-bold" style="color: var(--heading-color) !important;">
-                <i class="bi bi-gear-wide-connected me-2 text-success"></i>إدارة المحصول: {{ $crop->name }}
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Edit Crop') }}: {{ $crop->name }}
             </h2>
-            <a href="{{ route('crops.index') }}" class="btn btn-sm px-3 fw-bold rounded-0" style="background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color);">
-                <i class="bi bi-arrow-right me-1"></i>العودة للمحاصيل
+            <a href="{{ route('crops.index') }}" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400">
+                <i class="bi bi-arrow-right ml-1"></i> {{ __('Back to List') }}
             </a>
         </div>
     </x-slot>
 
-    <div class="container py-4">
-        <div class="row g-4">
-            <!-- Left Column: Details & Edit Form -->
-            <div class="col-lg-7">
-                <div class="card border-0 shadow-sm mb-4" style="background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-header py-3 border-0" style="background: var(--bg-secondary) !important;">
-                        <h5 class="fw-bold mb-0" style="color: var(--heading-color) !important;">معلومات المحصول</h5>
-                    </div>
-                    <div class="card-body p-4 pt-0">
-                        <form action="{{ route('crops.update', $crop) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                            
-                            <div class="row g-3">
-                                <div class="col-md-12">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">اسم المحصول</label>
-                                    <input type="text" name="name" class="form-control rounded-0 px-4 @error('name') is-invalid @enderror" value="{{ old('name', $crop->name) }}" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Edit Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700">
+                        <div class="p-6">
+                            <form action="{{ route('crops.update', $crop) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                                @csrf
+                                @method('PUT')
+
+                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">{{ __('Basic Information') }}</h3>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <x-input-label for="name" :value="__('Crop Name')" />
+                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $crop->name) }}" required />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="type" :value="__('Type')" />
+                                        <x-text-input id="type" name="type" type="text" class="mt-1 block w-full" value="{{ old('type', $crop->type) }}" required />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="area" :value="__('Area (Acres)')" />
+                                        <x-text-input id="area" name="area" type="number" step="0.1" class="mt-1 block w-full" value="{{ old('area', $crop->area) }}" required />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="planting_date" :value="__('Planting Date')" />
+                                        <x-text-input id="planting_date" name="planting_date" type="date" class="mt-1 block w-full" value="{{ $crop->planting_date ? $crop->planting_date->format('Y-m-d') : '' }}" required />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="expected_harvest_date" :value="__('Expected Harvest Date')" />
+                                        <x-text-input id="expected_harvest_date" name="expected_harvest_date" type="date" class="mt-1 block w-full" value="{{ $crop->expected_harvest_date ? $crop->expected_harvest_date->format('Y-m-d') : '' }}" required />
+                                    </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">النوع</label>
-                                    <input type="text" name="type" class="form-control rounded-0 px-4 @error('type') is-invalid @enderror" value="{{ old('type', $crop->type) }}" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     <div>
+                                        <x-input-label for="soil_type" :value="__('Soil Type')" />
+                                        <x-text-input id="soil_type" name="soil_type" type="text" class="mt-1 block w-full" value="{{ old('soil_type', $crop->soil_type) }}" />
+                                    </div>
+                                    <div>
+                                        <x-input-label for="irrigation_method" :value="__('Irrigation Method')" />
+                                        <x-text-input id="irrigation_method" name="irrigation_method" type="text" class="mt-1 block w-full" value="{{ old('irrigation_method', $crop->irrigation_method) }}" />
+                                    </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">المساحة (فدان)</label>
-                                    <input type="number" step="0.1" name="area" class="form-control rounded-0 px-4 @error('area') is-invalid @enderror" value="{{ old('area', $crop->area) }}" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
+                                <div>
+                                    <x-input-label for="notes" :value="__('Notes')" />
+                                    <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm">{{ old('notes', $crop->notes) }}</textarea>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">تاريخ الزراعة</label>
-                                    <input type="date" name="planting_date" class="form-control rounded-0 px-4 @error('planting_date') is-invalid @enderror" value="{{ old('planting_date', $crop->planting_date ? $crop->planting_date->format('Y-m-d') : '') }}" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
+                                <div>
+                                    <x-input-label :value="__('Add New Photos')" />
+                                    <input type="file" name="images[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">موعد الحصاد المتوقع</label>
-                                    <input type="date" name="expected_harvest_date" class="form-control rounded-0 px-4 @error('expected_harvest_date') is-invalid @enderror" value="{{ old('expected_harvest_date', $crop->expected_harvest_date ? $crop->expected_harvest_date->format('Y-m-d') : '') }}" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
+                                <div class="pt-4">
+                                    <x-primary-button class="w-full justify-center bg-green-600 hover:bg-green-700">{{ __('Save Changes') }}</x-primary-button>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">نوع التربة</label>
-                                    <input type="text" name="soil_type" class="form-control rounded-0 px-4" value="{{ old('soil_type', $crop->soil_type) }}" placeholder="طينية، رملية، إلخ" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">طريقة الري</label>
-                                    <input type="text" name="irrigation_method" class="form-control rounded-0 px-4" value="{{ old('irrigation_method', $crop->irrigation_method) }}" placeholder="تنقيط، رش، غمر" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);">
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">ملاحظات إضافية</label>
-                                    <textarea name="notes" class="form-control rounded-0 px-3 py-2" rows="3" style="background: var(--bg-primary) !important; color: var(--text-primary) !important; border-color: var(--border-color) !important;">{{ old('notes', $crop->notes) }}</textarea>
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">إضافة صور للمحصول</label>
-                                    <input type="file" name="images[]" class="form-control rounded-0 px-4" multiple accept="image/*" style="background-color: var(--bg-primary); color: var(--text-primary) !important; border-color: var(--border-color);">
-                                    <small class="d-block mt-1 px-3" style="color: var(--text-secondary);">يمكنك اختيار عدة صور في آن واحد</small>
-                                </div>
-
-                                <div class="col-12 pt-3">
-                                    <button type="submit" class="btn btn-success w-100 rounded-0 py-2 fw-bold shadow-sm">
-                                        حفظ التعديلات
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Right Column: Growth & Tasks -->
-            <div class="col-lg-5">
-                <!-- Manual Growth Update -->
-                <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-header bg-success text-white py-3 px-3 border-0">
-                        <h5 class="fw-bold mb-0">تحديث النمو</h5>
-                    </div>
-                    <div class="card-body p-3 text-center" style="background: var(--bg-secondary) !important;">
-                        <div class="growth-display mb-3">
-                            <h2 class="fw-bold text-success mb-0">{{ $crop->growth_percentage }}%</h2>
-                            <p class="text-muted small">الحالة: {{ $crop->growth_stage_label }}</p>
-                        </div>
-                        
-                        <form action="{{ route('crops.updateGrowth', $crop) }}" method="POST">
+                <!-- Right Sidebar -->
+                <div class="space-y-6">
+                    <!-- Growth Status -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-6 text-center">
+                         <h3 class="text-sm font-bold text-gray-500 mb-4">{{ __('Manual Growth Update') }}</h3>
+                         <div class="text-3xl font-bold text-green-600 mb-2">{{ $crop->growth_percentage }}%</div>
+                         <p class="text-xs text-gray-400 mb-6">{{ __($crop->growth_stage_label) }}</p>
+                         
+                         <form action="{{ route('crops.updateGrowth', $crop) }}" method="POST">
                             @csrf
-                            <input type="range" name="growth_percentage" class="form-range" min="0" max="100" value="{{ $crop->growth_percentage }}" id="growthRange">
-                            <div class="d-flex justify-content-between small text-muted mb-4">
+                            <input type="range" name="growth_percentage" min="0" max="100" value="{{ $crop->growth_percentage }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
+                             <div class="flex justify-between text-[10px] text-gray-400 mt-1 mb-4">
                                 <span>0%</span>
                                 <span>50%</span>
-                                <span>100% (حصاد)</span>
+                                <span>100%</span>
                             </div>
-                            <button type="submit" class="btn btn-outline-success rounded-0 px-4 fw-bold">
-                                تحديث نسبة النمو
-                            </button>
+                            <x-secondary-button type="submit" class="w-full justify-center">{{ __('Update Progress') }}</x-secondary-button>
                         </form>
                     </div>
-                </div>
 
-                <!-- Add New Task Quick Access -->
-                <div class="card border-0 shadow-sm overflow-hidden" style="background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-header py-3 px-3 border-0" style="background: var(--heading-color) !important;">
-                        <h5 class="mb-0 fw-bold" style="color: var(--bg-secondary) !important;">إضافة مهمة</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form action="{{ route('crops.tasks.store', $crop) }}" method="POST">
+                    <!-- Add Quick Task -->
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-6">
+                        <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">{{ __('Add Quick Task') }}</h3>
+                        <form action="{{ route('crops.tasks.store', $crop) }}" method="POST" class="space-y-4">
                             @csrf
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">وصف المهمة</label>
-                                    <input type="text" name="title" class="form-control rounded-0 px-4" placeholder="مثال: ري القطاع الغربي" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">نوع المهمة</label>
-                                    <select name="type" class="form-select rounded-0 px-4 shadow-none" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);">
-                                        <option value="irrigation">ري 💧</option>
-                                        <option value="fertilizer">تسميد 🌱</option>
-                                        <option value="pest">مكافحة 🐛</option>
-                                        <option value="harvest">حصاد 🧺</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold" style="color: var(--text-secondary);">التاريخ والوقت</label>
-                                    <input type="datetime-local" name="due_date" class="form-control rounded-0 px-4" style="background-color: var(--bg-primary); color: var(--text-primary); border-color: var(--border-color);" required>
-                                </div>
-                                <div class="col-12 pt-2 text-center">
-                                    <button type="submit" class="btn btn-dark w-100 rounded-0 py-2 fw-bold" style="background: var(--heading-color) !important; border-color: var(--heading-color) !important; color: var(--bg-secondary) !important;">إضافة المهمة</button>
-                                </div>
+                            <div>
+                                <x-text-input name="title" :placeholder="__('Task Title')" class="w-full text-sm" required />
                             </div>
+                             <div>
+                                <select name="type" class="w-full text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-md shadow-sm">
+                                    <option value="water">{{ __('Irrigation') }}</option>
+                                    <option value="fertilizer">{{ __('Fertilization') }}</option>
+                                    <option value="pest">{{ __('Pest Control') }}</option>
+                                    <option value="harvest">{{ __('Harvest') }}</option>
+                                </select>
+                            </div>
+                             <div>
+                                <x-text-input name="due_date" type="datetime-local" class="w-full text-sm" required />
+                            </div>
+                            <x-primary-button class="w-full justify-center bg-gray-800 hover:bg-gray-900">{{ __('Add') }}</x-primary-button>
                         </form>
                     </div>
                 </div>

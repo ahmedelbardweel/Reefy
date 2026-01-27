@@ -1,264 +1,203 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center" style="direction: rtl;">
+        <div class="flex justify-between items-center">
             <div>
-                <h2 class="h4 mb-0 font-weight-bold" style="color: var(--heading-color) !important;">
-                    <i class="bi bi-people-fill me-2 text-success"></i>مجتمع ريفي
+                <h2 class="text-xl font-bold mb-1 text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="bi bi-people-fill text-green-600"></i> {{ __('Reefy Community') }}
                 </h2>
-                <p class="text-muted small mb-0">تواصل مع المزارعين وشارك خبراتك في الأرض</p>
+                <p class="text-xs text-gray-500">{{ __('Connect with farmers and share your experiences from the land') }}</p>
             </div>
-            <div class="badge bg-success bg-opacity-10 text-success px-3 py-2 fw-bold" style="font-size: 0.8rem; border-radius: 0;">
-                <i class="bi bi-broadcast me-1"></i> مباشر الآن
+            <div class="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold border border-green-100 flex items-center gap-1 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800">
+                <i class="bi bi-broadcast animate-pulse"></i> {{ __('Live Now') }}
             </div>
         </div>
     </x-slot>
 
-    <div class="container-fluid py-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-7">
+    <div class="py-6 px-4">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Feed Column -->
+            <div class="lg:col-span-4 space-y-6">
+                
                 <!-- Create Post Card -->
-                <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 0; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-body p-4">
-                        <div class="d-flex gap-3 mb-3" style="direction: rtl;">
-                            <div class="flex-shrink-0">
-                                <div class="d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px; font-size: 1.2rem; border-radius: 0; background-color: var(--reefy-success); color: white;">
-                                    @auth
-                                        {{ mb_substr(auth()->user()->name, 0, 1) }}
-                                    @else
-                                        <i class="bi bi-person"></i>
-                                    @endauth
+                <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-4" x-data="{ postType: 'post' }">
+                    <div class="flex gap-3">
+                        <div class="shrink-0">
+                            <div class="w-10 h-10 bg-green-100 text-green-700 flex items-center justify-center font-bold text-lg dark:bg-green-900 dark:text-green-300">
+                                @auth
+                                    {{ mb_substr(auth()->user()->name, 0, 1) }}
+                                @else
+                                    <i class="bi bi-person"></i>
+                                @endauth
+                            </div>
+                        </div>
+                        <div class="flex-grow">
+                            <form action="{{ route('community.store') }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <input type="hidden" name="type" x-model="postType">
+                                
+                                <textarea name="content" class="w-full border-0 bg-gray-50 dark:bg-gray-700/50 p-3 text-sm focus:ring-1 focus:ring-green-500 resize-none dark:text-white placeholder-gray-400" rows="3" placeholder="{{ auth()->check() ? __('What is new in your farm today, :name?', ['name' => auth()->user()->name]) : __('Share your experience with the community now...') }}"></textarea>
+                                
+                                <div id="imagePreviewContainer" class="mt-3 hidden relative group">
+                                    <img id="imagePreview" src="#" alt="Preview" class="w-full max-h-60 object-cover border border-gray-100 dark:border-gray-600">
+                                    <button type="button" class="absolute top-2 left-2 bg-red-500 text-white p-1 opacity-0 group-hover:opacity-100 transition" onclick="removeImage()">
+                                        <i class="bi bi-x"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <div class="flex-grow-1">
-                                <form action="{{ route('community.store') }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <input type="hidden" name="type" id="postTypeInput" value="post">
-                                        <textarea name="content" class="form-control border-0 p-3" rows="3" placeholder="{{ auth()->check() ? 'ما الجديد في مزرعتك اليوم يا ' . auth()->user()->name . '؟' : 'شارك خبرتك مع المجتمع الآن...' }}" style="border-radius: 0; resize: none; direction: rtl; background: var(--bg-primary) !important; color: var(--text-primary) !important;"></textarea>
-                                    </div>
-                                    
-                                    <div id="imagePreviewContainer" class="mt-3 d-none">
-                                        <img id="imagePreview" src="#" alt="Preview" class="img-fluid shadow-sm" style="max-height: 300px; width: 100%; object-fit: cover; border-radius: 0;">
-                                        <button type="button" class="btn btn-sm btn-danger mt-2" onclick="removeImage()">حذف الصورة</button>
-                                    </div>
 
-                                    <div class="d-flex justify-content-between align-items-center mt-3" style="direction: rtl;">
-                                        <div class="d-flex gap-2 flex-wrap">
-                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn active shadow-sm" onclick="selectPostType('post', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-chat-left-text me-1 text-secondary"></i> منشور
-                                            </button>
-                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('question', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-question-circle me-1 text-primary"></i> سؤال
-                                            </button>
-                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('inquiry', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-info-circle me-1 text-info"></i> استفسار
-                                            </button>
-                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('tip', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-lightbulb-fill me-1 text-warning"></i> نصيحة
-                                            </button>
-                                            <button type="button" class="btn rounded-0 px-3 py-1 type-btn shadow-sm" onclick="selectPostType('poll', this)" style="background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-bar-chart-line me-1 text-danger"></i> استفتاء
-                                            </button>
-                                            
-                                            <div class="vr mx-1 my-1 text-muted opacity-25"></div>
-
-                                            <label class="btn rounded-0 px-3 py-1 mb-0 border-0 shadow-sm" style="cursor: pointer; background: var(--bg-primary); color: var(--reefy-success); border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-image me-1 text-success"></i> صورة
-                                                <input type="file" name="image" id="postImage" class="d-none" accept="image/*" onchange="previewImage(this)">
-                                            </label>
-                                            <button type="button" class="btn rounded-0 px-3 py-1 mb-0 border-0 shadow-sm" style="background: var(--bg-primary); color: #00aeef; border: 1px solid var(--border-color) !important; font-size: 0.85rem;">
-                                                <i class="bi bi-geo-alt me-1"></i> الموقع
-                                            </button>
-                                        </div>
-                                        <button type="submit" class="btn btn-success rounded-0 px-5 fw-bold">نشر الآن</button>
+                                <div class="flex flex-wrap items-center justify-between mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 gap-2">
+                                    <div class="flex gap-2 text-[11px] overflow-x-auto no-scrollbar pb-1 max-w-full">
+                                        <button type="button" @click="postType = 'post'" :class="postType === 'post' ? 'bg-green-50 text-green-700 border-green-200 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex items-center gap-1 px-3 py-1.5 border transition whitespace-nowrap dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                                            <i class="bi bi-chat-left-text"></i> {{ __('Post') }}
+                                        </button>
+                                        <button type="button" @click="postType = 'question'" :class="postType === 'question' ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex items-center gap-1 px-3 py-1.5 rounded-full border transition whitespace-nowrap dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                                            <i class="bi bi-question-circle"></i> {{ __('Question') }}
+                                        </button>
+                                        <button type="button" @click="postType = 'tip'" :class="postType === 'tip' ? 'bg-yellow-50 text-yellow-700 border-yellow-200 shadow-sm' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'" class="flex items-center gap-1 px-3 py-1.5 rounded-full border transition whitespace-nowrap dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                                            <i class="bi bi-lightbulb"></i> {{ __('Tip') }}
+                                        </button>
+                                        <label class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 cursor-pointer transition whitespace-nowrap dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                                            <i class="bi bi-image text-green-600"></i> {{ __('Image') }}
+                                            <input type="file" name="image" id="postImage" class="hidden" accept="image/*" onchange="previewImage(this)">
+                                        </label>
                                     </div>
-                                </form>
-                            </div>
+                                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-5 py-1.5 text-xs font-bold shadow-sm transition">{{ __('Share') }}</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Posts Feed -->
+                <!-- Posts List -->
                 @forelse($posts as $post)
-                    <div class="card border-0 shadow-sm mb-4 p-0" style="border-radius: 0; direction: rtl; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                        <div class="card-header border-0 pt-4 px-4 pb-0" style="background: var(--bg-secondary) !important;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="d-flex align-items-center justify-content-center text-success fw-bold border" style="width: 45px; height: 45px; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
+                    <div class="bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex gap-3">
+                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold text-gray-600 dark:text-gray-300">
                                         {{ $post->user ? mb_substr($post->user->name, 0, 1) : 'ز' }}
                                     </div>
                                     <div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h6 class="mb-0 fw-bold" style="color: var(--heading-color) !important;">{{ $post->user ? $post->user->name : 'زائر ريفي' }}</h6>
+                                        <div class="flex items-center gap-2">
+                                            <h6 class="font-bold text-sm text-gray-900 dark:text-white">{{ $post->user ? $post->user->name : 'زائر ريفي' }}</h6>
                                             @php
-                                                $badgeClass = [
-                                                    'post' => 'bg-secondary',
-                                                    'question' => 'bg-primary',
-                                                    'inquiry' => 'bg-info',
-                                                    'tip' => 'bg-warning',
-                                                    'poll' => 'bg-danger'
-                                                ][$post->type] ?? 'bg-secondary';
-                                                
-                                                $badgeText = [
-                                                    'post' => 'منشور',
-                                                    'question' => 'سؤال',
-                                                    'inquiry' => 'استفسار',
-                                                    'tip' => 'نصيحة',
-                                                    'poll' => 'استفتاء'
-                                                ][$post->type] ?? 'منشور';
+                                                $badges = [
+                                                    'post' => ['bg' => 'bg-gray-100 text-gray-600', 'text' => __('Post')],
+                                                    'question' => ['bg' => 'bg-blue-50 text-blue-600', 'text' => __('Question')],
+                                                    'inquiry' => ['bg' => 'bg-cyan-50 text-cyan-600', 'text' => __('Inquiry')],
+                                                    'tip' => ['bg' => 'bg-yellow-50 text-yellow-600', 'text' => __('Tip')],
+                                                    'poll' => ['bg' => 'bg-red-50 text-red-600', 'text' => __('Poll')],
+                                                ];
+                                                $badge = $badges[$post->type] ?? $badges['post'];
                                             @endphp
-                                            <span class="badge {{ $badgeClass }} bg-opacity-10 text-{{ str_replace('bg-', '', $badgeClass) }} very-small" style="border-radius: 0;">{{ $badgeText }}</span>
+                                            <span class="px-2 py-0.5 text-[10px] font-bold {{ $badge['bg'] }} dark:bg-opacity-20">{{ $badge['text'] }}</span>
                                         </div>
-                                        <div class="very-small text-muted">{{ $post->created_at->diffForHumans() }}</div>
+                                        <span class="text-[10px] text-gray-400 block mt-0.5">{{ $post->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    @auth
-                                        @if($post->user_id === auth()->id())
-                                            <div class="dropdown">
-                                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 0; background: var(--bg-secondary); border: 1px solid var(--border-color) !important;">
-                                                    <li>
-                                                        <form action="{{ route('community.destroy', $post) }}" method="POST">
-                                                            @csrf @method('DELETE')
-                                                            <button type="submit" class="dropdown-item d-flex align-items-center gap-2" style="color: #dc3545;">
-                                                                <i class="bi bi-trash"></i> حذف المنشور
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        @endif
-                                    @endauth
-                                </div>
+                                @if(auth()->id() === $post->user_id)
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-three-dots-vertical"></i></button>
+                                        <div x-show="open" class="absolute left-0 mt-1 w-32 bg-white dark:bg-gray-700 shadow-lg py-1 border border-gray-100 dark:border-gray-600 z-10" x-cloak>
+                                            <form action="{{ route('community.destroy', $post) }}" method="POST">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="w-full text-start px-4 py-2 text-xs text-red-500 hover:bg-gray-50 dark:hover:bg-gray-600">{{ __('Delete') }}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                        </div>
 
-                        <div class="card-body px-4 pt-3">
-                            <p class="mb-3" style="line-height: 1.6; color: var(--text-primary) !important;">{{ $post->content }}</p>
-                            
+                            <p class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed mb-3 whitespace-pre-wrap">{{ $post->content }}</p>
+
                             @if($post->image_path)
-                                <div class="overflow-hidden mb-3 border shadow-sm" style="border-radius: 0;">
-                                    <img src="{{ asset('storage/' . $post->image_path) }}" class="w-100" style="max-height: 400px; object-fit: cover;" alt="Post content">
+                                <div class="overflow-hidden mb-3 border border-gray-100 dark:border-gray-700">
+                                    <img src="{{ asset('storage/' . $post->image_path) }}" class="w-full max-h-96 object-cover" alt="Post content">
                                 </div>
                             @endif
 
-                            <!-- Interaction Stats -->
-                            <div class="d-flex justify-content-between border-bottom pb-2 mb-2 px-1">
-                                <div class="very-small text-muted px-2">
-                                    <i class="bi bi-heart-fill text-danger me-1"></i>
-                                    <span id="likesCount{{ $post->id }}">{{ $post->likes->count() }}</span> إعجاب
+                             <!-- Stats -->
+                             <div class="flex items-center justify-between text-xs text-gray-500 py-2 border-b border-gray-50 dark:border-gray-700">
+                                <div class="flex items-center gap-1">
+                                    <div class="flex -space-x-1 space-x-reverse">
+                                        <div class="w-4 h-4 bg-red-100 flex items-center justify-center border border-white"><i class="bi bi-heart-fill text-[8px] text-red-500"></i></div>
+                                    </div>
+                                    <span id="likesCount{{ $post->id }}">{{ $post->likes->count() }}</span>
                                 </div>
-                                <div class="very-small text-muted px-2">
-                                    <span id="commentsCount{{ $post->id }}">{{ $post->comments->count() }}</span> تعليق
+                                <div class="flex items-center gap-1">
+                                    <span id="commentsCount{{ $post->id }}">{{ $post->comments->count() }}</span> {{ __('comments') }}
                                 </div>
                             </div>
 
-                            <!-- Interaction Buttons -->
-                            <div class="d-flex gap-2">
-                                <button type="button" 
+                            <!-- Actions -->
+                            <div class="flex items-center pt-2">
+                                 <button type="button" 
                                     onclick="toggleLike({{ $post->id }})"
                                     id="likeBtn{{ $post->id }}"
-                                    class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 {{ $post->isLikedBy(auth()->user()) ? 'text-danger fw-bold bg-danger bg-opacity-10' : 'hover-bg-light' }}" style="border-radius: 0; transition: all 0.2s; color: var(--text-secondary);">
+                                    class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm transition {{ $post->isLikedBy(auth()->user()) ? 'text-red-500 font-bold bg-red-50 dark:bg-red-900/20' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                                     <i class="bi {{ $post->isLikedBy(auth()->user()) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
-                                    إعجاب
+                                    <span>{{ __('Like') }}</span>
                                 </button>
-                                
-                                <button type="button" class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 0; color: var(--text-secondary);" onclick="openComments({{ $post->id }})">
-                                    <i class="bi bi-chat-left-text"></i>
-                                    تعليق
+                                <button type="button" onclick="openComments({{ $post->id }})" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                    <i class="bi bi-chat"></i>
+                                    <span>{{ __('Comment') }}</span>
                                 </button>
-                                <button type="button" class="btn flex-grow-1 py-2 border-0 d-flex align-items-center justify-content-center gap-2 hover-bg-light" style="border-radius: 0; color: var(--text-secondary);" onclick="sharePost({{ $post->id }}, '{{ url('/community/post/' . $post->id) }}')">
+                                <button type="button" onclick="sharePost({{ $post->id }}, '{{ url('/community/post/' . $post->id) }}')" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                     <i class="bi bi-share"></i>
-                                    مشاركة
+                                    <span>{{ __('Share') }}</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-5">
-                        <i class="bi bi-chat-dots display-1 text-muted opacity-25"></i>
-                        <h4 class="mt-3 text-muted">لا توجد منشورات حتى الآن</h4>
-                        <p class="text-muted small">كن أول من يشارك خبرته في مجتمع ريفي!</p>
+                    <div class="text-center py-12">
+                        <i class="bi bi-chat-dots text-4xl text-gray-300 dark:text-gray-600 mb-3 block"></i>
+                        <h4 class="text-gray-500 dark:text-gray-400 font-medium">{{ __('No posts yet') }}</h4>
+                        <p class="text-xs text-gray-400 mt-1">{{ __('Be the first to share your experience in Reefy community!') }}</p>
                     </div>
                 @endforelse
 
-                <div class="mt-4">
+                <div class="py-4">
                     {{ $posts->links() }}
-                </div>
-            </div>
-
-            <!-- Sidebar Info (Trends/Suggestions) -->
-            <div class="col-lg-3 d-none d-lg-block" style="direction: rtl;">
-                <div class="card border-0 shadow-sm mb-4" style="border-radius: 0; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-body">
-                        <h6 class="fw-bold mb-3" style="color: var(--heading-color) !important;"><i class="bi bi-lightbulb text-warning me-2"></i>نصائح المجتمع</h6>
-                        <ul class="list-unstyled mb-0">
-                            <li class="mb-3">
-                                <a href="#" class="text-decoration-none d-flex gap-2 align-items-start">
-                                    <div class="badge bg-success bg-opacity-10 text-success p-2" style="border-radius: 0;"><i class="bi bi-droplets"></i></div>
-                                    <div>
-                                        <div class="small fw-bold" style="color: var(--text-primary);">أفضل وقت للري اليوم</div>
-                                        <div class="very-small" style="color: var(--text-secondary);">بناءً على التفاعل الأخير</div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="mb-0">
-                                <a href="#" class="text-decoration-none d-flex gap-2 align-items-start">
-                                    <div class="badge bg-warning bg-opacity-10 text-warning p-2" style="border-radius: 0;"><i class="bi bi-bug"></i></div>
-                                    <div>
-                                        <div class="small fw-bold" style="color: var(--text-primary);">مكافحة دودة الطماطم</div>
-                                        <div class="very-small" style="color: var(--text-secondary);">نقاش نشط حالياً</div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="card border-0 shadow-sm sticky-top" style="border-radius: 0; top: 120px; background: var(--bg-secondary) !important; border: 1px solid var(--border-color) !important;">
-                    <div class="card-body text-center p-4">
-                        <img src="{{ asset('logo.png') }}" alt="Reefy" class="mb-3 opacity-50" style="height: 40px; filter: grayscale(1);">
-                        <p class="very-small text-muted mb-0">جميع حقوق النشر محفوظة لـ ريفي 2026 &copy;</p>
-                        <div class="d-flex justify-content-center gap-2 mt-2">
-                             <a href="#" class="text-muted very-small text-decoration-none">سياسة الخصوصية</a>
-                             <a href="#" class="text-muted very-small text-decoration-none">شروط الاستخدام</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Sheet Comments -->
-    <div id="commentBottomSheet" class="comment-bottom-sheet">
-        <div class="sheet-overlay" onclick="closeComments()"></div>
-        <div class="sheet-content">
-            <div class="sheet-header">
-                <div class="drag-handle"></div>
-                <div class="d-flex justify-content-between align-items-center w-100 px-3 py-2 border-bottom">
-                    <h6 class="mb-0 fw-bold">التعليقات</h6>
-                    <button class="btn btn-link text-dark p-0" onclick="closeComments()"><i class="bi bi-x-lg"></i></button>
-                </div>
+    <!-- Bottom Sheet Comments (Alpine.js State handled in layout for visibility but here tailored for Tailwind) -->
+    <div id="commentBottomSheet" class="fixed inset-0 z-50 invisible transition-all duration-300" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 opacity-0 transition-opacity duration-300 overlay" onclick="closeComments()"></div>
+        
+        <!-- Sheet -->
+        <div class="absolute bottom-0 left-0 w-full h-[85%] lg:h-[80%] lg:w-1/2 lg:left-1/4 bg-white dark:bg-gray-800 shadow-2xl transform translate-y-full transition-transform duration-300 flex flex-col sheet-content">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white">{{ __('Comments') }}</h3>
+                <button onclick="closeComments()" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><i class="bi bi-x-lg"></i></button>
             </div>
-            <div class="sheet-body p-3" id="commentsList" style="direction: rtl; background-color: var(--bg-secondary);">
-                <!-- Comments will be loaded here -->
+            
+            <!-- List -->
+            <div id="commentsList" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <!-- Loaded via JS -->
             </div>
-            <div class="sheet-footer border-top p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important;">
-                <form onsubmit="postComment(event)" id="commentForm" style="direction: rtl;">
+
+            <!-- Input -->
+            <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <form onsubmit="postComment(event)" id="commentForm">
                     @csrf
                     <input type="hidden" name="post_id" id="sheetPostId">
                     <input type="hidden" name="parent_id" id="sheetParentId">
-                    <div id="replyingToIndicator" class="very-small text-success mb-2 d-none">
-                        جاري الرد على <span id="replyingToName"></span>
-                        <button type="button" class="btn btn-link very-small text-danger p-0 ms-2" onclick="cancelReply()">إلغاء</button>
+                    
+                    <div id="replyingToIndicator" class="hidden text-xs text-green-600 mb-2 flex items-center gap-2">
+                        <span>جاري الرد على <span id="replyingToName" class="font-bold"></span></span>
+                        <button type="button" class="text-red-500 hover:text-red-700" onclick="cancelReply()"><i class="bi bi-x-circle"></i></button>
                     </div>
-                    <div class="d-flex gap-2">
-                        <textarea name="content" id="commentInput" class="form-control px-3 py-2 border-0" rows="1" placeholder="أضف تعليقاً..." required style="resize: none; border-radius: 0; background-color: var(--bg-primary); color: var(--text-primary);"></textarea>
-                        <button type="submit" class="btn btn-success d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; border-radius: 0;">
-                            <i class="bi bi-send-fill fs-6" style="transform: rotate(180deg);"></i>
+                    
+                    <div class="flex gap-2">
+                        <input type="text" name="content" id="commentInput" class="flex-1 bg-gray-100 dark:bg-gray-700 border-0 px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 dark:text-white" placeholder="{{ __('Write a comment...') }}" required autocomplete="off">
+                        <button type="submit" class="w-10 h-10 bg-green-600 text-white flex items-center justify-center hover:bg-green-700 transition shadow-sm transform rotate-180">
+                            <i class="bi bi-send-fill text-xs"></i>
                         </button>
                     </div>
                 </form>
@@ -266,100 +205,16 @@
         </div>
     </div>
 
-    <style>
-        .hover-bg-light:hover { background-color: #f8fafc !important; }
-        .very-small { font-size: 0.7rem; }
-        .last-child-mb-0:last-child { margin-bottom: 0 !important; }
-        .card { transition: transform 0.2s ease-in-out; }
-        .text-info { color: #00aeef !important; }
-        
-        .dropdown-item:hover { background-color: #f0f7f4; color: var(--reefy-success); }
-        .type-btn.active {
-            background-color: #e2eee8 !important;
-            border-color: var(--reefy-success) !important;
-            font-weight: bold;
-        }
-        .type-btn.active i { color: var(--reefy-primary) !important; }
-        
-        /* Bottom Sheet Styles */
-        .comment-bottom-sheet {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1050;
-            visibility: hidden;
-            transition: visibility 0.3s;
-        }
-        
-        .comment-bottom-sheet.show {
-            visibility: visible;
-        }
-
-        .sheet-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .comment-bottom-sheet.show .sheet-overlay {
-            opacity: 1;
-        }
-
-        .sheet-content {
-            position: absolute;
-            bottom: -100%;
-            left: 0;
-            width: 100%;
-            height: 70%;
-            background: var(--bg-secondary);
-            border-radius: 0;
-            transition: bottom 0.3s ease-out;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .comment-bottom-sheet.show .sheet-content {
-            bottom: 0;
-        }
-
-        .drag-handle {
-            width: 40px;
-            height: 5px;
-            background: #e0e0e0;
-            border-radius: 0;
-            margin: 10px auto;
-        }
-
-        .sheet-body {
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        /* Desktop specific Adjustments */
-        @media (min-width: 992px) {
-            .sheet-content {
-                width: 50%;
-                left: 25%;
-                height: 80%;
-                border-radius: 0;
-            }
-        }
-    </style>
-
+    <!-- JavaScript for Dynamic Interactions -->
     <script>
+        // Image Preview
         function previewImage(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').classList.remove('d-none');
+                    const img = document.getElementById('imagePreview');
+                    img.src = e.target.result;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
                 }
                 reader.readAsDataURL(input.files[0]);
             }
@@ -367,18 +222,10 @@
 
         function removeImage() {
             document.getElementById('postImage').value = "";
-            document.getElementById('imagePreviewContainer').classList.add('d-none');
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
         }
 
-        function selectPostType(type, element) {
-            document.getElementById('postTypeInput').value = type;
-            
-            // Update active state in buttons
-            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-        }
-
-        // Like Functionality
+        // Like Logic
         async function toggleLike(postId) {
             try {
                 const response = await fetch(`/community/post/${postId}/like`, {
@@ -399,14 +246,12 @@
                 const icon = btn.querySelector('i');
                 const countSpan = document.getElementById(`likesCount${postId}`);
 
-                    btn.classList.add('fw-bold', 'bg-opacity-10');
-                    btn.classList.remove('text-muted');
-                    icon.classList.replace('bi-heart', 'bi-heart-fill');
+                if (data.liked) {
+                    btn.className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm transition text-red-500 font-bold bg-red-50 dark:bg-red-900/20";
+                    icon.className = "bi bi-heart-fill";
                 } else {
-                    btn.classList.remove('text-danger', 'fw-bold', 'bg-danger', 'bg-opacity-10');
-                    btn.style.color = 'var(--text-secondary)';
-                    btn.classList.add('text-muted'); // We are removing this in next line if theme aware but let's just keep strict color
-                    icon.classList.replace('bi-heart-fill', 'bi-heart');
+                    btn.className = "flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm transition text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700";
+                    icon.className = "bi bi-heart";
                 }
                 countSpan.innerText = data.likes_count;
             } catch (error) {
@@ -416,59 +261,67 @@
 
         // Comments System
         let currentPostsData = @json($posts->items());
-        
+        const sheet = document.getElementById('commentBottomSheet');
+        const overlay = sheet.querySelector('.overlay');
+        const content = sheet.querySelector('.sheet-content');
+
         function openComments(postId) {
-            const sheet = document.getElementById('commentBottomSheet');
             const list = document.getElementById('commentsList');
             const postIdInput = document.getElementById('sheetPostId');
             
             postIdInput.value = postId;
-            list.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-success" role="status"></div></div>';
+            list.innerHTML = '<div class="flex justify-center py-8"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>';
             
-            sheet.classList.add('show');
+            sheet.classList.remove('invisible');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                content.classList.remove('translate-y-full');
+            }, 10);
+            
             document.body.style.overflow = 'hidden';
 
-            // Find post data
+            // Load comments
             const post = currentPostsData.find(p => p.id === postId);
             renderComments(post.comments);
         }
 
         function closeComments() {
-            document.getElementById('commentBottomSheet').classList.remove('show');
-            document.body.style.overflow = 'auto';
-            cancelReply();
+            overlay.classList.add('opacity-0');
+            content.classList.add('translate-y-full');
+            
+            setTimeout(() => {
+                sheet.classList.add('invisible');
+                document.body.style.overflow = 'auto';
+                cancelReply();
+            }, 300);
         }
 
         function renderComments(comments) {
             const list = document.getElementById('commentsList');
             if (comments.length === 0) {
-                list.innerHTML = '<div class="text-center py-5 text-muted small">لا توجد تعليقات بعد. كن أول من يعلق!</div>';
+                list.innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">لا توجد تعليقات بعد. كن أول من يعلق!</div>';
                 return;
             }
 
             let html = '';
             comments.forEach(comment => {
+                const userInitial = comment.user ? comment.user.name.charAt(0) : 'ز';
+                const userName = comment.user ? comment.user.name : 'زائر ريفي';
+                
                 html += `
-                    <div class="d-flex gap-2 mb-3">
-                        <div class="flex-shrink-0">
-                            <div class="border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 35px; height: 35px; font-size: 0.9rem; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
-                                ${comment.user ? comment.user.name.charAt(0) : 'ز'}
+                    <div class="flex gap-3">
+                        <div class="shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">${userInitial}</div>
+                        <div class="flex-1">
+                            <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-2xl rounded-tr-none">
+                                <div class="font-bold text-xs text-gray-900 dark:text-gray-100 mb-1">${userName}</div>
+                                <p class="text-sm text-gray-700 dark:text-gray-300">${comment.content}</p>
                             </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="p-2 shadow-sm px-3" style="border-radius: 0; background-color: var(--bg-primary);">
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-bold small" style="color: var(--heading-color);">${comment.user ? comment.user.name : 'زائر ريفي'}</span>
-                                </div>
-                                <p class="mb-0 small mt-1" style="color: var(--text-primary);">${comment.content}</p>
+                            <div class="flex items-center gap-4 mt-1 mr-2 text-[10px] text-gray-400">
+                                <span>منذ فترة</span>
+                                <button onclick="setReply(${comment.id}, '${userName}')" class="font-bold hover:text-green-600 transition">رد</button>
                             </div>
-                            <div class="d-flex gap-2 mt-1 px-2">
-                                <button onclick="setReply(${comment.id}, '${comment.user.name}')" class="btn btn-link p-0 very-small text-decoration-none" style="color: var(--text-secondary);">رد</button>
-                                <span class="very-small opacity-50" style="color: var(--text-secondary);">منذ فترة</span>
-                            </div>
-                            
                             <!-- Replies -->
-                            <div class="replies-container ms-4 mt-2 border-end pe-3" style="border-right-width: 2px !important; border-color: var(--border-color) !important;">
+                            <div class="mt-2 space-y-2 mr-2 border-r-2 border-gray-100 dark:border-gray-700 pr-3">
                                 ${renderReplies(comment.replies || [])}
                             </div>
                         </div>
@@ -479,42 +332,32 @@
         }
 
         function renderReplies(replies) {
-            let html = '';
-            replies.forEach(reply => {
-                html += `
-                    <div class="d-flex gap-2 mb-2">
-                        <div class="flex-shrink-0">
-                            <div class="border d-flex align-items-center justify-content-center text-success fw-bold" style="width: 25px; height: 25px; font-size: 0.7rem; border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
-                                ${reply.user ? reply.user.name.charAt(0) : 'ز'}
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="border p-2 px-3" style="border-radius: 0; background-color: var(--bg-primary); border-color: var(--border-color) !important;">
-                                <span class="fw-bold small" style="font-size: 0.75rem; color: var(--heading-color);">${reply.user ? reply.user.name : 'زائر ريفي'}</span>
-                                <p class="mb-0 very-small mt-1" style="color: var(--text-primary);">${reply.content}</p>
-                            </div>
-                        </div>
+            if (!replies.length) return '';
+            return replies.map(reply => `
+                <div class="flex gap-2">
+                    <div class="shrink-0 w-6 h-6 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] font-bold text-gray-600 dark:text-gray-300">${reply.user ? reply.user.name.charAt(0) : 'ز'}</div>
+                    <div class="bg-gray-50 dark:bg-gray-700/30 p-2">
+                        <div class="font-bold text-[10px] text-gray-900 dark:text-gray-100">${reply.user ? reply.user.name : 'زائر ريفي'}</div>
+                        <p class="text-xs text-gray-700 dark:text-gray-300">${reply.content}</p>
                     </div>
-                `;
-            });
-            return html;
+                </div>
+            `).join('');
         }
 
         function setReply(commentId, userName) {
             document.getElementById('sheetParentId').value = commentId;
             document.getElementById('replyingToName').innerText = userName;
-            document.getElementById('replyingToIndicator').classList.remove('d-none');
+            document.getElementById('replyingToIndicator').classList.remove('hidden');
             document.getElementById('commentInput').focus();
         }
 
         function cancelReply() {
             document.getElementById('sheetParentId').value = '';
-            document.getElementById('replyingToIndicator').classList.add('d-none');
+            document.getElementById('replyingToIndicator').classList.add('hidden');
         }
 
         async function postComment(e) {
             e.preventDefault();
-            const form = e.target;
             const postId = document.getElementById('sheetPostId').value;
             const content = document.getElementById('commentInput').value;
             const parentId = document.getElementById('sheetParentId').value;
@@ -534,51 +377,43 @@
                     const data = await response.json();
                     const comment = data.comment;
                     
-                    // Clear input and reset reply state
                     document.getElementById('commentInput').value = '';
                     cancelReply();
                     
-                    // Update the local data structure (optional but good for consistency)
+                    // Update Local State
                     const post = currentPostsData.find(p => p.id == postId);
                     if (parentId) {
-                        const parentComment = post.comments.find(c => c.id == parentId);
-                        if (!parentComment.replies) parentComment.replies = [];
-                        parentComment.replies.push(comment);
+                        const parent = post.comments.find(c => c.id == parentId);
+                        if (!parent.replies) parent.replies = [];
+                        parent.replies.push(comment);
                     } else {
                         post.comments.push(comment);
                     }
                     
-                    // Re-render comments to show the new one
                     renderComments(post.comments);
                     
-                    // Increment the comment counter on the post card
+                    // Update Counter
                     const counter = document.getElementById(`commentsCount${postId}`);
-                    if (counter) {
-                        counter.innerText = parseInt(counter.innerText) + 1;
-                    }
+                    if (counter) counter.innerText = post.comments.length + countReplies(post.comments);
                 }
             } catch (error) {
                 console.error('Error posting comment:', error);
             }
         }
 
-        // Sharing Functionality
+        function countReplies(comments) {
+            return comments.reduce((acc, comment) => acc + (comment.replies ? comment.replies.length : 0), 0);
+        }
+
         function sharePost(postId, url) {
-            if (navigator.share) {
+             if (navigator.share) {
                 navigator.share({
                     title: 'منشور ريفي',
-                    text: 'شاهد هذا المنشور على مجتمع ريفي الزراعي',
+                    text: 'شاهد هذا المنشور على مجتمع ريفي',
                     url: url
                 }).catch(console.error);
             } else {
-                // Fallback copy to clipboard
-                const dummy = document.createElement('input');
-                document.body.appendChild(dummy);
-                dummy.value = url;
-                dummy.select();
-                document.execCommand('copy');
-                document.body.removeChild(dummy);
-                alert('تم نسخ الرابط!')
+                navigator.clipboard.writeText(url).then(() => alert('تم نسخ الرابط!'));
             }
         }
     </script>

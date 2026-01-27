@@ -34,7 +34,7 @@ class CropController extends ApiController
     public function index()
     {
         $crops = auth()->user()->crops()->with('images')->latest()->get();
-        return $this->successResponse($crops, 'Crops retrieved successfully.');
+        return $this->successResponse($crops, 'Crops retrieved successfully');
     }
 
     /**
@@ -68,29 +68,34 @@ class CropController extends ApiController
      */
     public function store(Request $request)
     {
-        // التحقق من البيانات
+        // التحقق من البيانات - جعل الحقول اختيارية لتسهيل الإدخال للمزارع
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'variety' => 'nullable|string|max:255',
-            'planting_date' => 'required|date',
-            'area_size' => 'required|numeric',
-            'area_unit' => 'required|string',
-            'expected_harvest_date' => 'required|date',
+            'planting_date' => 'nullable|date',
+            'area_size' => 'nullable|numeric',
+            'area_unit' => 'nullable|string',
+            'expected_harvest_date' => 'nullable|date',
+            'importance' => 'nullable|string',
+            'description' => 'nullable|string',
             'images' => 'nullable',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // زيادة الحجم لـ 5 ميجا
         ]);
 
         if ($validator->fails()) {
-            return $this->errorResponse('Validation Error.', $validator->errors(), 422);
+            return $this->errorResponse('Validation Error', $validator->errors(), 422);
         }
 
-        // إعداد البيانات
+        // إعداد البيانات مع قيم افتراضية إذا كانت الحقول فارغة
         $input = $request->all();
         $input['user_id'] = auth()->id();
+        $input['name'] = $request->name ?: 'محصول جديد ' . (auth()->user()->crops()->count() + 1);
         $input['status'] = 'active';
         $input['growth_stage'] = 'seedling';
         $input['health_status'] = 'good';
+        $input['planting_date'] = $request->planting_date ?: now();
+        $input['growth_percentage'] = 0;
 
         $crop = Crop::create($input);
 
@@ -110,7 +115,7 @@ class CropController extends ApiController
         // تحميل الصور للرد
         $crop->load('images');
 
-        return $this->successResponse($crop, 'Crop created successfully.');
+        return $this->successResponse($crop, 'Crop created successfully');
     }
 
     /**
@@ -137,7 +142,7 @@ class CropController extends ApiController
             return $this->errorResponse('Unauthorized.', [], 403);
         }
 
-        return $this->successResponse($crop->load('images'), 'Crop retrieved successfully.');
+        return $this->successResponse($crop->load('images'), 'Crop retrieved successfully');
     }
 
     /**
@@ -169,17 +174,21 @@ class CropController extends ApiController
             return $this->errorResponse('Unauthorized.', [], 403);
         }
 
-        // التحقق من البيانات
+        // التحقق من البيانات - جميعها اختيارية
         $validator = Validator::make($request->all(), [
-            'name' => 'string|max:255',
-            'type' => 'string|max:255',
+            'name' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'variety' => 'nullable|string|max:255',
-            'planting_date' => 'date',
-            'area_size' => 'numeric',
-            'area_unit' => 'string',
-            'expected_harvest_date' => 'date',
+            'planting_date' => 'nullable|date',
+            'area_size' => 'nullable|numeric',
+            'area_unit' => 'nullable|string',
+            'expected_harvest_date' => 'nullable|date',
+            'status' => 'nullable|string',
+            'growth_stage' => 'nullable|string',
+            'health_status' => 'nullable|string',
+            'description' => 'nullable|string',
             'images' => 'nullable',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         if ($validator->fails()) {
@@ -203,7 +212,7 @@ class CropController extends ApiController
             }
         }
 
-        return $this->successResponse($crop->load('images'), 'Crop updated successfully.');
+        return $this->successResponse($crop->load('images'), 'Crop updated successfully');
     }
 
     /**
@@ -239,7 +248,7 @@ class CropController extends ApiController
         
         $crop->delete();
 
-        return $this->successResponse([], 'Crop deleted successfully.');
+        return $this->successResponse([], 'Crop deleted successfully');
     }
 
     /**
@@ -310,5 +319,61 @@ class CropController extends ApiController
         ]);
 
         return $this->successResponse([], 'Log recorded successfully.');
+    }
+
+    /**
+     * الحصول على اقتراحات للحقول بناءً على بيانات المستخدم السابقة واقتراحات عامة
+     * 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function suggestions()
+    {
+        $user = auth()->user();
+        
+        $names = $user->crops()->pluck('name')->unique()->values();
+        $types = $user->crops()->pluck('type')->unique()->values();
+        $varieties = $user->crops()->pluck('variety')->whereNotNull('variety')->unique()->values();
+        $units = $user->crops()->pluck('area_unit')->unique()->values();
+
+        // اقتراحات عامة شائعة في المنطقة العربية
+        $commonTypes = ['قمح', 'ذرة', 'بطاطس', 'طماطم', 'خيار', 'نخيل', 'برسيم', 'زيتون', 'حمضيات'];
+        $commonUnits = ['فدان', 'دونم', 'هكتار', 'متر مربع'];
+
+        return $this->successResponse([
+            'names' => $names,
+            'types' => $types->merge($commonTypes)->unique()->values(),
+            'varieties' => $varieties,
+            'units' => $units->merge($commonUnits)->unique()->values(),
+        ], 'Suggestions retrieved successfully.');
+    }
+
+    /**
+     * حذف صورة معينة للمحصول
+     * 
+     * @param int $id رقم الصورة
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteImage($id)
+    {
+        $image = \App\Models\CropImage::with('crop')->find($id);
+
+        if (!$image) {
+            return $this->errorResponse('Image not found.', [], 404);
+        }
+
+        // التحقق من ملكية المحصول المرتبط بالصورة
+        if ($image->crop->user_id !== auth()->id()) {
+            return $this->errorResponse('Unauthorized.', [], 403);
+        }
+
+        // حذف الملف من التخزين
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
+        // حذف السجل من قاعدة البيانات
+        $image->delete();
+
+        return $this->successResponse([], 'Image deleted successfully.');
     }
 }

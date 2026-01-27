@@ -68,30 +68,34 @@ class CropController extends Controller
      */
     public function store(Request $request)
     {
-        // التحقق من البيانات
+        // التحقق من البيانات - جعل الحقول اختيارية لتسهيل الإدخال للمزارع
         $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|string',
-            'area' => 'required|numeric',
-            'planting_date' => 'required|date',
-            'expected_harvest_date' => 'required|date|after:planting_date',
+            'name' => 'nullable|string|max:255',
+            'type' => 'nullable|string',
+            'area' => 'nullable|numeric',
+            'planting_date' => 'nullable|date',
+            'expected_harvest_date' => 'nullable|date',
             'soil_type' => 'nullable|string',
             'irrigation_method' => 'nullable|string',
             'yield_estimate' => 'nullable|numeric',
         ]);
 
-        // إنشاء المحصول
+        // إنشاء المحصول مع قيم افتراضية
         $crop = auth()->user()->crops()->create([
-            'name' => $request->name,
-            'type' => $request->type,
-            'area' => $request->area,
+            'name' => $request->name ?: 'محصول جديد ' . (auth()->user()->crops()->count() + 1),
+            'type' => $request->type ?: 'غير محدد',
+            'area' => $request->area ?: 1,
             'soil_type' => $request->soil_type,
             'irrigation_method' => $request->irrigation_method,
             'seed_source' => $request->seed_source,
             'yield_estimate' => $request->yield_estimate,
-            'planting_date' => $request->planting_date,
+            'planting_date' => $request->planting_date ?: now(),
             'expected_harvest_date' => $request->expected_harvest_date,
             'notes' => $request->notes,
+            'growth_percentage' => 0,
+            'status' => 'active',
+            'growth_stage' => 'seedling',
+            'health_status' => 'good',
         ]);
 
         // رفع وحفظ الصور المتعددة
@@ -174,18 +178,20 @@ class CropController extends Controller
         // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
 
-        // التحقق من البيانات
+        // التحقق من البيانات - حقول اختيارية
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'required|string',
-            'area' => 'required|numeric',
-            'planting_date' => 'required|date',
-            'expected_harvest_date' => 'required|date|after:planting_date',
+            'name' => 'nullable|string|max:255',
+            'type' => 'nullable|string',
+            'area' => 'nullable|numeric',
+            'planting_date' => 'nullable|date',
+            'expected_harvest_date' => 'nullable|date',
             'soil_type' => 'nullable|string',
             'irrigation_method' => 'nullable|string',
             'yield_estimate' => 'nullable|numeric',
             'seed_source' => 'nullable|string',
             'notes' => 'nullable|string',
+            'status' => 'nullable|string',
+            'growth_percentage' => 'nullable|integer',
         ]);
 
         // تحديث المحصول
@@ -398,5 +404,30 @@ class CropController extends Controller
         $crop->update($data);
 
         return back()->with('success', 'تم تحديث مرحلة النمو والحالة بنجاح!');
+    }
+
+    /**
+     * جلب اقتراحات البيانات للواجهة
+     */
+    public function suggestionsData()
+    {
+        $user = auth()->user();
+        
+        $names = $user->crops()->pluck('name')->unique();
+        $types = $user->crops()->pluck('type')->unique();
+        
+        $commonTypes = ['Wheat', 'Corn', 'Rice', 'Tomato', 'Potato', 'Cotton', 'Other', 'Cucumber', 'Palm', 'Clover', 'Olive', 'Citrus'];
+        $commonNames = ['North Field', 'South Field', 'Greenhouse 1', 'Home Farm'];
+
+        $translatedNames = $names->merge($commonNames)->unique()->map(fn($item) => __($item))->values();
+        $translatedTypes = $types->merge($commonTypes)->unique()->map(fn($item) => __($item))->values();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'names' => $translatedNames,
+                'types' => $translatedTypes,
+            ]
+        ]);
     }
 }

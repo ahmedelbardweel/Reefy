@@ -80,7 +80,7 @@ class AuthController extends ApiController
         $success['token'] =  $user->createToken('ReefyApp')->plainTextToken;
         $success['user'] =  $user;
 
-        return $this->successResponse($success, 'User register successfully.');
+        return $this->successResponse($success, 'User registered successfully');
     }
 
     /**
@@ -107,7 +107,7 @@ class AuthController extends ApiController
             $success['token'] =  $user->createToken('ReefyApp')->plainTextToken; 
             $success['user'] =  $user;
    
-            return $this->successResponse($success, 'User login successfully.');
+            return $this->successResponse($success, 'User logged in successfully');
         } 
         else{ 
             return $this->errorResponse('Unauthorised.', ['error'=>'Unauthorised'], 401);
@@ -129,7 +129,7 @@ class AuthController extends ApiController
     public function logout(Request $request) {
         // حذف التوكن الحالي
         $request->user()->currentAccessToken()->delete();
-        return $this->successResponse([], 'User logged out successfully.');
+        return $this->successResponse([], 'User logged out successfully');
     }
 
     /**
@@ -149,7 +149,7 @@ class AuthController extends ApiController
         $user = $request->user();
         // تحميل الملف الشخصي
         $user->load(['farmerProfile', 'expertProfile']);
-        return $this->successResponse($user, 'User profile retrieved successfully.');
+        return $this->successResponse($user, 'User profile retrieved successfully');
     }
 
     /**
@@ -168,6 +168,6 @@ class AuthController extends ApiController
         $user->fcm_token = $request->fcm_token;
         $user->save();
 
-        return $this->successResponse([], 'FCM token updated successfully.');
+        return $this->successResponse([], 'FCM token updated successfully');
     }
 }

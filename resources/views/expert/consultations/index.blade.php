@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="h4 font-weight-bold mb-0" style="color: var(--heading-color);">
-            <i class="bi bi-mortarboard text-success"></i> لوحة الخبراء: طلبات الاستشارة (Expert Feed)
+            <i class="bi bi-mortarboard text-success"></i> {{ __('Expert Dashboard: Consultation Requests') }}
         </h2>
     </x-slot>
 
@@ -9,8 +9,8 @@
         @if($consultations->isEmpty())
             <div class="card border-0 shadow-sm rounded-0 text-center py-5" style="background-color: var(--bg-secondary);">
                 <i class="bi bi-check-circle text-success display-1 mb-3"></i>
-                <h5 class="fw-bold" style="color: var(--heading-color);">رائع! لا توجد استشارات متأخرة</h5>
-                <p style="color: var(--text-secondary);">لقد تم الرد على كافة الطلبات المتاحة حالياً.</p>
+                <h5 class="fw-bold" style="color: var(--heading-color);">{{ __('Great! No pending consultations') }}</h5>
+                <p style="color: var(--text-secondary);">{{ __('All current requests have been answered.') }}</p>
             </div>
         @else
             <div class="row">
@@ -21,7 +21,7 @@
                                 <div class="col-md-9 border-end" style="border-color: var(--border-color) !important;">
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center mb-2 small" style="color: var(--text-secondary);">
-                                            <i class="bi bi-person-circle me-1"></i> مزارع: {{ $consultation->user->name }}
+                                            <i class="bi bi-person-circle me-1"></i> {{ __('Farmer') }}: {{ $consultation->user->name }}
                                             <span class="mx-2">|</span>
                                             <i class="bi bi-clock me-1"></i> {{ $consultation->created_at->diffForHumans() }}
                                             <span class="mx-2">|</span>
@@ -34,10 +34,10 @@
                                 <div class="col-md-3 d-flex align-items-center justify-content-center p-4" style="background-color: var(--bg-primary);">
                                     <div class="text-center w-100">
                                         @if($consultation->crop)
-                                            <div class="small mb-2" style="color: var(--text-secondary);">المحصول: {{ $consultation->crop->name }}</div>
+                                            <div class="small mb-2" style="color: var(--text-secondary);">{{ __('Crop') }}: {{ $consultation->crop->name }}</div>
                                         @endif
                                         <a href="{{ route('consultations.show', $consultation) }}" class="btn btn-success rounded-0 px-4 fw-bold w-100">
-                                            تقديم النصيحة
+                                            {{ __('Provide Advice') }}
                                         </a>
                                     </div>
                                 </div>

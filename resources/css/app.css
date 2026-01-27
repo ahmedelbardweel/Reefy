@@ -1,94 +1,17 @@
-/* Reefy Global Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Global Sharp Design */
 * {
     border-radius: 0 !important;
 }
 
-:root {
-    /* Theme Variables - Light Mode */
-    --bg-primary: #f7fee7;
-    --bg-secondary: #ffffff;
-    --text-primary: #1a2e05;
-    --text-secondary: #4b5563;
-    --heading-color: #000000;
-    --card-bg: #ffffff;
-    --border-color: rgba(0, 0, 0, 0.08);
-
-    /* Branding */
-    --brand-success: #84cc16;
-    --brand-primary: #3f6212;
-    --brand-soft: #ecfccb;
-}
-
-[data-bs-theme="dark"] {
-    /* Theme Variables - Dark Mode */
-    --bg-primary: #0a0f02;
-    --bg-secondary: #141d05;
-    --text-primary: #ecfccb;
-    --text-secondary: #a3a3a3;
-    --heading-color: #ffffff;
-    --card-bg: #141d05;
-    --border-color: rgba(255, 255, 255, 0.1);
-
-    --brand-soft: #1a2e05;
-}
-
-body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Outfit', 'Cairo', sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-    color: var(--heading-color) !important;
-}
-
-/* Smooth Transitions */
-.transition-all {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Card Enhancements */
-.card {
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border-radius: 0px !important;
-}
-
-.shadow-hover-light:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Utility Classes */
-.very-small {
-    font-size: 0.75rem;
-}
-
-.ls-tight {
-    letter-spacing: -0.01em;
-}
-
-.last-child-border-0:last-child {
-    border-bottom: 0 !important;
-}
-
-.last-child-mb-0:last-child {
-    margin-bottom: 0 !important;
-}
-
-/* Arabic Specific Optimization */
-[dir="rtl"] body {
-    line-height: 1.7;
+/* Icons and Avatars Circular Exceptions */
+.rounded-full {
+    border-radius: 9999px !important;
 }

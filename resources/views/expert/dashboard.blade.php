@@ -1,237 +1,215 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center" style="direction: rtl;">
+        <div class="flex justify-between items-center">
             <div>
-                <h1 class="h4 fw-bold mb-1" style="color: var(--heading-color); letter-spacing: -0.01em;">
-                    مركز قيادة الخبير (Expert Control Center)
+                <h1 class="text-xl font-bold mb-1 text-gray-900 dark:text-white tracking-tight">
+                    مركز قيادة الخبير
                 </h1>
-                <p class="text-muted small mb-0">مرحباً بك مجدداً يا د. {{ Auth::user()->name }}، إليك ملخص نشاطك اليوم.</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">مرحباً بك مجدداً يا د. {{ Auth::user()->name }}، إليك ملخص نشاطك اليوم.</p>
             </div>
-            <div class="d-none d-lg-flex bg-white px-3 py-2 border rounded-0 align-items-center gap-2" style="border-color: var(--border-color) !important; background: var(--bg-secondary) !important;">
-                <i class="bi bi-calendar3 text-success"></i>
-                <span class="small fw-bold text-dark" style="color: var(--heading-color) !important;">{{ now()->translatedFormat('l, d M Y') }}</span>
+            <div class="hidden lg:flex px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-none items-center gap-2 bg-white dark:bg-gray-800">
+                <i class="bi bi-calendar3 text-green-600"></i>
+                <span class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ now()->translatedFormat('l, d M Y') }}</span>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-4 px-1" style="background-color: var(--bg-primary);">
-        <!-- KPI Pillars - Expert Edition -->
-        <div class="row g-3 mb-4 text-end" style="direction: rtl;">
-            <div class="col-6 col-lg-3">
-                <div class="card border shadow-none h-100 p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important; border-radius: 0px !important;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="text-muted fw-bold" style="font-size: 0.75rem;">استشارات معلقة</span>
-                        <i class="bi bi-patch-question text-warning opacity-50 f-5"></i>
-                    </div>
-                    <h3 class="fw-bold mb-1" style="color: #f59e0b;">{{ $pendingCount }}</h3>
-                    <div class="very-small text-warning fw-bold">تحتاج إلى رد عاجل</div>
+    <div class="py-6 px-4 sm:px-6 lg:px-8" x-data="{ activeEditModal: null, showAddModal: false }">
+        <!-- KPI Pillars -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-start">
+            <!-- Pending Consultations -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-gray-500">استشارات معلقة</span>
+                    <i class="bi bi-patch-question text-yellow-500 opacity-50 text-xl"></i>
                 </div>
+                <h3 class="font-bold text-2xl mb-1 text-yellow-500">{{ $pendingCount }}</h3>
+                <div class="text-[10px] text-yellow-500 font-bold">تحتاج إلى رد عاجل</div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border shadow-none h-100 p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important; border-radius: 0px !important;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="text-muted fw-bold" style="font-size: 0.75rem;">تقديم نصائح</span>
-                        <i class="bi bi-chat-heart text-success opacity-50 f-5"></i>
-                    </div>
-                    <h3 class="fw-bold mb-1" style="color: var(--reefy-primary);">{{ $answeredCount }}</h3>
-                    <div class="very-small text-success fw-bold">إجمالي المساهمات</div>
+
+            <!-- Answered -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-gray-500">تقديم نصائح</span>
+                    <i class="bi bi-chat-heart text-green-600 opacity-50 text-xl"></i>
                 </div>
+                <h3 class="font-bold text-2xl mb-1 text-green-600">{{ $answeredCount }}</h3>
+                <div class="text-[10px] text-green-600 font-bold">إجمالي المساهمات</div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border shadow-none h-100 p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important; border-radius: 0px !important;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="text-muted fw-bold" style="font-size: 0.75rem;">تقييم الأداء</span>
-                        <i class="bi bi-star-fill text-info opacity-50 f-5"></i>
-                    </div>
-                    <h3 class="fw-bold mb-1" style="color: #0369a1;">4.9</h3>
-                    <div class="very-small text-info fw-bold">بناءً على رأي المزارعين</div>
+
+            <!-- Rating -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-gray-500">تقييم الأداء</span>
+                    <i class="bi bi-star-fill text-blue-600 opacity-50 text-xl"></i>
                 </div>
+                <h3 class="font-bold text-2xl mb-1 text-blue-600">4.9</h3>
+                <div class="text-[10px] text-blue-600 font-bold">بناءً على رأي المزارعين</div>
             </div>
-            <div class="col-6 col-lg-3">
-                <div class="card border shadow-none h-100 p-3" style="background-color: var(--bg-secondary); border-color: var(--border-color) !important; border-radius: 0px !important;">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="text-muted fw-bold" style="font-size: 0.75rem;">مزارعين مستفيدين</span>
-                        <i class="bi bi-people text-secondary opacity-50 f-5"></i>
-                    </div>
-                    <h3 class="fw-bold mb-1" style="color: #334155;">85</h3>
-                    <div class="very-small text-muted fw-bold">خلال الشهر الأخير</div>
+
+            <!-- Beneficiaries -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-gray-500">مزارعين مستفيدين</span>
+                    <i class="bi bi-people text-gray-500 opacity-50 text-xl"></i>
                 </div>
+                <h3 class="font-bold text-2xl mb-1 text-gray-700 dark:text-gray-300">85</h3>
+                <div class="text-[10px] text-gray-500 font-bold">خلال الشهر الأخير</div>
             </div>
         </div>
 
-        <div class="row g-4">
-            <!-- Consultations List - Full Width -->
-            <div class="col-12" style="direction: rtl;">
-                <div class="card border-0 shadow-none" style="border-radius: 0px; border: 1px solid var(--border-color) !important;">
-                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center" style="background: var(--bg-secondary) !important;">
-                        <div>
-                            <h5 class="fw-bold mb-1 fs-6" style="color: var(--heading-color) !important;">أحدث طلبات الاستشارة مجهولة الرد</h5>
-                            <p class="very-small text-muted mb-0" style="color: var(--text-secondary) !important;">قم بمساعدة المزارعين من خلال خبراتك الميدانية</p>
-                        </div>
-                        <a href="{{ route('expert.consultations.index') }}" class="btn btn-sm btn-outline-success rounded-0 px-3 fw-bold" style="font-size: 0.75rem;">عرض الكل</a>
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Consultations List -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+                <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <div>
+                        <h5 class="font-bold text-sm text-gray-900 dark:text-white">أحدث طلبات الاستشارة مجهولة الرد</h5>
+                        <p class="text-xs text-gray-500">قم بمساعدة المزارعين من خلال خبراتك الميدانية</p>
                     </div>
-                    <div class="card-body p-4">
-                        @forelse($recentConsultations as $consultation)
-                            <div class="p-3 mb-3 border rounded-0 bg-white transition-all shadow-hover-light" style="border-color: #f1f5f9 !important;">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="rounded-0 bg-light p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-chat-dots text-success"></i>
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold small" style="color: var(--heading-color) !important;">{{ $consultation->subject }}</div>
-                                            <div class="very-small text-muted" style="color: var(--text-secondary) !important;">{{ $consultation->created_at->diffForHumans() }}</div>
-                                        </div>
-                                    </div>
-                                    <span class="badge rounded-0 bg-light text-dark px-3 py-2 very-small fw-bold border" style="border-color: #e2eee8 !important;">{{ $consultation->category }}</span>
-                                </div>
-                                <p class="text-muted small mb-3 ls-tight" style="line-height: 1.6;">{{ Str::limit($consultation->question, 140) }}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top" style="border-color: #f8fafc !important;">
-                                    <div class="very-small fw-bold text-muted">
-                                        <i class="bi bi-person me-1"></i> مزارع ريفي
-                                    </div>
-                                    <a href="{{ route('consultations.show', $consultation) }}" class="btn btn-success btn-sm rounded-0 px-4 fw-bold">
-                                        <i class="bi bi-reply-all me-1"></i> تقديم نصيحة
-                                    </a>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-5">
-                                <div class="bg-light rounded-0 d-inline-flex p-4 mb-3">
-                                    <i class="bi bi-check2-all text-success display-4"></i>
-                                </div>
-                                <h6 class="fw-bold text-dark">عمل رائع! لا توجد طلبات معلقة</h6>
-                                <p class="text-muted small">قمت بالرد على كافة الاستشارات المتاحة حتى الآن.</p>
-                            </div>
-                        @endforelse
-                    </div>
+                    <a href="{{ route('expert.consultations.index') }}" class="text-xs border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1 transition">عرض الكل</a>
                 </div>
-
-                <!-- Expert Tips Management -->
-                <div class="card border-0 shadow-none mt-4" style="border-radius: 0px; border: 1px solid #e2eee8 !important;">
-                    <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="fw-bold text-dark mb-1 fs-6">إدارة النصائح العامة</h5>
-                            <p class="very-small text-muted mb-0">انشر نصائح تظهر لجميع المزارعين في لوحة تحكمهم</p>
-                        </div>
-                        <button class="btn btn-sm btn-success rounded-0 px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#addTipModal" style="font-size: 0.75rem;">
-                            <i class="bi bi-plus-lg me-1"></i> إضافة نصيحة
-                        </button>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="row g-3">
-                            @forelse($myTips as $tip)
-                                <div class="col-md-6">
-                                    <div class="p-3 border rounded-0 bg-white transition-all shadow-hover-light position-relative" style="border-color: #f1f5f9 !important;">
-                                        <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold text-dark fs-6 mb-0">{{ $tip->title }}</h6>
-                                            <div class="dropdown">
-                                                <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-0 p-2">
-                                                    <li>
-                                                        <button class="dropdown-item rounded-0 py-2 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#editTipModal{{ $tip->id }}">
-                                                            <i class="bi bi-pencil text-primary"></i> <span class="small">تعديل</span>
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <form action="{{ route('expert.tips.destroy', $tip) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه النصيحة؟')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="dropdown-item text-danger rounded-0 py-2 d-flex align-items-center gap-2">
-                                                                <i class="bi bi-trash"></i> <span class="small">حذف</span>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <p class="text-muted small mb-0 ls-tight" style="line-height: 1.5; height: 3rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ $tip->content }}</p>
-                                        <div class="very-small text-muted mt-2 border-top pt-2">
-                                            <i class="bi bi-clock me-1"></i> {{ $tip->created_at->format('Y-m-d') }}
-                                        </div>
+                <div class="p-4">
+                    @forelse($recentConsultations as $consultation)
+                        <div class="p-4 mb-3 border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition group">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                        <i class="bi bi-chat-dots text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-sm text-gray-900 dark:text-white">{{ $consultation->subject }}</div>
+                                        <div class="text-[10px] text-gray-500">{{ $consultation->created_at->diffForHumans() }}</div>
                                     </div>
                                 </div>
+                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] border border-gray-200 dark:border-gray-600">{{ $consultation->category }}</span>
+                            </div>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">{{ Str::limit($consultation->question, 140) }}</p>
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50 dark:border-gray-700">
+                                <div class="text-[10px] font-bold text-gray-500">
+                                    <i class="bi bi-person me-1"></i> مزارع ريفي
+                                </div>
+                                <a href="{{ route('consultations.show', $consultation) }}" class="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold transition">
+                                    <i class="bi bi-reply-all ml-1"></i> تقديم نصيحة
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8">
+                            <div class="inline-flex p-4 bg-gray-50 dark:bg-gray-700 mb-3 rounded-full">
+                                <i class="bi bi-check2-all text-green-600 text-4xl"></i>
+                            </div>
+                            <h6 class="font-bold text-gray-900 dark:text-white">عمل رائع! لا توجد طلبات معلقة</h6>
+                            <p class="text-xs text-gray-500">قمت بالرد على كافة الاستشارات المتاحة حتى الآن.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
 
-                                <!-- Edit Tip Modal -->
-                                <div class="modal fade" id="editTipModal{{ $tip->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow-lg rounded-0">
-                                            <div class="modal-header border-0 pb-0 px-4 pt-4">
-                                                <h5 class="fw-bold text-dark fs-5">تعديل النصيحة</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <form action="{{ route('expert.tips.update', $tip) }}" method="POST">
+            <!-- Expert Tips Management -->
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm mt-4">
+                <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
+                    <div>
+                        <h5 class="font-bold text-sm text-gray-900 dark:text-white">إدارة النصائح العامة</h5>
+                        <p class="text-xs text-gray-500">انشر نصائح تظهر لجميع المزارعين في لوحة تحكمهم</p>
+                    </div>
+                    <button @click="showAddModal = true" class="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold transition">
+                        <i class="bi bi-plus-lg ml-1"></i> إضافة نصيحة
+                    </button>
+                </div>
+                <div class="p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @forelse($myTips as $tip)
+                            <div class="p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition relative group">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h6 class="font-bold text-sm text-gray-900 dark:text-white">{{ $tip->title }}</h6>
+                                    
+                                    <!-- Dropdown using Alpine -->
+                                    <div x-data="{ open: false }" class="relative">
+                                        <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <div x-show="open" class="absolute left-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-lg z-10" x-cloak>
+                                            <button @click="activeEditModal = {{ $tip->id }}; open = false" class="w-full text-start px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                                                <i class="bi bi-pencil text-blue-500"></i> تعديل
+                                            </button>
+                                            <form action="{{ route('expert.tips.destroy', $tip) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه النصيحة؟')">
                                                 @csrf
-                                                @method('PUT')
-                                                <div class="modal-body p-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold text-muted">عنوان النصيحة</label>
-                                                        <input type="text" name="title" class="form-control rounded-0 border-light bg-light" value="{{ $tip->title }}" required>
-                                                    </div>
-                                                    <div class="mb-0">
-                                                        <label class="form-label small fw-bold text-muted">محتوى النصيحة</label>
-                                                        <textarea name="content" rows="4" class="form-control rounded-0 border-light bg-light" required>{{ $tip->content }}</textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer border-0 p-4 pt-0">
-                                                    <button type="submit" class="btn btn-success w-100 rounded-0 py-2 fw-bold">حفظ التعديلات</button>
-                                                </div>
+                                                @method('DELETE')
+                                                <button type="submit" class="w-full text-start px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2 text-red-500">
+                                                    <i class="bi bi-trash"></i> حذف
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
-                            @empty
-                                <div class="text-center py-4 w-100">
-                                    <p class="text-muted small mb-0">لم تقم بإضافة أي نصائح عامة بعد.</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal for Adding New Tip -->
-            <div class="modal fade" id="addTipModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0 shadow-lg rounded-0">
-                        <div class="modal-header border-0 pb-0 px-4 pt-4">
-                            <h5 class="fw-bold text-dark fs-5">إضافة نصيحة جديدة</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form action="{{ route('expert.tips.store') }}" method="POST">
-                            @csrf
-                            <div class="modal-body p-4">
-                                <div class="mb-3">
-                                    <label class="form-label small fw-bold text-muted">عنوان النصيحة</label>
-                                    <input type="text" name="title" class="form-control rounded-0 border-light bg-light" placeholder="مثلاً: أفضل وقت للري في الصيف" required>
-                                </div>
-                                <div class="mb-0">
-                                    <label class="form-label small fw-bold text-muted">محتوى النصيحة</label>
-                                    <textarea name="content" rows="4" class="form-control rounded-0 border-light bg-light" placeholder="اكتب نصيحتك العلمية هنا..." required></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-0 leading-relaxed line-clamp-2">{{ $tip->content }}</p>
+                                <div class="text-[10px] text-gray-400 mt-2 border-t border-gray-50 dark:border-gray-700 pt-2">
+                                    <i class="bi bi-clock ml-1"></i> {{ $tip->created_at->format('Y-m-d') }}
                                 </div>
                             </div>
-                            <div class="modal-footer border-0 p-4 pt-0">
-                                <button type="submit" class="btn btn-success w-100 rounded-0 py-2 fw-bold">نشر النصيحة</button>
+
+                            <!-- Edit Modal (One per item vs Dynamic) -->
+                            <!-- Simulating dynamic modal by checking activeEditModal -->
+                            <div x-show="activeEditModal === {{ $tip->id }}" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
+                                <div class="bg-white dark:bg-gray-800 w-full max-w-md mx-4 shadow-lg" @click.away="activeEditModal = null">
+                                    <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700">
+                                        <h5 class="font-bold text-gray-900 dark:text-white">تعديل النصيحة</h5>
+                                        <button @click="activeEditModal = null" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
+                                    </div>
+                                    <form action="{{ route('expert.tips.update', $tip) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="p-4 space-y-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 mb-1">عنوان النصيحة</label>
+                                                <input type="text" name="title" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" value="{{ $tip->title }}" required>
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 mb-1">محتوى النصيحة</label>
+                                                <textarea name="content" rows="4" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" required>{{ $tip->content }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="p-4 pt-0">
+                                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-bold text-sm transition">حفظ التعديلات</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        </form>
+                        @empty
+                            <div class="col-span-2 text-center py-4">
+                                <p class="text-gray-400 text-xs">لم تقم بإضافة أي نصائح عامة بعد.</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
-            </div>
-
             </div>
         </div>
-    </div>
 
-    <style>
-        .very-small { font-size: 0.7rem; }
-        .ls-tight { letter-spacing: -0.01em; }
-        .shadow-hover-light:hover { 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.03) !important;
-            transform: translateY(-2px);
-            border-color: #e2eee8 !important;
-        }
-        .transition-all { transition: all 0.3s ease; }
-    </style>
+        <!-- Add Tip Modal -->
+        <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
+            <div class="bg-white dark:bg-gray-800 w-full max-w-md mx-4 shadow-lg" @click.away="showAddModal = false">
+                <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700">
+                    <h5 class="font-bold text-gray-900 dark:text-white">إضافة نصيحة جديدة</h5>
+                    <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <form action="{{ route('expert.tips.store') }}" method="POST">
+                    @csrf
+                    <div class="p-4 space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">عنوان النصيحة</label>
+                            <input type="text" name="title" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" placeholder="مثلاً: أفضل وقت للري في الصيف" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">محتوى النصيحة</label>
+                            <textarea name="content" rows="4" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" placeholder="اكتب نصيحتك العلمية هنا..." required></textarea>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-bold text-sm transition">نشر النصيحة</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
 </x-app-layout>

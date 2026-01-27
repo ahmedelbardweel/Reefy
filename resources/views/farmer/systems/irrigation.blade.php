@@ -1,83 +1,114 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="h4 font-weight-bold mb-0" style="color: var(--heading-color);">
-            <i class="bi bi-water me-2 text-primary"></i> {{ __('نظام إدارة الري') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold mb-1 text-gray-900 dark:text-white tracking-tight">
+                    <i class="bi bi-water text-blue-500 ml-2"></i> {{ __('Smart Irrigation Management') }}
+                </h1>
+                <p class="text-xs text-gray-500">{{ __('Monitor water consumption and track scheduled irrigation operations') }}</p>
+            </div>
+            <div class="hidden lg:flex px-3 py-2 border border-gray-200 dark:border-gray-700 items-center gap-2 bg-white dark:bg-gray-800">
+                <i class="bi bi-droplet-fill text-blue-500"></i>
+                <span class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ __('Total Consumption') }}: {{ number_format($totalWater) }} {{ __('L') }}</span>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-4">
-        <!-- Stats Card -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm bg-primary text-white">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="display-4 me-3"><i class="bi bi-droplet-fill"></i></div>
-                            <div>
-                                <h6 class="text-white-50 text-uppercase mb-1">إجمالي المياه المستهلكة</h6>
-                                <h3 class="mb-0 fw-bold">{{ number_format($totalWater) }} لتر</h3>
-                            </div>
-                        </div>
-                    </div>
+    <div class="py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Quick Insight -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-600 p-6 shadow-sm border border-blue-700 text-white flex items-center justify-between">
+                <div>
+                    <h6 class="text-blue-100 text-xs font-bold uppercase mb-1">{{ __('Total Registered Water') }}</h6>
+                    <h3 class="text-3xl font-bold">{{ number_format($totalWater) }} <span class="text-sm font-normal">{{ __('L') }}</span></h3>
                 </div>
+                <i class="bi bi-droplet-half text-4xl opacity-30"></i>
+            </div>
+            
+            <div class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h6 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase mb-1">{{ __('Irrigation Operations') }}</h6>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $tasks->total() }}</h3>
+                </div>
+                <i class="bi bi-calendar-check text-4xl text-blue-500 opacity-20"></i>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h6 class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase mb-1">{{ __('Active Crops') }}</h6>
+                    <h3 class="text-3xl font-bold text-gray-900 dark:text-white">{{ Auth::user()->crops()->count() }}</h3>
+                </div>
+                <i class="bi bi-sprout text-4xl text-green-500 opacity-20"></i>
             </div>
         </div>
 
         <!-- Irrigation Log -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header py-3" style="background-color: var(--bg-secondary); border-bottom: 1px solid var(--border-color);">
-                <h5 class="mb-0 fw-bold" style="color: var(--heading-color);">سجل عمليات الري</h5>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+                <h5 class="font-bold text-sm text-gray-900 dark:text-white uppercase tracking-wider">{{ __('Live Irrigation Log') }}</h5>
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-[10px] font-bold">{{ __('Real-time Update') }}</span>
             </div>
-            <div class="card-body p-0" style="background-color: var(--bg-secondary);">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" style="color: var(--text-primary);">
-                        <thead style="background-color: var(--bg-primary);">
-                            <tr>
-                                <th class="border-0" style="color: var(--text-secondary);">المحصول</th>
-                                <th class="border-0" style="color: var(--text-secondary);">التاريخ</th>
-                                <th class="border-0" style="color: var(--text-secondary);">كمية المياه</th>
-                                <th class="border-0" style="color: var(--text-secondary);">مدة الري</th>
-                                <th class="border-0" style="color: var(--text-secondary);">الحالة</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($tasks as $task)
-                            <tr>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ $task->crop->image_url ?? asset('images/crop-placeholder.png') }}" class="rounded-0 me-2" width="40" height="40" alt="{{ $task->crop->name }}">
-                                        <span class="fw-bold">{{ $task->crop->name }}</span>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase">
+                            <th class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">{{ __('Crop') }}</th>
+                            <th class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">{{ __('Operation Date') }}</th>
+                            <th class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 text-center">{{ __('Flow Amount') }}</th>
+                            <th class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 text-center">{{ __('Duration') }}</th>
+                            <th class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 text-center">{{ __('Status') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        @forelse($tasks as $task)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 border border-gray-200 dark:border-gray-600 overflow-hidden shrink-0">
+                                        <img src="{{ $task->crop->image_url ?? asset('images/crop-placeholder.png') }}" class="w-full h-full object-cover" alt="{{ $task->crop->name }}">
                                     </div>
-                                </td>
-                                <td>{{ $task->due_date->format('Y-m-d') }}</td>
-                                <td>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary">
-                                        {{ $task->water_amount ?? '-' }} لتر
-                                    </span>
-                                </td>
-                                <td>{{ $task->duration ?? '-' }} دقيقة</td>
-                                <td>
-                                    @if($task->status == 'completed')
-                                        <span class="badge bg-success">مكتملة</span>
-                                    @else
-                                        <span class="badge bg-warning text-dark">قيد الانتظار</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
-                                    لا توجد سجلات ري حتى الآن
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $task->crop->name }}</div>
+                                        <div class="text-[10px] text-gray-500">{{ __('Field') }}: {{ $task->crop->location ?? __('Main') }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                {{ $task->due_date->translatedFormat('d F Y') }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-bold border border-blue-100 dark:border-blue-800">
+                                    {{ $task->water_amount ?? '-' }} {{ __('L') }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center text-sm text-gray-700 dark:text-gray-300 font-bold">
+                                {{ $task->duration ?? '-' }} <span class="text-[10px] font-normal text-gray-500 uppercase">{{ __('min') }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($task->status == 'completed')
+                                    <span class="px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] font-bold border border-green-200 dark:border-green-800 leading-none">{{ __('Completed') }}</span>
+                                @else
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 text-[10px] font-bold border border-yellow-200 dark:border-yellow-800 leading-none">{{ __('Pending') }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <i class="bi bi-wind text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-sm text-gray-500 font-bold">{{ __('No irrigation records found yet') }}</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
+            
             @if($tasks->hasPages())
-                <div class="card-footer" style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+                <div class="p-4 bg-gray-50 dark:bg-gray-900/30 border-t border-gray-100 dark:border-gray-700">
                     {{ $tasks->links() }}
                 </div>
             @endif

@@ -125,7 +125,7 @@
                     <div class="card border-0 p-4 mb-4 bg-success text-white">
                         <h5 class="fw-bold mb-3">حالة الحساب</h5>
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <div class="ripple-status bg-white rounded-circle" style="width: 12px; height: 12px;"></div>
+                            <div class="ripple-status bg-white" style="width: 12px; height: 12px;"></div>
                             <span class="fw-bold">نشط</span>
                         </div>
                         <p class="small opacity-75">حسابك مفعل وجاهز للاستخدام. يمكنك دائماً تحديث بياناتك من خلال زر التعديل.</p>
