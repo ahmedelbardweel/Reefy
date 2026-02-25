@@ -101,4 +101,11 @@ Route::get('/farmer/profile/{id}', [App\Http\Controllers\FarmerProfileController
 Route::get('/community', [App\Http\Controllers\CommunityController::class, 'index'])->name('community.index');
 Route::get('/community/post/{post}', [App\Http\Controllers\CommunityController::class, 'show'])->name('community.show');
 
+// Temporary route for Render deployment to run migrations without shell access
+use Illuminate\Support\Facades\Artisan;
+Route::get('/run-migrations-secret-url', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return "Migration Completed Successfully: " . Artisan::output();
+});
+
 require __DIR__.'/auth.php';
