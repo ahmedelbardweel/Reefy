@@ -1,7 +1,7 @@
 services:
   - type: web
     name: reefy-app
-    runtime: php
+    env: php
     region: frankfurt
     plan: free
     buildCommand: "composer install --no-dev --optimize-autoloader && npm install && npm run build"
