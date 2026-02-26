@@ -112,7 +112,14 @@ Route::get('/run-migrations-secret-url', function () {
 Route::prefix('preview')->name('preview.')->middleware(\App\Http\Middleware\PreviewMockAuth::class)->group(function () {
     Route::get('/farmer/dashboard', function () { return view('farmer.dashboard-preview'); })->name('farmer.dashboard');
     Route::get('/admin/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
-    Route::get('/expert/dashboard', function () { return view('expert.dashboard'); })->name('expert.dashboard');
+    Route::get('/expert/dashboard', function () { 
+        return view('expert.dashboard', [
+            'pendingCount' => 0,
+            'answeredCount' => 0,
+            'recentConsultations' => collect([]),
+            'myTips' => collect([])
+        ]); 
+    })->name('expert.dashboard');
     
     // Community
     Route::get('/community', function () { 
