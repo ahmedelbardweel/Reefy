@@ -108,4 +108,9 @@ Route::get('/run-migrations-secret-url', function () {
     return "Migration Completed Successfully: " . Artisan::output();
 });
 
+// Public Preview Route for Design Purposes
+Route::get('/dashboard-preview', function () {
+    return view('farmer.dashboard-preview');
+})->name('dashboard.preview');
+
 require __DIR__.'/auth.php';
