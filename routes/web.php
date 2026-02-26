@@ -108,9 +108,36 @@ Route::get('/run-migrations-secret-url', function () {
     return "Migration Completed Successfully: " . Artisan::output();
 });
 
-// Public Preview Route for Design Purposes
-Route::get('/dashboard-preview', function () {
-    return view('farmer.dashboard-preview');
-})->name('dashboard.preview');
+// ---------- PREVIEW ROUTES (NO AUTH REQUIRED) ----------
+Route::prefix('preview')->name('preview.')->group(function () {
+    Route::get('/farmer/dashboard', function () { return view('farmer.dashboard-preview'); })->name('farmer.dashboard');
+    Route::get('/admin/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
+    Route::get('/expert/dashboard', function () { return view('expert.dashboard'); })->name('expert.dashboard');
+    
+    // Community
+    Route::get('/community', function () { return view('community.index', ['posts' => collect([]), 'trendingTags' => collect()]); })->name('community.index');
+    Route::get('/community/post', function () { 
+        $dummyPost = (object)[
+            'id' => 1, 'title' => 'Sample Post', 'content' => 'Sample content', 'user' => (object)['name' => 'John Doe', 'avatar_url' => null],
+            'created_at' => now(), 'likes_count' => 5, 'comments' => collect([])
+        ];
+        return view('community.show', ['post' => $dummyPost]); 
+    })->name('community.show');
+
+    // Crops & Systems
+    Route::get('/crops', function () { return view('farmer.crops.index', ['crops' => collect([])]); })->name('crops.index');
+    Route::get('/crops/create', function () { return view('farmer.crops.create'); })->name('crops.create');
+    Route::get('/systems/irrigation', function () { return view('farmer.systems.irrigation'); })->name('systems.irrigation');
+    Route::get('/systems/treatment', function () { return view('farmer.systems.treatment'); })->name('systems.treatment');
+    Route::get('/systems/harvesting', function () { return view('farmer.systems.harvesting'); })->name('systems.harvesting');
+
+    // Consultations
+    Route::get('/consultations', function () { return view('consultations.index', ['consultations' => collect([])]); })->name('consultations.index');
+    Route::get('/consultations/create', function () { return view('consultations.create'); })->name('consultations.create');
+    
+    // Profiles
+    Route::get('/profile', function () { return view('profile.show'); })->name('profile.show');
+    Route::get('/profile/edit', function () { return view('profile.edit', ['user' => (object)['name' => 'Preview User', 'email' => 'preview@example.com']]); })->name('profile.edit');
+});
 
 require __DIR__.'/auth.php';
