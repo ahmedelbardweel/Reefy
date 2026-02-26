@@ -109,19 +109,7 @@ Route::get('/run-migrations-secret-url', function () {
 });
 
 // ---------- PREVIEW ROUTES (NO AUTH REQUIRED, MOCKS AUTH & DATA) ----------
-Route::prefix('preview')->name('preview.')->middleware(function ($request, $next) {
-    if (!auth()->check()) {
-        $dummyUser = new \App\Models\User([
-            'id' => 9999,
-            'name' => 'Designer Preview',
-            'email' => 'designer@preview.com',
-            'role' => 'farmer'
-        ]);
-        $dummyUser->setRelation('crops', collect([]));
-        auth()->setUser($dummyUser);
-    }
-    return $next($request);
-})->group(function () {
+Route::prefix('preview')->name('preview.')->middleware(\App\Http\Middleware\PreviewMockAuth::class)->group(function () {
     Route::get('/farmer/dashboard', function () { return view('farmer.dashboard-preview'); })->name('farmer.dashboard');
     Route::get('/admin/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
     Route::get('/expert/dashboard', function () { return view('expert.dashboard'); })->name('expert.dashboard');
