@@ -108,28 +108,64 @@ Route::get('/run-migrations-secret-url', function () {
     return "Migration Completed Successfully: " . Artisan::output();
 });
 
-// ---------- PREVIEW ROUTES (NO AUTH REQUIRED) ----------
-Route::prefix('preview')->name('preview.')->group(function () {
+// ---------- PREVIEW ROUTES (NO AUTH REQUIRED, MOCKS AUTH & DATA) ----------
+Route::prefix('preview')->name('preview.')->middleware(function ($request, $next) {
+    if (!auth()->check()) {
+        $dummyUser = new \App\Models\User([
+            'id' => 9999,
+            'name' => 'Designer Preview',
+            'email' => 'designer@preview.com',
+            'role' => 'farmer'
+        ]);
+        $dummyUser->setRelation('crops', collect([]));
+        auth()->setUser($dummyUser);
+    }
+    return $next($request);
+})->group(function () {
     Route::get('/farmer/dashboard', function () { return view('farmer.dashboard-preview'); })->name('farmer.dashboard');
     Route::get('/admin/dashboard', function () { return view('admin.dashboard'); })->name('admin.dashboard');
     Route::get('/expert/dashboard', function () { return view('expert.dashboard'); })->name('expert.dashboard');
     
     // Community
-    Route::get('/community', function () { return view('community.index', ['posts' => collect([]), 'trendingTags' => collect()]); })->name('community.index');
+    Route::get('/community', function () { 
+        $emptyPaginator = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 10, 1, ['path' => url('/')]);
+        return view('community.index', ['posts' => $emptyPaginator, 'trendingTags' => collect()]); 
+    })->name('community.index');
+    
     Route::get('/community/post', function () { 
-        $dummyPost = (object)[
-            'id' => 1, 'title' => 'Sample Post', 'content' => 'Sample content', 'user' => (object)['name' => 'John Doe', 'avatar_url' => null],
-            'created_at' => now(), 'likes_count' => 5, 'comments' => collect([])
-        ];
+        $dummyPost = new \App\Models\CommunityPost();
+        $dummyPost->id = 1;
+        $dummyPost->content = 'Sample content';
+        $dummyPost->user_id = 1;
+        $dummyPost->created_at = now();
+        $dummyPost->setRelation('user', new \App\Models\User(['name' => 'Designer']));
+        $dummyPost->setRelation('comments', collect([]));
+        $dummyPost->setRelation('likes', collect([]));
         return view('community.show', ['post' => $dummyPost]); 
     })->name('community.show');
 
     // Crops & Systems
-    Route::get('/crops', function () { return view('farmer.crops.index', ['crops' => collect([])]); })->name('crops.index');
-    Route::get('/crops/create', function () { return view('farmer.crops.create'); })->name('crops.create');
-    Route::get('/systems/irrigation', function () { return view('farmer.systems.irrigation'); })->name('systems.irrigation');
-    Route::get('/systems/treatment', function () { return view('farmer.systems.treatment'); })->name('systems.treatment');
-    Route::get('/systems/harvesting', function () { return view('farmer.systems.harvesting'); })->name('systems.harvesting');
+    Route::get('/crops', function () { 
+        $emptyPaginator = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 10, 1, ['path' => url('/')]);
+        return view('crops.index', ['crops' => $emptyPaginator]); 
+    })->name('crops.index');
+    
+    Route::get('/crops/create', function () { return view('crops.create'); })->name('crops.create');
+    
+    Route::get('/systems/irrigation', function () { 
+        $emptyPaginator = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 10, 1, ['path' => url('/')]);
+        return view('farmer.systems.irrigation', ['tasks' => $emptyPaginator, 'totalWater' => 0]); 
+    })->name('systems.irrigation');
+    
+    Route::get('/systems/treatment', function () { 
+        $emptyPaginator = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 10, 1, ['path' => url('/')]);
+        return view('farmer.systems.treatment', ['tasks' => $emptyPaginator]); 
+    })->name('systems.treatment');
+    
+    Route::get('/systems/harvesting', function () { 
+        $emptyPaginator = new \Illuminate\Pagination\LengthAwarePaginator(collect([]), 0, 10, 1, ['path' => url('/')]);
+        return view('farmer.systems.harvesting', ['tasks' => $emptyPaginator, 'totalYield' => 0]); 
+    })->name('systems.harvesting');
 
     // Consultations
     Route::get('/consultations', function () { return view('consultations.index', ['consultations' => collect([])]); })->name('consultations.index');
@@ -137,7 +173,7 @@ Route::prefix('preview')->name('preview.')->group(function () {
     
     // Profiles
     Route::get('/profile', function () { return view('profile.show'); })->name('profile.show');
-    Route::get('/profile/edit', function () { return view('profile.edit', ['user' => (object)['name' => 'Preview User', 'email' => 'preview@example.com']]); })->name('profile.edit');
+    Route::get('/profile/edit', function () { return view('profile.edit', ['user' => auth()->user()]); })->name('profile.edit');
 });
 
 require __DIR__.'/auth.php';
