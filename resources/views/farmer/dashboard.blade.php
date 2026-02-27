@@ -23,12 +23,12 @@
                 <h6 class="font-bold text-sm text-gray-900 dark:text-white">{{ __('Expert Guidance') }}</h6>
             </div>
             
-            <div class="flex flex-wrap gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($expertTips as $tip)
-                    <div class="p-4 shadow-sm transition-all bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 border-r-4 border-r-blue-500 min-w-[250px] max-w-sm">
+                    <div class="p-4 shadow-sm transition-all bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 border-r-4 border-r-blue-500 flex flex-col h-full">
                         <div class="text-xs font-bold mb-1 text-green-700">{{ $tip->title }}</div>
-                        <p class="text-xs mb-2 leading-relaxed text-gray-600 dark:text-gray-400">{{ $tip->content }}</p>
-                        <div class="flex items-center gap-1 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                        <p class="text-xs mb-2 leading-relaxed text-gray-600 dark:text-gray-400 flex-grow">{{ $tip->content }}</p>
+                        <div class="flex items-center gap-1 mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
                             <span class="text-[10px] text-gray-500">{{ __('Dr.') }} {{ $tip->user->name }}</span>
                             <i class="bi bi-patch-check-fill text-blue-500 text-[10px]"></i>
                         </div>

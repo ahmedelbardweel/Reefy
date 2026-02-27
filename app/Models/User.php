@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    public function unreadNotifications()
+    {
+        return $this->hasMany(Notification::class)->where('is_read', false);
+    }
+
     public function consultations()
     {
         return $this->hasMany(Consultation::class);

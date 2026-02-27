@@ -38,7 +38,7 @@ class NotificationController extends ApiController
      */
     public function markAllAsRead()
     {
-        auth()->user()->unreadNotifications->markAsRead();
+        auth()->user()->unreadNotifications->each->markAsRead();
         
         return $this->successResponse([], 'All notifications marked as read.');
     }
