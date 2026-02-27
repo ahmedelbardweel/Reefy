@@ -21,18 +21,7 @@ use App\Http\Controllers\LanguageController;
 Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
 Route::get('/', function () {
-    $posts = \App\Models\Post::with('user')
-        ->withCount(['likes', 'comments'])
-        ->latest()
-        ->take(3)
-        ->get();
-        
-    $consultations = \App\Models\Consultation::with('user')
-        ->latest()
-        ->take(3)
-        ->get();
-
-    return view('welcome', compact('posts', 'consultations'));
+    return view('welcome');
 });
 
 
@@ -139,7 +128,7 @@ Route::prefix('preview')->name('preview.')->middleware(\App\Http\Middleware\Prev
     })->name('community.index');
     
     Route::get('/community/post', function () { 
-        $dummyPost = new \App\Models\Post();
+        $dummyPost = new \App\Models\CommunityPost();
         $dummyPost->id = 1;
         $dummyPost->content = 'Sample content';
         $dummyPost->user_id = 1;
