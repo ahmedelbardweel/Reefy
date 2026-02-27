@@ -41,4 +41,4 @@ RUN sed -i -e 's/html/html\/public/g' /etc/apache2/sites-available/000-default.c
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Start Apache & Migrate
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan storage:link && php artisan migrate --force && apache2-foreground
