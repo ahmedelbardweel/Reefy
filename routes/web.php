@@ -21,7 +21,18 @@ use App\Http\Controllers\LanguageController;
 Route::get('/lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
 Route::get('/', function () {
-    return view('welcome');
+    $posts = \App\Models\CommunityPost::with('user')
+        ->withCount(['likes', 'comments'])
+        ->latest()
+        ->take(3)
+        ->get();
+        
+    $consultations = \App\Models\Consultation::with('user')
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('posts', 'consultations'));
 });
 
 
