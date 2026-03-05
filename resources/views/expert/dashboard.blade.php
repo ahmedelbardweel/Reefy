@@ -1,215 +1,225 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 class="text-xl font-bold mb-1 text-gray-900 dark:text-white tracking-tight">
-                    مركز قيادة الخبير
+                <h1 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                    {{ __('Expert Command Center') }}
                 </h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">مرحباً بك مجدداً يا د. {{ Auth::user()->name }}، إليك ملخص نشاطك اليوم.</p>
+                <p class="text-xs text-gray-400 font-medium mt-1">
+                    {{ __('Welcome back, Dr. :name. Here is your activity brief for today.', ['name' => Auth::user()->name]) }}
+                </p>
             </div>
-            <div class="hidden lg:flex px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-none items-center gap-2 bg-white dark:bg-gray-800">
+            <div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/30 border border-gray-100 dark:border-gray-700 px-4 py-2">
                 <i class="bi bi-calendar3 text-green-600"></i>
-                <span class="text-xs font-bold text-gray-700 dark:text-gray-300">{{ now()->translatedFormat('l, d M Y') }}</span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-700 dark:text-gray-300">{{ now()->translatedFormat('l, d M Y') }}</span>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-6 px-4 sm:px-6 lg:px-8" x-data="{ activeEditModal: null, showAddModal: false }">
+    <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" x-data="{ activeEditModal: null, showAddModal: false }">
         <!-- KPI Pillars -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 text-start">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 text-start">
             <!-- Pending Consultations -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-gray-500">استشارات معلقة</span>
-                    <i class="bi bi-patch-question text-yellow-500 opacity-50 text-xl"></i>
+            <div class="bg-white dark:bg-gray-800 border-r-4 border-yellow-500 shadow-sm p-6 group hover:translate-y-[-2px] transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{{ __('Pending Requests') }}</span>
+                    <i class="bi bi-hourglass-split text-yellow-500 text-xl"></i>
                 </div>
-                <h3 class="font-bold text-2xl mb-1 text-yellow-500">{{ $pendingCount }}</h3>
-                <div class="text-[10px] text-yellow-500 font-bold">تحتاج إلى رد عاجل</div>
+                <h3 class="font-black text-4xl mb-1 text-gray-900 dark:text-white">{{ $pendingCount }}</h3>
+                <div class="text-[10px] text-yellow-600 font-bold uppercase tracking-widest">{{ __('Requires Action') }}</div>
             </div>
 
             <!-- Answered -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-gray-500">تقديم نصائح</span>
-                    <i class="bi bi-chat-heart text-green-600 opacity-50 text-xl"></i>
+            <div class="bg-white dark:bg-gray-800 border-r-4 border-green-600 shadow-sm p-6 group hover:translate-y-[-2px] transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{{ __('Total Advice Given') }}</span>
+                    <i class="bi bi-patch-check-fill text-green-600 text-xl"></i>
                 </div>
-                <h3 class="font-bold text-2xl mb-1 text-green-600">{{ $answeredCount }}</h3>
-                <div class="text-[10px] text-green-600 font-bold">إجمالي المساهمات</div>
+                <h3 class="font-black text-4xl mb-1 text-gray-900 dark:text-white">{{ $answeredCount }}</h3>
+                <div class="text-[10px] text-green-600 font-bold uppercase tracking-widest">{{ __('Community Impact') }}</div>
             </div>
 
             <!-- Rating -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-gray-500">تقييم الأداء</span>
-                    <i class="bi bi-star-fill text-blue-600 opacity-50 text-xl"></i>
+            <div class="bg-white dark:bg-gray-800 border-r-4 border-blue-600 shadow-sm p-6 group hover:translate-y-[-2px] transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{{ __('Expert Rating') }}</span>
+                    <i class="bi bi-star-fill text-blue-600 text-xl"></i>
                 </div>
-                <h3 class="font-bold text-2xl mb-1 text-blue-600">4.9</h3>
-                <div class="text-[10px] text-blue-600 font-bold">بناءً على رأي المزارعين</div>
+                <h3 class="font-black text-4xl mb-1 text-gray-900 dark:text-white">4.9</h3>
+                <div class="text-[10px] text-blue-600 font-bold uppercase tracking-widest">{{ __('By 85+ Farmers') }}</div>
             </div>
 
             <!-- Beneficiaries -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-gray-500">مزارعين مستفيدين</span>
-                    <i class="bi bi-people text-gray-500 opacity-50 text-xl"></i>
+            <div class="bg-white dark:bg-gray-800 border-r-4 border-gray-400 shadow-sm p-6 group hover:translate-y-[-2px] transition-transform">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{{ __('Active Beneficiaries') }}</span>
+                    <i class="bi bi-people-fill text-gray-400 text-xl"></i>
                 </div>
-                <h3 class="font-bold text-2xl mb-1 text-gray-700 dark:text-gray-300">85</h3>
-                <div class="text-[10px] text-gray-500 font-bold">خلال الشهر الأخير</div>
+                <h3 class="font-black text-4xl mb-1 text-gray-900 dark:text-white">124</h3>
+                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ __('This Month') }}</div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
             <!-- Consultations List -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
-                <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-4">
                     <div>
-                        <h5 class="font-bold text-sm text-gray-900 dark:text-white">أحدث طلبات الاستشارة مجهولة الرد</h5>
-                        <p class="text-xs text-gray-500">قم بمساعدة المزارعين من خلال خبراتك الميدانية</p>
+                        <h5 class="font-black text-xs uppercase tracking-[0.3em] text-gray-900 dark:text-white">{{ __('Urgent Inquiries') }}</h5>
+                        <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold">{{ __('Latest Farmer requests awaiting your specialty') }}</p>
                     </div>
-                    <a href="{{ route('expert.consultations.index') }}" class="text-xs border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1 transition">عرض الكل</a>
+                    <a href="{{ route('expert.consultations.index') }}" class="text-[10px] font-black uppercase tracking-widest text-green-600 hover:text-green-700 transition">
+                        {{ __('View All Records') }} <i class="bi bi-arrow-left"></i>
+                    </a>
                 </div>
-                <div class="p-4">
+
+                <div class="space-y-4">
                     @forelse($recentConsultations as $consultation)
-                        <div class="p-4 mb-3 border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition group">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="bi bi-chat-dots text-green-600"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-sm text-gray-900 dark:text-white">{{ $consultation->subject }}</div>
-                                        <div class="text-[10px] text-gray-500">{{ $consultation->created_at->diffForHumans() }}</div>
-                                    </div>
-                                </div>
-                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] border border-gray-200 dark:border-gray-600">{{ $consultation->category }}</span>
+                        <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-6 relative group overflow-hidden">
+                            <div class="absolute top-0 right-0 w-1 h-full bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600">{{ $consultation->category }}</span>
+                                <span class="text-[10px] text-gray-400 font-bold">{{ $consultation->created_at->diffForHumans() }}</span>
                             </div>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">{{ Str::limit($consultation->question, 140) }}</p>
-                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-gray-50 dark:border-gray-700">
-                                <div class="text-[10px] font-bold text-gray-500">
-                                    <i class="bi bi-person me-1"></i> مزارع ريفي
+
+                            <h4 class="text-md font-bold text-gray-900 dark:text-white mb-2 leading-tight">{{ $consultation->subject }}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 italic mb-6">"{{ Str::limit($consultation->question, 120) }}"</p>
+
+                            <div class="flex justify-between items-center pt-4 border-t border-gray-50 dark:border-gray-700">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center text-[10px]">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ __('Farmer') }}</span>
                                 </div>
-                                <a href="{{ route('consultations.show', $consultation) }}" class="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold transition">
-                                    <i class="bi bi-reply-all ml-1"></i> تقديم نصيحة
+                                <a href="{{ route('consultations.show', $consultation) }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-widest hover:bg-green-600 dark:hover:bg-green-600 dark:hover:text-white transition group/btn">
+                                    {{ __('Provide Advice') }}
+                                    <i class="bi bi-send-fill transition-transform group-hover/btn:-translate-x-1"></i>
                                 </a>
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-8">
-                            <div class="inline-flex p-4 bg-gray-50 dark:bg-gray-700 mb-3 rounded-full">
-                                <i class="bi bi-check2-all text-green-600 text-4xl"></i>
+                        <div class="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-200 dark:border-gray-700 p-12 text-center">
+                            <div class="w-16 h-16 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mx-auto mb-6">
+                                <i class="bi bi-check2-all text-green-600 text-3xl"></i>
                             </div>
-                            <h6 class="font-bold text-gray-900 dark:text-white">عمل رائع! لا توجد طلبات معلقة</h6>
-                            <p class="text-xs text-gray-500">قمت بالرد على كافة الاستشارات المتاحة حتى الآن.</p>
+                            <h6 class="font-black text-xs uppercase tracking-widest text-gray-900 dark:text-white">{{ __('Clear Horizon') }}</h6>
+                            <p class="text-xs text-gray-400 mt-2">{{ __('All pending consultations have been addressed.') }}</p>
                         </div>
                     @endforelse
                 </div>
             </div>
 
             <!-- Expert Tips Management -->
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm mt-4">
-                <div class="p-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">
+            <div class="space-y-6">
+                <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-4">
                     <div>
-                        <h5 class="font-bold text-sm text-gray-900 dark:text-white">إدارة النصائح العامة</h5>
-                        <p class="text-xs text-gray-500">انشر نصائح تظهر لجميع المزارعين في لوحة تحكمهم</p>
+                        <h5 class="font-black text-xs uppercase tracking-[0.3em] text-gray-900 dark:text-white">{{ __('Global Insights') }}</h5>
+                        <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold">{{ __('Manage advice broadcasted to all users') }}</p>
                     </div>
-                    <button @click="showAddModal = true" class="inline-flex items-center px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-bold transition">
-                        <i class="bi bi-plus-lg ml-1"></i> إضافة نصيحة
+                    <button @click="showAddModal = true" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-[10px] font-black uppercase tracking-widest shadow-lg transition">
+                        <i class="bi bi-plus-lg"></i> {{ __('Post New Tip') }}
                     </button>
                 </div>
-                <div class="p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @forelse($myTips as $tip)
-                            <div class="p-4 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md transition relative group">
-                                <div class="flex justify-between items-start mb-2">
-                                    <h6 class="font-bold text-sm text-gray-900 dark:text-white">{{ $tip->title }}</h6>
-                                    
-                                    <!-- Dropdown using Alpine -->
-                                    <div x-data="{ open: false }" class="relative">
-                                        <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <div x-show="open" class="absolute left-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-lg z-10" x-cloak>
-                                            <button @click="activeEditModal = {{ $tip->id }}; open = false" class="w-full text-start px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2 text-gray-700 dark:text-gray-200">
-                                                <i class="bi bi-pencil text-blue-500"></i> تعديل
-                                            </button>
-                                            <form action="{{ route('expert.tips.destroy', $tip) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه النصيحة؟')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="w-full text-start px-4 py-2 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2 text-red-500">
-                                                    <i class="bi bi-trash"></i> حذف
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @forelse($myTips as $tip)
+                        <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition relative group">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-8 h-8 bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center text-sm">
+                                    <i class="bi bi-lightbulb-fill"></i>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-0 leading-relaxed line-clamp-2">{{ $tip->content }}</p>
-                                <div class="text-[10px] text-gray-400 mt-2 border-t border-gray-50 dark:border-gray-700 pt-2">
-                                    <i class="bi bi-clock ml-1"></i> {{ $tip->created_at->format('Y-m-d') }}
+                                <div x-data="{ open: false }" class="relative">
+                                    <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-900 dark:hover:text-white p-1">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div x-show="open" class="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-2xl z-20" x-cloak>
+                                        <button @click="activeEditModal = {{ $tip->id }}; open = false" class="w-full text-start px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                                            <i class="bi bi-pencil text-blue-500"></i> {{ __('Edit Insight') }}
+                                        </button>
+                                        <form action="{{ route('expert.tips.destroy', $tip) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this tip?') }}')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="w-full text-start px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 text-red-500">
+                                                <i class="bi bi-trash"></i> {{ __('Remove') }}
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Edit Modal (One per item vs Dynamic) -->
-                            <!-- Simulating dynamic modal by checking activeEditModal -->
-                            <div x-show="activeEditModal === {{ $tip->id }}" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
-                                <div class="bg-white dark:bg-gray-800 w-full max-w-md mx-4 shadow-lg" @click.away="activeEditModal = null">
-                                    <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700">
-                                        <h5 class="font-bold text-gray-900 dark:text-white">تعديل النصيحة</h5>
-                                        <button @click="activeEditModal = null" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
+                            <h6 class="font-bold text-gray-900 dark:text-white mb-2 leading-tight uppercase tracking-tighter">{{ $tip->title }}</h6>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3 mb-4 italic">"{{ $tip->content }}"</p>
+                            
+                            <div class="text-[9px] font-black uppercase tracking-widest text-gray-400 border-t border-gray-50 dark:border-gray-700 pt-3 flex items-center justify-between">
+                                <span>{{ __('Posted') }}</span>
+                                <span>{{ $tip->created_at->format('M d, Y') }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Edit Insight Modal -->
+                        <div x-show="activeEditModal === {{ $tip->id }}" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" x-cloak>
+                            <div class="bg-white dark:bg-gray-800 w-full max-w-lg border border-gray-100 dark:border-gray-700 shadow-2xl relative" @click.away="activeEditModal = null">
+                                <div class="absolute -top-1 left-0 right-0 h-1 bg-blue-600"></div>
+                                <div class="p-8">
+                                    <div class="flex justify-between items-center mb-8">
+                                        <h5 class="font-black text-xs uppercase tracking-[0.3em] text-gray-900 dark:text-white">{{ __('Edit Professional Insight') }}</h5>
+                                        <button @click="activeEditModal = null" class="text-gray-400 hover:text-red-500 transition"><i class="bi bi-x-lg"></i></button>
                                     </div>
-                                    <form action="{{ route('expert.tips.update', $tip) }}" method="POST">
+                                    <form action="{{ route('expert.tips.update', $tip) }}" method="POST" class="space-y-6">
                                         @csrf
                                         @method('PUT')
-                                        <div class="p-4 space-y-4">
-                                            <div>
-                                                <label class="block text-xs font-bold text-gray-500 mb-1">عنوان النصيحة</label>
-                                                <input type="text" name="title" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" value="{{ $tip->title }}" required>
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs font-bold text-gray-500 mb-1">محتوى النصيحة</label>
-                                                <textarea name="content" rows="4" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" required>{{ $tip->content }}</textarea>
-                                            </div>
+                                        <div class="space-y-2">
+                                            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">{{ __('Subject Title') }}</label>
+                                            <input type="text" name="title" class="w-full bg-gray-50 dark:bg-gray-700/30 border-gray-100 dark:border-gray-600 focus:border-blue-600 focus:ring-0 text-gray-900 dark:text-white font-bold p-4 text-sm" value="{{ $tip->title }}" required>
                                         </div>
-                                        <div class="p-4 pt-0">
-                                            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-bold text-sm transition">حفظ التعديلات</button>
+                                        <div class="space-y-2">
+                                            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">{{ __('Insight Content') }}</label>
+                                            <textarea name="content" rows="5" class="w-full bg-gray-50 dark:bg-gray-700/30 border-gray-100 dark:border-gray-600 focus:border-blue-600 focus:ring-0 text-gray-900 dark:text-white p-4 text-sm leading-relaxed" required>{{ $tip->content }}</textarea>
                                         </div>
+                                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 font-black text-[10px] uppercase tracking-[0.2em] transition shadow-xl">
+                                            {{ __('Verify & Save Changes') }}
+                                        </button>
                                     </form>
                                 </div>
                             </div>
-                        @empty
-                            <div class="col-span-2 text-center py-4">
-                                <p class="text-gray-400 text-xs">لم تقم بإضافة أي نصائح عامة بعد.</p>
-                            </div>
-                        @endforelse
-                    </div>
+                        </div>
+                    @empty
+                        <div class="col-span-2 bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-200 dark:border-gray-700 p-8 text-center">
+                            <i class="bi bi-lightbulb text-gray-300 text-3xl mb-4 block"></i>
+                            <p class="text-[10px] uppercase font-black text-gray-400 tracking-widest">{{ __('No published insights yet.') }}</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
 
         <!-- Add Tip Modal -->
-        <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak>
-            <div class="bg-white dark:bg-gray-800 w-full max-w-md mx-4 shadow-lg" @click.away="showAddModal = false">
-                <div class="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-700">
-                    <h5 class="font-bold text-gray-900 dark:text-white">إضافة نصيحة جديدة</h5>
-                    <button @click="showAddModal = false" class="text-gray-400 hover:text-gray-600"><i class="bi bi-x-lg"></i></button>
+        <div x-show="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" x-cloak>
+            <div class="bg-white dark:bg-gray-800 w-full max-w-lg border border-gray-100 dark:border-gray-700 shadow-2xl relative" @click.away="showAddModal = false">
+                <div class="absolute -top-1 left-0 right-0 h-1 bg-green-600"></div>
+                <div class="p-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <h5 class="font-black text-xs uppercase tracking-[0.3em] text-gray-900 dark:text-white">{{ __('Post Scientific Insight') }}</h5>
+                        <button @click="showAddModal = false" class="text-gray-400 hover:text-red-500 transition"><i class="bi bi-x-lg"></i></button>
+                    </div>
+                    <form action="{{ route('expert.tips.store') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">{{ __('Broadcast Title') }}</label>
+                            <input type="text" name="title" class="w-full bg-gray-50 dark:bg-gray-700/30 border-gray-100 dark:border-gray-600 focus:border-green-600 focus:ring-0 text-gray-900 dark:text-white font-bold p-4 text-sm placeholder-gray-300 dark:placeholder-gray-500" placeholder="{{ __('e.g., Optimizing irrigation intervals during summer') }}" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[9px] font-black uppercase tracking-widest text-gray-400">{{ __('Broadcast Content') }}</label>
+                            <textarea name="content" rows="6" class="w-full bg-gray-50 dark:bg-gray-700/30 border-gray-100 dark:border-gray-600 focus:border-green-600 focus:ring-0 text-gray-900 dark:text-white p-4 text-sm leading-relaxed placeholder-gray-300 dark:placeholder-gray-500" placeholder="{{ __('Provide factual, scientifically-backed agricultural advice...') }}" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 font-black text-[10px] uppercase tracking-[0.2em] transition shadow-xl">
+                            <i class="bi bi-megaphone-fill me-2"></i> {{ __('Authorize & Broadcast') }}
+                        </button>
+                    </form>
                 </div>
-                <form action="{{ route('expert.tips.store') }}" method="POST">
-                    @csrf
-                    <div class="p-4 space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">عنوان النصيحة</label>
-                            <input type="text" name="title" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" placeholder="مثلاً: أفضل وقت للري في الصيف" required>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">محتوى النصيحة</label>
-                            <textarea name="content" rows="4" class="w-full border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm p-2" placeholder="اكتب نصيحتك العلمية هنا..." required></textarea>
-                        </div>
-                    </div>
-                    <div class="p-4 pt-0">
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 font-bold text-sm transition">نشر النصيحة</button>
-                    </div>
-                </form>
             </div>
         </div>
-
     </div>
 </x-app-layout>

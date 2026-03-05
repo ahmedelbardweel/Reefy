@@ -1,57 +1,86 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="text-xl font-bold mb-1 text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="bi bi-chat-dots-fill text-green-600"></i> {{ __('Agricultural Consultations') }}
-            </h2>
-            <a href="{{ route('consultations.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
-                <i class="bi bi-plus-lg ml-2"></i> {{ __('Request New Consultation') }}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="bi bi-chat-right-dots-fill text-green-600"></i> {{ __('Agricultural Consultations') }}
+                </h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ __('Get professional advice from our verified agricultural experts') }}</p>
+            </div>
+            <a href="{{ route('consultations.create') }}" class="group flex items-center gap-3 px-6 py-3 bg-green-600 hover:bg-green-700 text-white shadow-lg transition active:scale-[0.98]">
+                <span class="text-sm font-black uppercase tracking-widest">{{ __('Request New Consultation') }}</span>
+                <i class="bi bi-plus-lg transition-transform group-hover:rotate-90"></i>
             </a>
         </div>
     </x-slot>
 
-    <div class="py-8 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-7xl mx-auto">
-            @if($consultations->isEmpty())
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-8 text-center">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 mb-4">
-                        <i class="bi bi-chat-left-text text-3xl"></i>
-                    </div>
-                    <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ __('You have not requested any consultations yet') }}</h5>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mb-6">{{ __('You can contact our experts to get advice on your crops.') }}</p>
-                    <a href="{{ route('consultations.create') }}" class="inline-flex items-center px-4 py-2 border border-green-600 text-sm font-medium rounded-md text-green-600 bg-white hover:bg-green-50 dark:bg-transparent dark:text-green-400 dark:border-green-500 dark:hover:bg-green-900/20 transition">
+    <div class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        @if($consultations->isEmpty())
+            <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-16 text-center shadow-sm">
+                <div class="inline-flex items-center justify-center w-24 h-24 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 mb-8">
+                    <i class="bi bi-patch-question text-5xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">{{ __('Need expert advice?') }}</h3>
+                <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto leading-relaxed mb-8">
+                    {{ __('Our team of agricultural specialists is ready to help you with any issues your crops might be facing.') }}
+                </p>
+                <div class="flex justify-center">
+                    <a href="{{ route('consultations.create') }}" class="px-8 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-black uppercase tracking-widest hover:bg-black dark:hover:bg-gray-100 transition shadow-xl">
                         {{ __('Request your first consultation') }}
                     </a>
                 </div>
-            @else
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($consultations as $consultation)
-                        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-xl border border-gray-100 dark:border-gray-700 hover:shadow-md transition flex flex-col h-full">
-                            <div class="p-5 flex-1">
-                                <div class="flex justify-between items-start mb-3">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $consultation->status == 'answered' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' }}">
-                                        {{ $consultation->status == 'answered' ? __('Answered') : __('Waiting for Expert') }}
-                                    </span>
-                                    <span class="text-xs text-gray-400 font-medium">{{ $consultation->created_at->format('Y-m-d') }}</span>
-                                </div>
-                                <h5 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">{{ $consultation->subject }}</h5>
-                                <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3">
-                                    <span class="flex items-center gap-1"><i class="bi bi-tag-fill text-gray-400"></i> {{ $consultation->category }}</span>
-                                    @if($consultation->crop)
-                                        <span class="flex items-center gap-1"><i class="bi bi-flower1 text-gray-400"></i> {{ $consultation->crop->name }}</span>
-                                    @endif
-                                </div>
-                                <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">{{ $consultation->question }}</p>
+            </div>
+        @else
+            <div class="mb-8 flex items-center gap-4">
+                <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] whitespace-nowrap">{{ __('My Consultations') }} ({{ $consultations->count() }})</span>
+                <div class="h-px w-full bg-gray-100 dark:bg-gray-800"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($consultations as $consultation)
+                    <div class="group bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all flex flex-col h-full relative overflow-hidden">
+                        <!-- Top Progress Bar (Visual only) -->
+                        <div class="absolute top-0 left-0 right-0 h-1 {{ $consultation->status == 'answered' ? 'bg-green-600' : 'bg-yellow-500' }}"></div>
+
+                        <div class="p-8 flex-1">
+                            <div class="flex justify-between items-start mb-6">
+                                <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest {{ $consultation->status == 'answered' ? 'bg-green-600 text-white' : 'bg-yellow-500 text-white' }}">
+                                    {{ $consultation->status == 'answered' ? __('Answered') : __('Pending') }}
+                                </span>
+                                <span class="text-[10px] text-gray-400 font-bold">{{ $consultation->created_at->format('M d, Y') }}</span>
                             </div>
-                            <div class="px-5 py-4 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 rounded-b-xl">
-                                <a href="{{ route('consultations.show', $consultation) }}" class="block w-full text-center text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition">
-                                    {{ __('View Details') }} {{ $consultation->status == 'answered' ? __('and Answer') : '' }} <i class="bi bi-arrow-left mr-1"></i>
-                                </a>
+
+                            <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-green-600 transition-colors line-clamp-2 leading-tight">
+                                {{ $consultation->subject }}
+                            </h4>
+
+                            <div class="flex flex-wrap items-center gap-3 mb-6">
+                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase border border-gray-100 dark:border-gray-700 px-2 py-0.5 bg-gray-50 dark:bg-gray-700/30">
+                                    <i class="bi bi-tag-fill text-green-600"></i>
+                                    {{ $consultation->category }}
+                                </div>
+                                @if($consultation->crop)
+                                    <div class="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase border border-gray-100 dark:border-gray-700 px-2 py-0.5 bg-gray-50 dark:bg-gray-700/30">
+                                        <i class="bi bi-flower1 text-green-600"></i>
+                                        {{ $consultation->crop->name }}
+                                    </div>
+                                @endif
                             </div>
+
+                            <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed italic">
+                                "{{ Str::limit($consultation->question, 150) }}"
+                            </p>
                         </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
+
+                        <div class="p-6 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-50 dark:border-gray-700">
+                            <a href="{{ route('consultations.show', $consultation) }}" class="flex items-center justify-center gap-2 w-full py-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-black uppercase tracking-widest border border-gray-200 dark:border-gray-600 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition shadow-sm">
+                                <span>{{ $consultation->status == 'answered' ? __('Check Answer') : __('View Inquiry') }}</span>
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </x-app-layout>
