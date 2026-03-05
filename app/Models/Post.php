@@ -9,7 +9,14 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'content', 'image_path', 'type'];
+    protected $fillable = ['user_id', 'content', 'image_path', 'type', 'likes_count', 'comments_count'];
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+    }
 
     public function user()
     {

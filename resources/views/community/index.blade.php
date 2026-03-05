@@ -112,7 +112,7 @@
 
                             @if($post->image_path)
                                 <div class="overflow-hidden mb-3 border border-gray-100 dark:border-gray-700">
-                                    <img src="{{ asset('storage/' . $post->image_path) }}" class="w-full max-h-96 object-cover" alt="Post content">
+                                    <img src="{{ $post->image_url }}" class="w-full max-h-96 object-cover" alt="Post content">
                                 </div>
                             @endif
 

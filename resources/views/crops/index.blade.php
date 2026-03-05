@@ -19,7 +19,7 @@
                         @if($crop->images->count() > 0)
                             @foreach($crop->images as $index => $image)
                                 <div x-show="currentImg === {{ $index }}" class="absolute inset-0 transition-opacity duration-300">
-                                    <img src="{{ asset('storage/' . $image->image_path) }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
+                                    <img src="{{ $image->image_url }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
                                     <!-- Delete Image Button -->
                                     <button @click.prevent="if(confirm('{{ __('Are you sure you want to delete this image?') }}')) deleteImage({{ $image->id }})" 
                                             class="absolute top-2 right-2 p-2 bg-red-600/90 text-white rounded shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-red-700 z-30 flex items-center justify-center"

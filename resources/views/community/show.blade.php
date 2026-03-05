@@ -49,7 +49,7 @@
                     
                     @if($post->image_path)
                         <div class="mb-6 border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-center overflow-hidden shadow-sm">
-                            <img src="{{ asset('storage/' . $post->image_path) }}" class="max-w-full max-h-[600px] object-contain shadow-inner" alt="Post content">
+                            <img src="{{ $post->image_url }}" class="max-w-full max-h-[600px] object-contain shadow-inner" alt="Post content">
                         </div>
                     @endif
 
