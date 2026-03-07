@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Global Sharp Design */
+* {
+    border-radius: 0 !important;
+}
+
+/* Icons and Avatars Circular Exceptions */
+.rounded-full {
+    border-radius: 9999px !important;
+}
