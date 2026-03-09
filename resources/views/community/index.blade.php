@@ -120,11 +120,14 @@
                             <a href="{{ url('/community/post/' . $post->id) }}" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-lg">
                             <span>{{ __('Comment') }}</span>
                         </a>
-                        <a href="{{ url('/community/post/' . $post->id) }}" class="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-lg">
-                            <i class="bi bi-share"></i>
-                            <span>{{ __('Share') }}</span>
-                        </a>
-                    </div>
+                       <a href="javascript:void(0)" onclick="copyPostLink('{{ url('/community/post/' . $post->id) }}')"
+                        class="flex-1 flex items-center justify-center gap-2 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition rounded-lg">
+
+                     <i class="bi bi-share"></i>
+                <span>{{ __('CopyPostLink') }}</span>
+
+</a>
+               </div>
 
                     <!-- Last 3 Comments -->
                     <div class="mt-3 space-y-2">
@@ -174,3 +177,10 @@
         </div>
     </div>
 </x-app-layout>
+<script>
+function copyPostLink(link) {
+    navigator.clipboard.writeText(link).then(function() {
+        alert("تم نسخ رابط المنشور ✅");
+    });
+}
+</script>
