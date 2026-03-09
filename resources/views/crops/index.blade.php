@@ -22,40 +22,28 @@
         .crop-img-wrap > *:not(:first-child) { display: none; }
     </style>
 
-    <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div class="flex flex-wrap justify-center gap-6">
+    <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-9xl mx-auto">
+        <div class="flex flex-wrap justify-start gap-6">
             @forelse($crops as $crop)
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700 flex flex-col shrink-0" style="width: 320px; max-width: 320px;">
-                    
-                    {{-- Image Section - Sleeker height --}}
-                    <div class="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden group">
-                        @if($crop->images->count() > 0)
-                            @php $firstImage = $crop->images->first(); @endphp
-                            <img src="{{ $firstImage->image_url }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
 
-                            {{-- Image count badge --}}
-                            @if($crop->images->count() > 1)
-                                <div class="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 text-white text-[9px] font-black rounded border border-white/20 z-10 flex items-center gap-1" dir="ltr">
-                                    <i class="bi bi-camera-fill text-[8px]"></i>
-                                    <span>1 / {{ $crop->images->count() }}</span>
-                                </div>
-                            @endif
+             {{-- Image Section --}}
+            <div class="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
 
-                            {{-- Delete image form (no JS) --}}
-                            <form action="{{ route('crops.images.destroy', $firstImage) }}" method="POST"
-                                  class="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                @csrf @method('DELETE')
-                                <button type="submit"
-                                        class="p-1.5 bg-red-600/90 text-white rounded shadow-lg hover:bg-red-700 flex items-center justify-center"
-                                        title="{{ __('Delete Image') }}">
-                                    <i class="bi bi-trash-fill text-xs"></i>
-                                </button>
-                            </form>
-                        @else
-                            <div class="absolute inset-0 flex items-center justify-center text-gray-400">
-                                <i class="bi bi-image-fill text-3xl opacity-30"></i>
-                            </div>
-                        @endif
+             @if($crop->images->count() > 0)
+
+    <div class="flex overflow-x-auto snap-x snap-mandatory h-full scroll-smooth">
+         @foreach($crop->images as $index => $image)
+            <div id="crop{{$crop->id}}img{{$index}}"  class="min-w-full h-full snap-center relative">
+                 <img src="{{ $image->image_url }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
+            </div>
+        @endforeach
+     </div>
+@else
+<div class="absolute inset-0 flex items-center justify-center text-gray-400">
+<i class="bi bi-image-fill text-3xl opacity-30"></i>
+</div>
+@endif
 
                         {{-- Status Badge --}}
                         <div class="absolute top-2 left-2 z-10">
@@ -183,21 +171,43 @@
                                 </a>
                             </div>
 
-                            {{-- Footer Actions --}}
-                            <div class="flex gap-1.5">
-                                <a href="{{ route('crops.edit', $crop) }}" class="flex-1 py-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 border border-gray-200 dark:border-gray-600 transition text-[9px] font-black uppercase tracking-wider">
-                                    {{ __('Edit') }}
-                                </a>
-                                <a href="#addTaskModal{{ $crop->id }}" class="flex items-center justify-center px-2 py-1 bg-gray-900 text-white dark:bg-white dark:text-gray-900 hover:opacity-80 transition text-[10px]" title="{{ __('Add Task') }}">
-                                    <i class="bi bi-plus-lg"></i>
-                                </a>
-                                <form action="{{ route('crops.destroy', $crop) }}" method="POST" class="flex-none">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="p-1 px-2.5 bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 border border-red-100 dark:border-red-900/50 hover:bg-red-100 transition" title="{{ __('Delete') }}">
-                                        <i class="bi bi-trash text-sm"></i>
-                                    </button>
-                                </form>
-                            </div>
+              {{-- Footer Actions --}}
+<div class="flex items-center gap-2">
+
+    {{-- Add Task Button (يأخذ المساحة) --}}
+    <a href="#addTaskModal{{ $crop->id }}"
+       class="flex-1 flex items-center justify-center gap-1 px-3 py-1.5
+       bg-green-600 hover:bg-green-700 text-white
+       text-xs font-semibold rounded transition">
+        <i class="bi bi-plus-lg"></i>
+        Add Task
+    </a>
+
+    {{-- Edit Button --}}
+    <a href="{{ route('crops.edit', $crop) }}"
+       class="flex items-center justify-center w-8 h-8
+       bg-gray-100 hover:bg-gray-200
+       text-gray-700 dark:bg-gray-700 dark:text-gray-200
+       rounded transition">
+        <i class="bi bi-pencil"></i>
+    </a>
+
+    {{-- Delete Button --}}
+    <form action="{{ route('crops.destroy', $crop) }}" method="POST">
+        @csrf
+        @method('DELETE')
+
+        <button type="submit"
+            class="flex items-center justify-center w-8 h-8
+            bg-red-50 text-red-600
+            dark:bg-red-900/30 dark:text-red-400
+            border border-red-100 dark:border-red-900/50
+            hover:bg-red-100 rounded transition">
+            <i class="bi bi-trash"></i>
+        </button>
+    </form>
+
+</div>
                         </div>
                     </div>
 
@@ -414,18 +424,28 @@
 
                 </div>
             @empty
-                <div class="col-span-1 sm:col-span-2 lg:col-span-4 text-center py-12">
-                    <div class="inline-flex p-4 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-                        <i class="bi bi-sprout text-4xl text-gray-400"></i>
-                    </div>
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ __('No crops currently') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('Start by adding the first crop to your farm and track its growth.') }}</p>
-                    <div class="mt-6">
-                        <a href="{{ route('crops.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                            <i class="bi bi-plus-lg ml-2"></i> {{ __('Add Crop') }}
-                        </a>
-                    </div>
-                </div>
+                <div class="w-full flex flex-col items-center justify-center text-center py-24">
+
+    <div class="inline-flex p-4 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+        <i class="bi bi-sprout text-4xl text-gray-400"></i>
+    </div>
+
+    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        {{ __('No crops currently') }}
+    </h3>
+
+    <p class="mt-1 text-sm text-gray-500">
+        {{ __('Start by adding the first crop to your farm and track its growth.') }}
+    </p>
+
+    <div class="mt-6">
+        <a href="{{ route('crops.create') }}"
+           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+            <i class="bi bi-plus-lg ml-2"></i> {{ __('Add Crop') }}
+        </a>
+    </div>
+
+</div>
             @endforelse
         </div>
 

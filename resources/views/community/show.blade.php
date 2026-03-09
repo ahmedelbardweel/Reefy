@@ -11,28 +11,7 @@
         </div>
     </x-slot>
 
-    {{-- CSS-only modal styles for comments --}}
-    <style>
-        .comment-modal { display: none; position: fixed; inset: 0; z-index: 50; overflow-y: auto; padding: 1rem; }
-        .comment-modal:target { display: flex; align-items: flex-end; justify-content: center; }
-        @media (min-width: 1024px) {
-            .comment-modal:target { align-items: center; }
-        }
-        .comment-modal__overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.4); }
-        .comment-modal__sheet { 
-            position: relative; 
-            z-index: 10; 
-            background: white; 
-            width: 100%; 
-            height: 85%;
-            display: flex;
-            flex-direction: column;
-        }
-        .dark .comment-modal__sheet { background: #1f2937; }
-        @media (min-width: 1024px) {
-            .comment-modal__sheet { height: 80%; width: 50%; }
-        }
-    </style>
+
 
     <div class="py-10 px-4" dir="rtl">
         <div class="max-w-3xl mx-auto">
@@ -68,7 +47,7 @@
                 <!-- Post Body -->
                 <div class="p-6">
                     <p class="text-lg text-gray-800 dark:text-gray-200 leading-relaxed mb-6 whitespace-pre-wrap">{{ $post->content }}</p>
-                    
+
                     @if($post->image_path)
                         <div class="mb-6 border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-center overflow-hidden shadow-sm rounded-xl">
                             <img src="{{ $post->image_url }}" class="max-w-full max-h-[600px] object-contain shadow-inner" alt="Post content">
@@ -92,85 +71,57 @@
                     <div class="flex gap-2">
                         <form action="{{ route('community.like', $post) }}" method="POST" class="flex-1">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                 class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl transition text-sm {{ $post->isLikedBy(auth()->user()) ? 'text-red-500 font-bold bg-red-50 dark:bg-red-900/20' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
                                 <i class="bi {{ $post->isLikedBy(auth()->user()) ? 'bi-heart-fill' : 'bi-heart' }}"></i>
                                 <span>{{ __('Like') }}</span>
                             </button>
                         </form>
-                        
+
                         <a href="#commentsModal" class="flex-1 flex items-center justify-center gap-2 py-2.5 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm rounded-xl">
                             <i class="bi bi-chat-dots"></i>
                             <span>{{ __('Comment') }}</span>
                         </a>
-                        
+
                         <a href="{{ url('/community/post/' . $post->id) }}" class="flex-1 flex items-center justify-center gap-2 py-2.5 text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm rounded-xl">
                             <i class="bi bi-share"></i>
                             <span>{{ __('Share') }}</span>
                         </a>
                     </div>
+                                        <!-- Last 3 Comments -->
+                    <div class="mt-3 space-y-2">
+                        @php
+                            $comments = $post->comments()->whereNull('parent_id')->latest()->take(3)->get();
+                        @endphp
+                        @foreach($comments as $comment)
+                            <div class="flex gap-3">
+                                <div class="shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 rounded-full">
+                                    {{ $comment->user ? mb_substr($comment->user->name, 0, 1) : 'ز' }}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-gray-50 dark:bg-gray-700/50 p-2 rounded-2xl rounded-tr-none">
+                                        <div class="font-bold text-xs text-gray-900 dark:text-gray-100 mb-1">
+                                            {{ $comment->user ? $comment->user->name : 'زائر ريفي' }}
+                                        </div>
+                                        <p class="text-sm text-gray-700 dark:text-gray-300">{{ $comment->content }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Add Comment Form -->
+                    <form action="{{ route('community.comment', $post) }}" method="POST" class="mt-2 flex gap-2">
+                        @csrf
+                        <input type="text" name="content" class="flex-1 bg-gray-100 dark:bg-gray-700 border-0 px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 dark:text-white rounded-lg" placeholder="{{ __('Write a comment...') }}" required autocomplete="off">
+                        <button type="submit" class="w-10 h-10 bg-green-600 text-white flex items-center justify-center hover:bg-green-700 transition shadow-sm rounded-lg">
+                            <i class="bi bi-send-fill text-xs"></i>
+                        </button>
+                    </form>
+                </div>
                 </div>
             </div>
         </div>
-
-        {{-- CSS-only Comments Modal --}}
-        <div id="commentsModal" class="comment-modal">
-            <div class="comment-modal__overlay"></div>
-            <div class="comment-modal__sheet rounded-t-3xl lg:rounded-3xl shadow-2xl">
-                <!-- Header -->
-                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="text-sm font-bold text-gray-900 dark:text-white">{{ __('Comments') }}</h3>
-                    <a href="#" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">&times;</a>
-                </div>
-                
-                <!-- Comments List -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                    @forelse($post->comments()->whereNull('parent_id')->with('replies')->get() as $comment)
-                        <div class="flex gap-3">
-                            <div class="shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 rounded-full">
-                                {{ $comment->user ? mb_substr($comment->user->name, 0, 1) : 'ز' }}
-                            </div>
-                            <div class="flex-1">
-                                <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-2xl rounded-tr-none">
-                                    <div class="font-bold text-xs text-gray-900 dark:text-gray-100 mb-1">{{ $comment->user ? $comment->user->name : 'زائر ريفي' }}</div>
-                                    <p class="text-sm text-gray-700 dark:text-gray-300">{{ $comment->content }}</p>
-                                </div>
-                                
-                                <!-- Replies -->
-                                @if($comment->replies->count() > 0)
-                                    <div class="mt-2 space-y-2 mr-2 border-r-2 border-gray-100 dark:border-gray-700 pr-3">
-                                        @foreach($comment->replies as $reply)
-                                            <div class="flex gap-2">
-                                                <div class="shrink-0 w-6 h-6 bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-[10px] font-bold text-gray-600 dark:text-gray-300 rounded-full">
-                                                    {{ $reply->user ? mb_substr($reply->user->name, 0, 1) : 'ز' }}
-                                                </div>
-                                                <div class="bg-gray-50 dark:bg-gray-700/30 p-2 rounded-lg">
-                                                    <div class="font-bold text-[10px] text-gray-900 dark:text-gray-100">{{ $reply->user ? $reply->user->name : 'زائر ريفي' }}</div>
-                                                    <p class="text-xs text-gray-700 dark:text-gray-300">{{ $reply->content }}</p>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-8 text-gray-400 text-sm italic">{{ __('No comments yet. Be the first!') }}</div>
-                    @endforelse
-                </div>
-
-                <!-- Add Comment Form -->
-                <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-3xl">
-                    <form action="{{ route('community.comment', $post) }}" method="POST">
-                        @csrf
-                        <div class="flex gap-2">
-                            <input type="text" name="content" class="flex-1 bg-gray-100 dark:bg-gray-700 border-0 px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 dark:text-white rounded-lg" placeholder="{{ __('Write a comment...') }}" required autocomplete="off">
-                            <button type="submit" class="w-10 h-10 bg-green-600 text-white flex items-center justify-center hover:bg-green-700 transition shadow-sm rounded-lg transform rotate-180">
-                                <i class="bi bi-send-fill text-xs"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
     </div>

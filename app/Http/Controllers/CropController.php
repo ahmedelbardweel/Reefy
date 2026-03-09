@@ -2,73 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CropImage;
 use App\Models\Crop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
-/**
- * كونترولر المحاصيل - Crop Controller
- * 
- * العلاقات:
- * - Crop (المحصول): belongsTo User (المزارع)
- * - Crop: hasMany Task (المهام المرتبطة بالمحصول)
- * - Crop: hasMany CropImage (صور المحصول)
- * - Crop: hasMany Consultation (الاستشارات المرتبطة بالمحصول)
- */
 class CropController extends Controller
 {
-    /**
-     * عرض قائمة محاصيل المزارع الحالي
-     * 
-     * تقوم هذه الدالة بـ:
-     * - جلب جميع المحاصيل الخاصة بالمستخدم الحالي
-     * - تحميل علاقة المهام (tasks) لكل محصول
-     * - ترتيب المحاصيل من الأحدث للأقدم
-     * - تقسيم النتائج إلى صفحات (9 محاصيل في كل صفحة)
-     * 
-     * العلاقة: Crop belongsTo User, hasMany Task
-     * 
-     * @return \Illuminate\View\View
-     */
     public function index()
     {
         $crops = auth()->user()->crops()->with('tasks')->latest()->paginate(9);
         return view('crops.index', compact('crops'));
     }
 
-    /**
-     * عرض نموذج إضافة محصول جديد
-     * 
-     * تقوم هذه الدالة بـ:
-     * - عرض صفحة نموذج إنشاء محصول جديد
-     * 
-     * @return \Illuminate\View\View
-     */
     public function create()
     {
         return view('crops.create');
     }
 
-    /**
-     * حفظ محصول جديد مع توليد مهام تلقائية
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صحة البيانات المدخلة
-     * - إنشاء محصول جديد مرتبط بالمستخدم الحالي
-     * - رفع الصور المرفقة وحفظها في جدول CropImage
-     * - توليد مهام تلقائية للمحصول:
-     *   * مهمة الري الأولى (بعد يوم من الزراعة)
-     *   * مهمة التسميد (بعد 14 يوم من الزراعة)
-     * - إعادة التوجيه إلى قائمة المحاصيل مع رسالة نجاح
-     * 
-     * البيانات المطلوبة: الاسم، النوع، المساحة، تاريخ الزراعة، تاريخ الحصاد المتوقع
-     * البيانات الاختيارية: نوع التربة، طريقة الري، مصدر البذور، الإنتاج المتوقع، ملاحظات، صور
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function store(Request $request)
     {
-        // التحقق من البيانات - جعل الحقول اختيارية لتسهيل الإدخال للمزارع
         $request->validate([
             'name' => 'nullable|string|max:255',
             'type' => 'nullable|string',
@@ -80,7 +34,6 @@ class CropController extends Controller
             'yield_estimate' => 'nullable|numeric',
         ]);
 
-        // إنشاء المحصول مع قيم افتراضية
         $crop = auth()->user()->crops()->create([
             'name' => $request->name ?: 'محصول جديد ' . (auth()->user()->crops()->count() + 1),
             'type' => $request->type ?: 'غير محدد',
@@ -98,20 +51,16 @@ class CropController extends Controller
             'health_status' => 'good',
         ]);
 
-        // رفع وحفظ الصور المتعددة
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($image->isValid()) {
                     $imagePath = $image->store('crops/images', 'public');
-                    $crop->images()->create([
-                        'image_path' => $imagePath,
-                    ]);
+                    $crop->images()->create(['image_path' => $imagePath]);
                 }
             }
         }
 
-        // توليد مهام تلقائية ذكية
-        // مهمة الري الأولى
+        // مهام تلقائية
         $crop->tasks()->create([
             'title' => 'Initial Irrigation (الرية الأولى)',
             'type' => 'water',
@@ -119,7 +68,6 @@ class CropController extends Controller
             'status' => 'pending',
         ]);
 
-        // مهمة التسميد
         $crop->tasks()->create([
             'title' => 'Fertilizer Application (تسميد)',
             'type' => 'fertilizer',
@@ -130,55 +78,21 @@ class CropController extends Controller
         return redirect()->route('crops.index')->with('success', 'Crop added and smart tasks generated!');
     }
 
-    /**
-     * عرض تفاصيل محصول معين
-     * 
-     * هذه الدالة غير مفعلة حالياً
-     * 
-     * @param string $id
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * عرض نموذج تعديل محصول
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من أن المحصول يخص المستخدم الحالي
-     * - عرض صفحة تعديل المحصول
-     * 
-     * @param Crop $crop المحصول المراد تعديله
-     * @return \Illuminate\View\View
-     */
     public function edit(Crop $crop)
     {
-        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
         return view('crops.edit', compact('crop'));
     }
 
-    /**
-     * تحديث بيانات محصول موجود
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صلاحية المستخدم
-     * - التحقق من صحة البيانات المدخلة
-     * - تحديث بيانات المحصول
-     * - رفع وإضافة صور إضافية إن وجدت (لا تحذف الصور القديمة)
-     * - إعادة التوجيه مع رسالة نجاح
-     * 
-     * @param Request $request
-     * @param Crop $crop المحصول المراد تحديثه
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function update(Request $request, Crop $crop)
     {
-        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
 
-        // التحقق من البيانات - حقول اختيارية
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
             'type' => 'nullable|string',
@@ -194,17 +108,13 @@ class CropController extends Controller
             'growth_percentage' => 'nullable|integer',
         ]);
 
-        // تحديث المحصول
         $crop->update($validated);
 
-        // إضافة صور جديدة (لا يحذف القديمة)
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($image->isValid()) {
                     $imagePath = $image->store('crops/images', 'public');
-                    $crop->images()->create([
-                        'image_path' => $imagePath,
-                    ]);
+                    $crop->images()->create(['image_path' => $imagePath]);
                 }
             }
         }
@@ -212,55 +122,27 @@ class CropController extends Controller
         return redirect()->route('crops.index')->with('success', 'Crop details updated.');
     }
 
-    /**
-     * حذف محصول
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صلاحية المستخدم
-     * - حذف المحصول (سيتم حذف المهام والصور تلقائياً بسبب cascade)
-     * - إعادة التوجيه مع رسالة نجاح
-     * 
-     * @param Crop $crop المحصول المراد حذفه
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function destroy(Crop $crop)
     {
-        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
         $crop->delete();
         return redirect()->route('crops.index')->with('success', 'Crop removed.');
     }
 
-    /**
-     * إضافة مهمة جديدة للمحصول يدوياً
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صلاحية المستخدم
-     * - التحقق من صحة البيانات المدخلة
-     * - إنشاء مهمة جديدة مرتبطة بالمحصول
-     * - استخراج وقت التذكير تلقائياً من تاريخ الاستحقاق إن لم يتم تحديده
-     * - إنشاء إشعار فوري للمهام المستحقة اليوم أو غداً
-     * - تحديث حالة المحصول تلقائياً إلى 'harvested' عند إضافة مهمة حصاد
-     * 
-     * أنواع المهام: water (ري), fertilizer (تسميد), pest (مكافحة آفات), harvest (حصاد), other (أخرى)
-     * الحالات: pending (قيد الانتظار), completed (مكتملة)
-     * 
-     * البيانات التفصيلية حسب نوع المهمة:
-     * - للري: كمية الماء، مدة الري بالدقائق
-     * - للتسميد: اسم المادة، الجرعة، وحدة القياس
-     * - للآفات: اسم المادة، الجرعة، وحدة القياس
-     * - للحصاد: كمية الحصاد، وحدة القياس
-     * 
-     * @param Request $request
-     * @param Crop $crop المحصول المراد إضافة مهمة له
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    public function destroyImage(CropImage $image)
+    {
+
+    if (Storage::disk('public')->exists($image->image_path)) {
+        Storage::disk('public')->delete($image->image_path);
+    }
+        $image->delete();
+        return back()->with('success', 'Image deleted successfully');
+        }
+
     public function storeTask(Request $request, Crop $crop)
     {
-        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
 
-        // التحقق من البيانات
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'type' => 'required|in:water,fertilizer,pest,harvest,other',
@@ -268,7 +150,6 @@ class CropController extends Controller
             'reminder_time' => 'nullable|date_format:H:i',
             'notes' => 'nullable|string',
             'status' => 'nullable|in:pending,completed',
-            // حقول تفصيلية
             'water_amount' => 'nullable|numeric',
             'duration_minutes' => 'nullable|integer',
             'material_name' => 'nullable|string|max:255',
@@ -279,12 +160,10 @@ class CropController extends Controller
             'system_notes' => 'nullable|string',
         ]);
 
-        // استخراج وقت التذكير تلقائياً من تاريخ الاستحقاق
         if (!$request->filled('reminder_time')) {
-            $validated['reminder_time'] = \Carbon\Carbon::parse($validated['due_date'])->format('H:i');
+            $validated['reminder_time'] = Carbon::parse($validated['due_date'])->format('H:i');
         }
 
-        // إنشاء المهمة
         $task = $crop->tasks()->create([
             'title' => $validated['title'],
             'type' => $validated['type'],
@@ -302,10 +181,9 @@ class CropController extends Controller
             'system_notes' => $validated['system_notes'] ?? null,
         ]);
 
-        // إنشاء إشعار فوري للمهام القريبة (اليوم أو غداً)
-        $dueDate = \Carbon\Carbon::parse($validated['due_date']);
-        $now = \Carbon\Carbon::now();
-        
+        $dueDate = Carbon::parse($validated['due_date']);
+        $now = Carbon::now();
+
         if ($dueDate->isToday() || $dueDate->isTomorrow()) {
             \App\Models\Notification::create([
                 'user_id' => auth()->id(),
@@ -316,46 +194,24 @@ class CropController extends Controller
             ]);
         }
 
-        // تحديث حالة المحصول تلقائياً عند الحصاد
         if ($validated['type'] === 'harvest') {
             $crop->update(['status' => 'harvested']);
         }
 
-        return back()->with('success', $validated['type'] === 'harvest' 
-            ? 'تم تسجيل الحصاد وتحديث حالة المحصول بنجاح!' 
+        return back()->with('success', $validated['type'] === 'harvest'
+            ? 'تم تسجيل الحصاد وتحديث حالة المحصول بنجاح!'
             : 'New task added successfully!');
     }
 
-    /**
-     * تحديد مهمة كمكتملة وزيادة نسبة نمو المحصول
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صلاحية المستخدم (عبر المحصول)
-     * - تحديث حالة المهمة إلى 'completed'
-     * - زيادة نسبة نمو المحصول بـ 5% للمهام الأساسية (ري، تسميد، مكافحة آفات)
-     * - التأكد من عدم تجاوز نسبة النمو 100%
-     * - إعادة التوجيه مع رسالة نجاح
-     * 
-     * المهام التي تزيد نسبة النمو: water, fertilizer, pest
-     * 
-     * @param Request $request
-     * @param int $taskId رقم المهمة المراد إكمالها
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function completeTask(Request $request, $taskId)
     {
         $task = \App\Models\Task::findOrFail($taskId);
-        
-        // التحقق من الملكية عبر المحصول
         if ($task->crop->user_id !== auth()->id()) abort(403);
 
-        // تحديث حالة المهمة
         $task->update(['status' => 'completed']);
 
-        // زيادة نسبة النمو للمهام المهمة
         if (in_array($task->type, ['water', 'fertilizer', 'pest'])) {
             $task->crop->increment('growth_percentage', 5);
-            // التأكد من عدم تجاوز 100%
             if ($task->crop->growth_percentage > 100) {
                 $task->crop->update(['growth_percentage' => 100]);
             }
@@ -364,37 +220,16 @@ class CropController extends Controller
         return back()->with('success', 'تم إتمام المهمة! زادت نسبة نمو المحصول بفضل اهتمامك.');
     }
 
-    /**
-     * تحديث نسبة نمو المحصول يدوياً
-     * 
-     * تقوم هذه الدالة بـ:
-     * - التحقق من صلاحية المستخدم
-     * - التحقق من صحة القيمة المدخلة (0-100)
-     * - تحديث نسبة النمو
-     * - تحديث حالة المحصول تلقائياً:
-     *   * إذا وصلت النسبة 100%: تغيير الحالة إلى 'harvested'
-     *   * إذا كانت أكبر من 0: تغيير الحالة إلى 'growing'
-     * - إعادة التوجيه مع رسالة نجاح
-     * 
-     * حالات المحصول: growing (ينمو), harvested (تم الحصاد)
-     * 
-     * @param Request $request
-     * @param Crop $crop المحصول المراد تحديث نموه
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function updateGrowth(Request $request, Crop $crop)
     {
-        // التحقق من الملكية
         if ($crop->user_id !== auth()->id()) abort(403);
 
-        // التحقق من البيانات
         $validated = $request->validate([
             'growth_percentage' => 'required|integer|min:0|max:100',
         ]);
 
         $data = ['growth_percentage' => $validated['growth_percentage']];
 
-        // تحديث الحالة تلقائياً بناءً على نسبة النمو
         if ($validated['growth_percentage'] == 100) {
             $data['status'] = 'harvested';
         } elseif ($validated['growth_percentage'] > 0) {
@@ -406,16 +241,13 @@ class CropController extends Controller
         return back()->with('success', 'تم تحديث مرحلة النمو والحالة بنجاح!');
     }
 
-    /**
-     * جلب اقتراحات البيانات للواجهة
-     */
     public function getAjaxSuggestions()
     {
         $user = auth()->user();
-        
+
         $names = $user->crops()->pluck('name')->unique();
         $types = $user->crops()->pluck('type')->unique();
-        
+
         $commonTypes = ['Wheat', 'Corn', 'Rice', 'Tomato', 'Potato', 'Cotton', 'Other', 'Cucumber', 'Palm', 'Clover', 'Olive', 'Citrus'];
         $commonNames = ['North Field', 'South Field', 'Greenhouse 1', 'Home Farm'];
 

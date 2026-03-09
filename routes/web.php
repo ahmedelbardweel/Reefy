@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
@@ -54,6 +53,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/upcoming-tasks', 'getUpcomingTasks')->name('notifications.upcoming');
         Route::post('/{notification}/read', 'markAsRead')->name('notifications.read');
         Route::post('/read-all', 'markAllAsRead')->name('notifications.readAll');
+        Route::get('/notifications/unread-count',
+                                            [NotificationController::class, 'getUnreadCount']
+          )->middleware('auth');
+
     });
 
     // Community Actions (Authenticated)

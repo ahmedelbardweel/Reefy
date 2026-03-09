@@ -13,6 +13,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
                 <!-- Edit Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700">
@@ -22,23 +23,23 @@
                                 @method('PUT')
 
                                 <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">{{ __('Basic Information') }}</h3>
-                                
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <x-input-label for="name" :value="__('Crop Name')" />
-                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $crop->name) }}" required />
+                                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $crop->name) }}" />
                                     </div>
                                     <div>
                                         <x-input-label for="type" :value="__('Type')" />
-                                        <x-text-input id="type" name="type" type="text" class="mt-1 block w-full" value="{{ old('type', $crop->type) }}" required />
+                                        <x-text-input id="type" name="type" type="text" class="mt-1 block w-full" value="{{ old('type', $crop->type) }}"  />
                                     </div>
                                     <div>
                                         <x-input-label for="area" :value="__('Area (Acres)')" />
-                                        <x-text-input id="area" name="area" type="number" step="0.1" class="mt-1 block w-full" value="{{ old('area', $crop->area) }}" required />
+                                        <x-text-input id="area" name="area" type="number" step="0.1" class="mt-1 block w-full" value="{{ old('area', $crop->area) }}"  />
                                     </div>
                                     <div>
                                         <x-input-label for="planting_date" :value="__('Planting Date')" />
-                                        <x-text-input id="planting_date" name="planting_date" type="date" class="mt-1 block w-full" value="{{ $crop->planting_date ? $crop->planting_date->format('Y-m-d') : '' }}" required />
+                                        <x-text-input id="planting_date" name="planting_date" type="date" class="mt-1 block w-full" value="{{ $crop->planting_date ? $crop->planting_date->format('Y-m-d') : '' }}"/>
                                     </div>
                                     <div>
                                         <x-input-label for="expected_harvest_date" :value="__('Expected Harvest Date')" />
@@ -47,7 +48,7 @@
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                     <div>
+                                    <div>
                                         <x-input-label for="soil_type" :value="__('Soil Type')" />
                                         <x-text-input id="soil_type" name="soil_type" type="text" class="mt-1 block w-full" value="{{ old('soil_type', $crop->soil_type) }}" />
                                     </div>
@@ -62,13 +63,42 @@
                                     <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm">{{ old('notes', $crop->notes) }}</textarea>
                                 </div>
 
+                                <!-- Existing Images with Delete -->
                                 <div>
-                                    <x-input-label :value="__('Add New Photos')" />
+                  @if($crop->images && count($crop->images))
+<div id="images-container" class="flex gap-2 mt-3 flex-wrap">
+
+@foreach($crop->images as $image)
+
+<div class="relative w-20 h-20">
+
+<img src="{{ asset('storage/'.$image->image_path) }}"
+class="w-full h-full object-cover rounded border">
+</div>
+                        {{-- <form action="{{ route('crops.images.destroy', $image->id) }}"
+method="POST"
+class="absolute -top-1 -right-1">
+@csrf
+@method('DELETE')
+<button type="submit"
+onclick="return confirm('Delete image?')"
+class="bg-red-600 text-white w-5 h-5 rounded-full text-xs">
+×
+</button>
+</form> --}}
+@endforeach
+
+</div>
+@endif
+                                </div>
+                                <!-- Upload New Images -->
+                                <div>
                                     <input type="file" name="images[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
                                 </div>
 
+                                <!-- Save Changes Button -->
                                 <div class="pt-4">
-                                    <x-primary-button class="w-full justify-center bg-green-600 hover:bg-green-700">{{ __('Save Changes') }}</x-primary-button>
+                                    <x-primary-button type="submit" class="w-full justify-center bg-green-600 hover:bg-green-700">{{ __('Save Changes') }}</x-primary-button>
                                 </div>
                             </form>
                         </div>
@@ -79,14 +109,14 @@
                 <div class="space-y-6">
                     <!-- Growth Status -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-6 text-center">
-                         <h3 class="text-sm font-bold text-gray-500 mb-4">{{ __('Manual Growth Update') }}</h3>
-                         <div class="text-3xl font-bold text-green-600 mb-2">{{ $crop->growth_percentage }}%</div>
-                         <p class="text-xs text-gray-400 mb-6">{{ __($crop->growth_stage_label) }}</p>
-                         
-                         <form action="{{ route('crops.updateGrowth', $crop) }}" method="POST">
+                        <h3 class="text-sm font-bold text-gray-500 mb-4">{{ __('Manual Growth Update') }}</h3>
+                        <div class="text-3xl font-bold text-green-600 mb-2">{{ $crop->growth_percentage }}%</div>
+                        <p class="text-xs text-gray-400 mb-6">{{ __($crop->growth_stage_label) }}</p>
+
+                        <form action="{{ route('crops.updateGrowth', $crop) }}" method="POST">
                             @csrf
                             <input type="range" name="growth_percentage" min="0" max="100" value="{{ $crop->growth_percentage }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
-                             <div class="flex justify-between text-[10px] text-gray-400 mt-1 mb-4">
+                            <div class="flex justify-between text-[10px] text-gray-400 mt-1 mb-4">
                                 <span>0%</span>
                                 <span>50%</span>
                                 <span>100%</span>
@@ -103,7 +133,7 @@
                             <div>
                                 <x-text-input name="title" :placeholder="__('Task Title')" class="w-full text-sm" required />
                             </div>
-                             <div>
+                            <div>
                                 <select name="type" class="w-full text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-md shadow-sm">
                                     <option value="water">{{ __('Irrigation') }}</option>
                                     <option value="fertilizer">{{ __('Fertilization') }}</option>
@@ -111,7 +141,7 @@
                                     <option value="harvest">{{ __('Harvest') }}</option>
                                 </select>
                             </div>
-                             <div>
+                            <div>
                                 <x-text-input name="due_date" type="datetime-local" class="w-full text-sm" required />
                             </div>
                             <x-primary-button class="w-full justify-center bg-gray-800 hover:bg-gray-900">{{ __('Add') }}</x-primary-button>
