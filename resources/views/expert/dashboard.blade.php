@@ -74,43 +74,43 @@
                 </div>
 
                 <div class="space-y-4">
-                    @forelse($recentConsultations as $consultation)
-                        <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-6 relative group overflow-hidden">
-                            <div class="absolute top-0 right-0 w-1 h-full bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            
-                            <div class="flex justify-between items-start mb-4">
-                                <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600">{{ $consultation->category }}</span>
-                                <span class="text-[10px] text-gray-400 font-bold">{{ $consultation->created_at->diffForHumans() }}</span>
-                            </div>
+    @forelse($recentConsultations as $consultation)
+        @if($consultation->expert_id === auth()->id()) {{-- فقط الاستشارات الخاصة بالخبير الحالي --}}
+            <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-6 relative group overflow-hidden">
+                <div class="absolute top-0 right-0 w-1 h-full bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                            <h4 class="text-md font-bold text-gray-900 dark:text-white mb-2 leading-tight">{{ $consultation->subject }}</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 italic mb-6">"{{ Str::limit($consultation->question, 120) }}"</p>
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-gray-50 dark:bg-gray-700 text-gray-400 border border-gray-100 dark:border-gray-600">{{ $consultation->category }}</span>
+                    <span class="text-[10px] text-gray-400 font-bold">{{ $consultation->created_at->diffForHumans() }}</span>
+                </div>
 
-                            <div class="flex justify-between items-center pt-4 border-t border-gray-50 dark:border-gray-700">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-6 h-6 bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center text-[10px]">
-                                        <i class="bi bi-person-fill"></i>
-                                    </div>
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ __('Farmer') }}</span>
-                                </div>
-                                <a href="{{ route('consultations.show', $consultation) }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-widest hover:bg-green-600 dark:hover:bg-green-600 dark:hover:text-white transition group/btn">
-                                    {{ __('Provide Advice') }}
-                                    <i class="bi bi-send-fill transition-transform group-hover/btn:-translate-x-1"></i>
-                                </a>
-                            </div>
+                <h4 class="text-md font-bold text-gray-900 dark:text-white mb-2 leading-tight">{{ $consultation->subject }}</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 italic mb-6">"{{ Str::limit($consultation->question, 120) }}"</p>
+
+                <div class="flex justify-between items-center pt-4 border-t border-gray-50 dark:border-gray-700">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center text-[10px]">
+                            <i class="bi bi-person-fill"></i>
                         </div>
-                    @empty
-                        <div class="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-200 dark:border-gray-700 p-12 text-center">
-                            <div class="w-16 h-16 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mx-auto mb-6">
-                                <i class="bi bi-check2-all text-green-600 text-3xl"></i>
-                            </div>
-                            <h6 class="font-black text-xs uppercase tracking-widest text-gray-900 dark:text-white">{{ __('Clear Horizon') }}</h6>
-                            <p class="text-xs text-gray-400 mt-2">{{ __('All pending consultations have been addressed.') }}</p>
-                        </div>
-                    @endforelse
+                        <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">{{ __('Farmer') }}</span>
+                    </div>
+                    <a href="{{ route('consultations.show', $consultation) }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-[10px] font-black uppercase tracking-widest hover:bg-green-600 dark:hover:bg-green-600 dark:hover:text-white transition group/btn">
+                        {{ __('Provide Advice') }}
+                        <i class="bi bi-send-fill transition-transform group-hover/btn:-translate-x-1"></i>
+                    </a>
                 </div>
             </div>
-
+        @endif
+    @empty
+        <div class="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-200 dark:border-gray-700 p-12 text-center">
+            <div class="w-16 h-16 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center mx-auto mb-6">
+                <i class="bi bi-check2-all text-green-600 text-3xl"></i>
+            </div>
+            <h6 class="font-black text-xs uppercase tracking-widest text-gray-900 dark:text-white">{{ __('Clear Horizon') }}</h6>
+            <p class="text-xs text-gray-400 mt-2">{{ __('All pending consultations have been addressed.') }}</p>
+        </div>
+    @endforelse
+</div>
             <!-- Expert Tips Management -->
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-4">
@@ -130,7 +130,7 @@
                                 <div class="w-8 h-8 bg-green-50 dark:bg-green-900/20 text-green-600 flex items-center justify-center text-sm">
                                     <i class="bi bi-lightbulb-fill"></i>
                                 </div>
-                                
+
                                 <x-dropdown align="right" width="40">
                                     <x-slot name="trigger">
                                         <button class="text-gray-400 hover:text-gray-900 dark:hover:text-white p-1">
@@ -154,7 +154,7 @@
 
                             <h6 class="font-bold text-gray-900 dark:text-white mb-2 leading-tight uppercase tracking-tighter">{{ $tip->title }}</h6>
                             <p class="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-3 mb-4 italic">"{{ $tip->content }}"</p>
-                            
+
                             <div class="text-[9px] font-black uppercase tracking-widest text-gray-400 border-t border-gray-50 dark:border-gray-700 pt-3 flex items-center justify-between">
                                 <span>{{ __('Posted') }}</span>
                                 <span>{{ $tip->created_at->format('M d, Y') }}</span>

@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Providers;
-
+use Illuminate\Support\Facades\View;
+use App\Models\Notification;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
                 // If it's a folder but not a link, remove it to allow link creation
                 $this->app->make('files')->deleteDirectory($storageLink);
             }
-            
+
             if (!file_exists($storageLink)) {
                 try {
                     $this->app->make('files')->link(storage_path('app/public'), $storageLink);
@@ -39,5 +40,18 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
         }
+
+
+        View::composer('*', function ($view) {
+
+        if(auth()->check()){
+            $unreadCount = Notification::where('user_id', auth()->id())
+                ->where('is_read', false)
+                ->count();
+        } else {
+            $unreadCount = 0;
+        }
+        $view->with('unreadCount', $unreadCount);
+    });
     }
 }

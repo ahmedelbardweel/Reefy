@@ -3,7 +3,7 @@
 @endphp
 <nav class="fixed w-full top-0 z-50 shadow-sm bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <input type="checkbox" id="{{ $navId }}" class="peer hidden">
-    
+
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center h-16">
@@ -95,11 +95,22 @@
                     </a>
 
                     <!-- Notifications -->
-                    <a href="{{ route('notifications.index') }}" class="relative w-10 h-10 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                    </a>
+     <a href="{{ route('notifications.index') }}"
+class="relative w-12 h-10 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-all">
+
+<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+</svg>
+
+@if($unreadCount > 0)
+<span class="absolute top-1 right-3  bg-red-500 text-white text-xs
+w-3 h-3 flex items-center justify-center rounded-full font-bold">
+{{ $unreadCount }}
+</span>
+@endif
+
+</a>
 
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
@@ -204,7 +215,7 @@
         @auth
             <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
                 <!-- Mobile Language Toggle -->
-                <a href="{{ route('lang.switch', app()->getLocale() == 'ar' ? 'en' : 'ar') }}" 
+                <a href="{{ route('lang.switch', app()->getLocale() == 'ar' ? 'en' : 'ar') }}"
                    class="w-full text-start flex items-center px-4 py-2 text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
                     <div class="flex items-center gap-2">
                         <i class="bi bi-translate text-lg"></i>
@@ -212,7 +223,7 @@
                     </div>
                 </a>
 
-                <a href="{{ route('theme.toggle') }}" 
+                <a href="{{ route('theme.toggle') }}"
                         class="w-full text-start flex items-center px-4 py-2 text-base font-medium text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
                     <div class="flex items-center gap-2">
                         @if(session('theme') === 'dark')

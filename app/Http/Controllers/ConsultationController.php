@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Consultation;
 use App\Models\Crop;
@@ -9,7 +9,7 @@ use App\Models\Notification;
 
 /**
  * كونترولر الاستشارات - Consultation Controller
- * 
+ *
  * العلاقات:
  * - Consultation (الاستشارة): belongsTo User (المزارع الذي طرح السؤال)
  * - Consultation: belongsTo Expert (الخبير الذي أجاب)
@@ -19,15 +19,15 @@ class ConsultationController extends Controller
 {
     /**
      * عرض قائمة استشارات المزارع الحالي
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - جلب جميع الاستشارات الخاصة بالمستخدم الحالي
      * - تحميل علاقات: الخبير الذي أجاب والمحصول المرتبط
      * - ترتيب الاستشارات من الأحدث للأقدم
      * - عرض صفحة قائمة الاستشارات
-     * 
+     *
      * العلاقة: Consultation belongsTo User, Expert, Crop
-     * 
+     *
      * @return \Illuminate\View\View
      */
     public function index()
@@ -38,30 +38,36 @@ class ConsultationController extends Controller
 
     /**
      * عرض نموذج إنشاء استشارة جديدة
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - جلب محاصيل المستخدم الحالي لعرضها في القائمة المنسدلة
      * - عرض صفحة نموذج إنشاء الاستشارة
-     * 
+     *
      * @return \Illuminate\View\View
      */
     public function create()
     {
-        $crops = auth()->user()->crops;
-        return view('consultations.create', compact('crops'));
+
+    $crops = auth()->user()->crops;
+
+    // جلب المستخدمين الذين دورهم expert
+    $experts = User::where('role', 'expert')->get();
+
+    return view('consultations.create', compact('crops','experts'));
+
     }
 
     /**
      * حفظ استشارة جديدة
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - التحقق من صحة البيانات المدخلة (العنوان، السؤال، المحصول، الفئة)
      * - إنشاء استشارة جديدة مرتبطة بالمستخدم الحالي
      * - تعيين حالة الاستشارة إلى 'pending' (قيد الانتظار)
      * - إعادة التوجيه إلى قائمة الاستشارات مع رسالة نجاح
-     * 
+     *
      * الحالات: pending (قيد الانتظار), answered (تم الرد)
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -73,12 +79,14 @@ class ConsultationController extends Controller
             'question' => 'required|string',
             'crop_id' => 'nullable|exists:crops,id',
             'category' => 'required|string',
+            'expert_id' => 'nullable|exists:users,id',
         ]);
 
         // إنشاء الاستشارة
         Consultation::create([
             'user_id' => auth()->id(),
             'crop_id' => $request->crop_id,
+            'expert_id' => $request->expert_id,
             'subject' => $request->subject,
             'question' => $request->question,
             'category' => $request->category,
@@ -90,11 +98,11 @@ class ConsultationController extends Controller
 
     /**
      * عرض تفاصيل استشارة معينة
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - التحقق من صلاحية الوصول (صاحب الاستشارة أو خبير)
      * - عرض صفحة تفاصيل الاستشارة
-     * 
+     *
      * @param Consultation $consultation الاستشارة المراد عرضها
      * @return \Illuminate\View\View
      */
@@ -109,33 +117,54 @@ class ConsultationController extends Controller
 
     /**
      * عرض قائمة الاستشارات المعلقة للخبراء
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - جلب جميع الاستشارات ذات الحالة 'pending' (قيد الانتظار)
      * - ترتيبها من الأحدث للأقدم
      * - عرض صفحة الاستشارات للخبير
-     * 
+     *
      * هذه الصفحة خاصة بالخبراء فقط
-     * 
+     *
      * @return \Illuminate\View\View
      */
     public function expertIndex()
     {
-        $consultations = Consultation::where('status', 'pending')->latest()->get();
-        return view('expert.consultations.index', compact('consultations'));
+        $recentConsultations = Consultation::where('status', 'pending')
+        ->where('expert_id', auth()->id())
+        ->latest()
+        ->take(5)
+        ->get();
+
+    $pendingCount = Consultation::where('status','pending')
+        ->where('expert_id', auth()->id())
+        ->count();
+
+    $answeredCount = Consultation::where('status','answered')
+        ->where('expert_id', auth()->id())
+        ->count();
+
+    $myTips = \App\Models\ExpertTip::where('user_id', auth()->id())->latest()->get();
+
+    return view('expert.consultations.index', compact(
+        'recentConsultations',
+        'pendingCount',
+        'answeredCount',
+        'myTips'
+    ));
+
     }
 
     /**
      * إضافة رد من الخبير على استشارة
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - التحقق من صحة البيانات (الرد)
      * - تحديث الاستشارة بإضافة: رقم الخبير، الرد، وتغيير الحالة إلى 'answered'
      * - إنشاء إشعار للمزارع صاحب الاستشارة لإعلامه بالرد
      * - إعادة التوجيه مع رسالة نجاح
-     * 
+     *
      * العلاقة: Notification belongsTo User و Task (اختياري)
-     * 
+     *
      * @param Request $request
      * @param Consultation $consultation الاستشارة المراد الرد عليها
      * @return \Illuminate\Http\RedirectResponse

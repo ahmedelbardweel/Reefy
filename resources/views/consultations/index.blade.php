@@ -65,6 +65,12 @@
                                         {{ $consultation->crop->name }}
                                     </div>
                                 @endif
+                                        @if($consultation->expert)
+                                    <div class="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase border border-gray-100 dark:border-gray-700 px-2 py-0.5 bg-gray-50 dark:bg-gray-700/30">
+                                       <i class="bi bi-patch-check-fill text-blue-500 text-[10px]"></i>
+                                         Dr.{{ $consultation->expert->name }}
+                                    </div>
+                                @endif
                             </div>
 
                             <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed italic">
