@@ -386,41 +386,99 @@
                         </div>
                     </div>
 
-                    {{-- Add Task Modal --}}
-                    <div id="addTaskModal{{ $crop->id }}" class="css-modal">
-                        <div class="css-modal__overlay"></div>
-                        <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                                    <i class="bi bi-plus-circle text-gray-600"></i> {{ __('Add Task') }}: {{ $crop->name }}
-                                </h2>
-                                <a href="#" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">&times;</a>
-                            </div>
-                            <form action="{{ route('crops.tasks.store', $crop) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="type" value="other">
-                                <input type="hidden" name="status" value="pending">
-                                <div class="space-y-4 mb-4">
-                                    <div>
-                                        <x-input-label value="{{ __('Task Title') }}" />
-                                        <x-text-input name="title" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Soil testing, pruning...') }}" required />
-                                    </div>
-                                    <div>
-                                        <x-input-label value="{{ __('Date & Time') }}" />
-                                        <x-text-input name="due_date" type="datetime-local" class="mt-1 block w-full" value="{{ now()->format('Y-m-d\TH:i') }}" required />
-                                    </div>
-                                    <div>
-                                        <x-input-label value="{{ __('Notes') }}" />
-                                        <textarea name="notes" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm" rows="3"></textarea>
-                                    </div>
-                                </div>
-                                <div class="flex justify-end gap-2">
-                                    <a href="#" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-none font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">{{ __('Cancel') }}</a>
-                                    <x-primary-button class="bg-gray-800 hover:bg-gray-900">{{ __('Save Task') }}</x-primary-button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+{{-- Add Task Modal --}}
+<div id="addTaskModal{{ $crop->id }}" class="css-modal">
+    <div class="css-modal__overlay"></div>
+    <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <i class="bi bi-plus-circle text-gray-600"></i> {{ __('Add Task') }}: {{ $crop->name }}
+            </h2>
+            <a href="#" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">&times;</a>
+        </div>
+        <form action="{{ route('crops.tasks.store', $crop) }}" method="POST">
+            @csrf
+            <input type="hidden" name="status" value="pending">
+
+            {{-- Task Title --}}
+            <div class="mb-4">
+                <x-input-label value="{{ __('Task Title') }}" />
+                <x-text-input name="title" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Soil testing, pruning...') }}" required />
+            </div>
+
+            {{-- Task Type --}}
+            <div class="mb-4">
+                <x-input-label value="{{ __('Task Type') }}" />
+                <select name="task_type" id="taskTypeSelect{{ $crop->id }}" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm">
+                    <option value="Growth">{{ __('Growth') }}</option>
+                    <option value="Harvest">{{ __('Harvest') }}</option>
+                    <option value="Treatment">{{ __('Treatment') }}</option>
+                    <option value="Irrigation">{{ __('Irrigation') }}</option>
+                </select>
+            </div>
+
+            {{-- Dynamic Fields --}}
+            <div class="space-y-4 mb-4">
+                {{-- Growth Fields --}}
+                <div id="growthFields{{ $crop->id }}" class="task-fields hidden">
+                    <x-input-label value="{{ __('Growth Details') }}" />
+                    <x-text-input name="growth_details" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Leaf fertilization') }}" />
+                </div>
+
+                {{-- Harvest Fields --}}
+                <div id="harvestFields{{ $crop->id }}" class="task-fields hidden">
+                    <x-input-label value="{{ __('Harvest Quantity') }}" />
+                    <x-text-input name="harvest_quantity" type="number" step="0.1" class="mt-1 block w-full" placeholder="{{ __('e.g., 50') }}" />
+                    <x-input-label value="{{ __('Unit') }}" class="mt-2" />
+                    <select name="harvest_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm">
+                        <option value="kg">{{ __('kg') }}</option>
+                        <option value="ton">{{ __('ton') }}</option>
+                        <option value="box">{{ __('box') }}</option>
+                    </select>
+                </div>
+
+                {{-- Treatment Fields --}}
+                <div id="treatmentFields{{ $crop->id }}" class="task-fields hidden">
+                    <x-input-label value="{{ __('Material Name') }}" />
+                    <x-text-input name="material_name" type="text" class="mt-1 block w-full" />
+                    <x-input-label value="{{ __('Dosage') }}" class="mt-2" />
+                    <x-text-input name="dosage" type="number" step="0.1" class="mt-1 block w-full" />
+                    <x-input-label value="{{ __('Unit') }}" class="mt-2" />
+                    <select name="dosage_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm">
+                        <option value="L/Acre">{{ __('L/Acre') }}</option>
+                        <option value="kg/Acre">{{ __('kg/Acre') }}</option>
+                        <option value="ml/L">{{ __('ml/L') }}</option>
+                    </select>
+                </div>
+
+                {{-- Irrigation Fields --}}
+                <div id="irrigationFields{{ $crop->id }}" class="task-fields hidden">
+                    <x-input-label value="{{ __('Water Amount (L)') }}" />
+                    <x-text-input name="water_amount" type="number" class="mt-1 block w-full" />
+                    <x-input-label value="{{ __('Duration (min)') }}" class="mt-2" />
+                    <x-text-input name="duration_minutes" type="number" class="mt-1 block w-full" />
+                </div>
+
+                {{-- Common Fields --}}
+                <div>
+                    <x-input-label value="{{ __('Date & Time') }}" />
+                    <x-text-input name="due_date" type="datetime-local" class="mt-1 block w-full" value="{{ now()->format('Y-m-d\TH:i') }}" required />
+                </div>
+
+                <div>
+                    <x-input-label value="{{ __('Notes') }}" />
+                    <textarea name="notes" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm" rows="3"></textarea>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div class="flex justify-end gap-2">
+                <a href="#" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-none font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">{{ __('Cancel') }}</a>
+                <x-primary-button class="bg-gray-800 hover:bg-gray-900">{{ __('Save Task') }}</x-primary-button>
+            </div>
+        </form>
+    </div>
+</div>
 
                 </div>
             @empty
@@ -454,3 +512,23 @@
         </div>
     </div>
 </x-app-layout>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const select = document.getElementById('taskTypeSelect{{ $crop->id }}');
+    const fields = {
+        'Growth': document.getElementById('growthFields{{ $crop->id }}'),
+        'Harvest': document.getElementById('harvestFields{{ $crop->id }}'),
+        'Treatment': document.getElementById('treatmentFields{{ $crop->id }}'),
+        'Irrigation': document.getElementById('irrigationFields{{ $crop->id }}'),
+    };
+
+    function updateFields() {
+        Object.values(fields).forEach(f => f.classList.add('hidden'));
+        const selected = select.value;
+        if(fields[selected]) fields[selected].classList.remove('hidden');
+    }
+
+    select.addEventListener('change', updateFields);
+    updateFields(); // initial call
+});
+</script>
