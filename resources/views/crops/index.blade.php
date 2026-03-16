@@ -129,7 +129,7 @@
 
                         {{-- Tasks Section (Compact) --}}
                         <div class="mb-3 space-y-1.5 pt-2 border-t border-gray-100 dark:border-gray-700">
-                            @php $pendingTasks = $crop->tasks()->where('status', 'pending')->orderBy('due_date')->take(2)->get(); @endphp
+                            @php $pendingTasks = $crop->tasks()->where('status', 'pending')->orderBy('due_date')->take(4)->get(); @endphp
                             @forelse($pendingTasks as $task)
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex items-center gap-1.5 min-w-0">
@@ -170,6 +170,12 @@
                                     <span class="text-[7px] font-black uppercase mt-0.5">{{ __('Growth') }}</span>
                                 </a>
                             </div>
+
+                            @if($errors->any() && old('crop_id') == $crop->id)
+                                <div class="mb-2 p-2 bg-red-50 border border-red-200 text-red-600 text-[10px] rounded">
+                                    {{ __('Please check the task details and try again.') }}
+                                </div>
+                            @endif
 
               {{-- Footer Actions --}}
 <div class="flex items-center gap-2">
@@ -214,7 +220,7 @@
                     {{-- ======== CSS-only Modals (:target based) ======== --}}
 
                     {{-- Irrigation Modal --}}
-                    <div id="irrigationModal{{ $crop->id }}" class="css-modal">
+                    <div id="irrigationModal{{ $crop->id }}" class="css-modal @if($errors->any() && old('crop_id') == $crop->id && old('type') == 'water') !flex items-center justify-center @endif">
                         <div class="css-modal__overlay"></div>
                         <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
                             <div class="flex justify-between items-center mb-4">
@@ -227,6 +233,7 @@
                                 @csrf
                                 <input type="hidden" name="type" value="water">
                                 <input type="hidden" name="status" value="completed">
+                                <input type="hidden" name="crop_id" value="{{ $crop->id }}">
                                 <input type="hidden" name="title" value="{{ __('Irrigation execution') }}">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
@@ -255,7 +262,7 @@
                     </div>
 
                     {{-- Treatment Modal --}}
-                    <div id="treatmentModal{{ $crop->id }}" class="css-modal">
+                    <div id="treatmentModal{{ $crop->id }}" class="css-modal @if($errors->any() && old('crop_id') == $crop->id && old('type') == 'fertilizer') !flex items-center justify-center @endif">
                         <div class="css-modal__overlay"></div>
                         <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
                             <div class="flex justify-between items-center mb-4">
@@ -268,6 +275,7 @@
                                 @csrf
                                 <input type="hidden" name="type" value="fertilizer">
                                 <input type="hidden" name="status" value="completed">
+                                <input type="hidden" name="crop_id" value="{{ $crop->id }}">
                                 <input type="hidden" name="title" value="{{ __('Treatment execution') }}">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div class="col-span-1 md:col-span-2">
@@ -300,7 +308,7 @@
                     </div>
 
                     {{-- Harvest Modal --}}
-                    <div id="harvestModal{{ $crop->id }}" class="css-modal">
+                    <div id="harvestModal{{ $crop->id }}" class="css-modal @if($errors->any() && old('crop_id') == $crop->id && old('type') == 'harvest') !flex items-center justify-center @endif">
                         <div class="css-modal__overlay"></div>
                         <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
                             <div class="flex justify-between items-center mb-4">
@@ -313,6 +321,7 @@
                                 @csrf
                                 <input type="hidden" name="type" value="harvest">
                                 <input type="hidden" name="status" value="completed">
+                                <input type="hidden" name="crop_id" value="{{ $crop->id }}">
                                 <input type="hidden" name="title" value="{{ __('Harvest execution') }}">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
@@ -341,7 +350,7 @@
                     </div>
 
                     {{-- Growth Modal --}}
-                    <div id="growthModal{{ $crop->id }}" class="css-modal">
+                    <div id="growthModal{{ $crop->id }}" class="css-modal @if($errors->any() && old('crop_id') == $crop->id && !old('type')) !flex items-center justify-center @endif">
                         <div class="css-modal__overlay"></div>
                         <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
                             <div class="flex justify-between items-center mb-4">
@@ -386,95 +395,158 @@
                         </div>
                     </div>
 
-{{-- Add Task Modal --}}
-<div id="addTaskModal{{ $crop->id }}" class="css-modal">
+{{-- Add Task Modal (Pure CSS Dynamic) --}}
+<div id="addTaskModal{{ $crop->id }}" class="css-modal @if($errors->any() && old('crop_id') == $crop->id) !flex items-center justify-center @endif">
     <div class="css-modal__overlay"></div>
     <div class="css-modal__dialog p-6 rounded-none shadow-xl max-w-lg w-full">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <i class="bi bi-plus-circle text-gray-600"></i> {{ __('Add Task') }}: {{ $crop->name }}
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <i class="bi bi-plus-circle text-green-600"></i> {{ __('Add Task') }}: {{ $crop->name }}
             </h2>
             <a href="#" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">&times;</a>
         </div>
+
+        @if($errors->any() && old('crop_id') == $crop->id)
+            <div class="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs text-right">
+                <p class="font-bold">{{ __('Please fix the following errors:') }}</p>
+                <ul class="mt-1 list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('crops.tasks.store', $crop) }}" method="POST">
             @csrf
             <input type="hidden" name="status" value="pending">
+            <input type="hidden" name="crop_id" value="{{ $crop->id }}">
 
             {{-- Task Title --}}
-            <div class="mb-4">
+            <div class="mb-5">
                 <x-input-label value="{{ __('Task Title') }}" />
-                <x-text-input name="title" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Soil testing, pruning...') }}" required />
+                <x-text-input name="title" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Soil testing, pruning...') }}" value="{{ old('title') }}" required />
             </div>
 
-            {{-- Task Type --}}
-            <div class="mb-4">
-                <x-input-label value="{{ __('Task Type') }}" />
-                <select name="task_type" id="taskTypeSelect{{ $crop->id }}" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm">
-                    <option value="Growth">{{ __('Growth') }}</option>
-                    <option value="Harvest">{{ __('Harvest') }}</option>
-                    <option value="Treatment">{{ __('Treatment') }}</option>
-                    <option value="Irrigation">{{ __('Irrigation') }}</option>
-                </select>
-            </div>
+            {{-- Dynamic Fields via Radio Toggles --}}
+            <div class="task-type-system">
+                <style>
+                    /* Toggle Fields */
+                    .dynamic-field-group { display: none; }
+                    .type-radio-{{ $crop->id }}-water:checked ~ .fields-water-{{ $crop->id }} { display: block; }
+                    .type-radio-{{ $crop->id }}-fertilizer:checked ~ .fields-treatment-{{ $crop->id }} { display: block; }
+                    .type-radio-{{ $crop->id }}-pest:checked ~ .fields-treatment-{{ $crop->id }} { display: block; } /* Share treatment fields */
+                    .type-radio-{{ $crop->id }}-harvest:checked ~ .fields-harvest-{{ $crop->id }} { display: block; }
+                    
+                    /* Active Link Styling */
+                    .type-radio-{{ $crop->id }}-water:checked ~ .type-grid-{{ $crop->id }} .label-water { background: #2563eb; color: white; border-color: #2563eb; }
+                    .type-radio-{{ $crop->id }}-fertilizer:checked ~ .type-grid-{{ $crop->id }} .label-fertilizer { background: #dc2626; color: white; border-color: #dc2626; }
+                    .type-radio-{{ $crop->id }}-pest:checked ~ .type-grid-{{ $crop->id }} .label-pest { background: #9333ea; color: white; border-color: #9333ea; }
+                    .type-radio-{{ $crop->id }}-harvest:checked ~ .type-grid-{{ $crop->id }} .label-harvest { background: #16a34a; color: white; border-color: #16a34a; }
+                    .type-radio-{{ $crop->id }}-other:checked ~ .type-grid-{{ $crop->id }} .label-other { background: #4b5563; color: white; border-color: #4b5563; }
+                </style>
 
-            {{-- Dynamic Fields --}}
-            <div class="space-y-4 mb-4">
-                {{-- Growth Fields --}}
-                <div id="growthFields{{ $crop->id }}" class="task-fields hidden">
-                    <x-input-label value="{{ __('Growth Details') }}" />
-                    <x-text-input name="growth_details" type="text" class="mt-1 block w-full" placeholder="{{ __('e.g., Leaf fertilization') }}" />
-                </div>
+                {{-- Hidden Radios acting as State --}}
+                <input type="radio" name="type" value="water" id="radio_{{ $crop->id }}_water" class="hidden type-radio-{{ $crop->id }}-water" {{ old('type') == 'water' ? 'checked' : '' }}>
+                <input type="radio" name="type" value="fertilizer" id="radio_{{ $crop->id }}_fertilizer" class="hidden type-radio-{{ $crop->id }}-fertilizer" {{ old('type') == 'fertilizer' ? 'checked' : '' }}>
+                <input type="radio" name="type" value="pest" id="radio_{{ $crop->id }}_pest" class="hidden type-radio-{{ $crop->id }}-pest" {{ old('type') == 'pest' ? 'checked' : '' }}>
+                <input type="radio" name="type" value="harvest" id="radio_{{ $crop->id }}_harvest" class="hidden type-radio-{{ $crop->id }}-harvest" {{ old('type') == 'harvest' ? 'checked' : '' }}>
+                <input type="radio" name="type" value="other" id="radio_{{ $crop->id }}_other" class="hidden type-radio-{{ $crop->id }}-other" {{ old('type') == 'other' || !old('type') ? 'checked' : '' }}>
 
-                {{-- Harvest Fields --}}
-                <div id="harvestFields{{ $crop->id }}" class="task-fields hidden">
-                    <x-input-label value="{{ __('Harvest Quantity') }}" />
-                    <x-text-input name="harvest_quantity" type="number" step="0.1" class="mt-1 block w-full" placeholder="{{ __('e.g., 50') }}" />
-                    <x-input-label value="{{ __('Unit') }}" class="mt-2" />
-                    <select name="harvest_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm">
-                        <option value="kg">{{ __('kg') }}</option>
-                        <option value="ton">{{ __('ton') }}</option>
-                        <option value="box">{{ __('box') }}</option>
-                    </select>
-                </div>
-
-                {{-- Treatment Fields --}}
-                <div id="treatmentFields{{ $crop->id }}" class="task-fields hidden">
-                    <x-input-label value="{{ __('Material Name') }}" />
-                    <x-text-input name="material_name" type="text" class="mt-1 block w-full" />
-                    <x-input-label value="{{ __('Dosage') }}" class="mt-2" />
-                    <x-text-input name="dosage" type="number" step="0.1" class="mt-1 block w-full" />
-                    <x-input-label value="{{ __('Unit') }}" class="mt-2" />
-                    <select name="dosage_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm">
-                        <option value="L/Acre">{{ __('L/Acre') }}</option>
-                        <option value="kg/Acre">{{ __('kg/Acre') }}</option>
-                        <option value="ml/L">{{ __('ml/L') }}</option>
-                    </select>
+                {{-- Type Selection Grid --}}
+                <div class="mb-6">
+                    <x-input-label value="{{ __('Task Type') }}" class="mb-2" />
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 type-grid-{{ $crop->id }}">
+                        <label for="radio_{{ $crop->id }}_water" class="label-water cursor-pointer border py-2 px-1 text-center text-[9px] font-bold transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 flex flex-col items-center justify-center gap-1">
+                            <i class="bi bi-water text-xs"></i> {{ __('Irrigation') }}
+                        </label>
+                        <label for="radio_{{ $crop->id }}_fertilizer" class="label-fertilizer cursor-pointer border py-2 px-1 text-center text-[9px] font-bold transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 flex flex-col items-center justify-center gap-1">
+                            <i class="bi bi-shield-plus text-xs"></i> {{ __('Treatment') }}
+                        </label>
+                        <label for="radio_{{ $crop->id }}_pest" class="label-pest cursor-pointer border py-2 px-1 text-center text-[9px] font-bold transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 flex flex-col items-center justify-center gap-1">
+                            <i class="bi bi-bug text-xs"></i> {{ __('Pest Control') }}
+                        </label>
+                        <label for="radio_{{ $crop->id }}_harvest" class="label-harvest cursor-pointer border py-2 px-1 text-center text-[9px] font-bold transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 flex flex-col items-center justify-center gap-1">
+                            <i class="bi bi-archive text-xs"></i> {{ __('Harvest') }}
+                        </label>
+                        <label for="radio_{{ $crop->id }}_other" class="label-other cursor-pointer border py-2 px-1 text-center text-[9px] font-bold transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 flex flex-col items-center justify-center gap-1">
+                            <i class="bi bi-gear text-xs"></i> {{ __('Other') }}
+                        </label>
+                    </div>
                 </div>
 
                 {{-- Irrigation Fields --}}
-                <div id="irrigationFields{{ $crop->id }}" class="task-fields hidden">
-                    <x-input-label value="{{ __('Water Amount (L)') }}" />
-                    <x-text-input name="water_amount" type="number" class="mt-1 block w-full" />
-                    <x-input-label value="{{ __('Duration (min)') }}" class="mt-2" />
-                    <x-text-input name="duration_minutes" type="number" class="mt-1 block w-full" />
+                <div class="dynamic-field-group fields-water-{{ $crop->id }} border-l-4 border-blue-500 bg-blue-50/30 dark:bg-blue-900/10 p-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label value="{{ __('Water Amount (L)') }}" />
+                            <x-text-input name="water_amount" type="number" class="mt-1 block w-full" value="{{ old('water_amount') }}" />
+                        </div>
+                        <div>
+                            <x-input-label value="{{ __('Duration (min)') }}" />
+                            <x-text-input name="duration_minutes" type="number" class="mt-1 block w-full" value="{{ old('duration_minutes') }}" />
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Common Fields --}}
+                {{-- Treatment & Pest Fields (Shared) --}}
+                <div class="dynamic-field-group fields-treatment-{{ $crop->id }} border-l-4 border-red-500 bg-red-50/30 dark:bg-red-900/10 p-4 mb-4">
+                    <div class="mb-4">
+                        <x-input-label value="{{ __('Material Name') }}" />
+                        <x-text-input name="material_name" type="text" class="mt-1 block w-full" value="{{ old('material_name') }}" />
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label value="{{ __('Dosage') }}" />
+                            <x-text-input name="dosage" type="number" step="0.1" class="mt-1 block w-full" value="{{ old('dosage') }}" />
+                        </div>
+                        <div>
+                            <x-input-label value="{{ __('Unit') }}" />
+                            <select name="dosage_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm h-[42px]">
+                                <option value="L/Acre" {{ old('dosage_unit') == 'L/Acre' ? 'selected' : '' }}>{{ __('L/Acre') }}</option>
+                                <option value="kg/Acre" {{ old('dosage_unit') == 'kg/Acre' ? 'selected' : '' }}>{{ __('kg/Acre') }}</option>
+                                <option value="ml/L" {{ old('dosage_unit') == 'ml/L' ? 'selected' : '' }}>{{ __('ml/L') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Harvest Fields --}}
+                <div class="dynamic-field-group fields-harvest-{{ $crop->id }} border-l-4 border-green-500 bg-green-50/30 dark:bg-green-900/10 p-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <x-input-label value="{{ __('Quantity') }}" />
+                            <x-text-input name="harvest_quantity" type="number" step="0.1" class="mt-1 block w-full" value="{{ old('harvest_quantity') }}" />
+                        </div>
+                        <div>
+                            <x-input-label value="{{ __('Unit') }}" />
+                            <select name="harvest_unit" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 rounded-none shadow-sm h-[42px]">
+                                <option value="kg" {{ old('harvest_unit') == 'kg' ? 'selected' : '' }}>{{ __('kg') }}</option>
+                                <option value="ton" {{ old('harvest_unit') == 'ton' ? 'selected' : '' }}>{{ __('ton') }}</option>
+                                <option value="box" {{ old('harvest_unit') == 'box' ? 'selected' : '' }}>{{ __('box') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- General Fields (Always visible) --}}
+            <div class="space-y-4 mb-4 mt-6">
                 <div>
                     <x-input-label value="{{ __('Date & Time') }}" />
-                    <x-text-input name="due_date" type="datetime-local" class="mt-1 block w-full" value="{{ now()->format('Y-m-d\TH:i') }}" required />
+                    <x-text-input name="due_date" type="datetime-local" class="mt-1 block w-full" value="{{ old('due_date') ?: now()->format('Y-m-d\TH:i') }}" required />
                 </div>
 
                 <div>
-                    <x-input-label value="{{ __('Notes') }}" />
-                    <textarea name="notes" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm" rows="3"></textarea>
+                    <x-input-label value="{{ __('Additional Notes') }}" />
+                    <textarea name="notes" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-none shadow-sm" rows="3">{{ old('notes') }}</textarea>
                 </div>
             </div>
 
             {{-- Actions --}}
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-2 border-t pt-4">
                 <a href="#" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-none font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 transition">{{ __('Cancel') }}</a>
-                <x-primary-button class="bg-gray-800 hover:bg-gray-900">{{ __('Save Task') }}</x-primary-button>
+                <x-primary-button class="bg-green-600 hover:bg-green-700 text-white border-0">{{ __('Save Task') }}</x-primary-button>
             </div>
         </form>
     </div>
@@ -512,23 +584,3 @@
         </div>
     </div>
 </x-app-layout>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const select = document.getElementById('taskTypeSelect{{ $crop->id }}');
-    const fields = {
-        'Growth': document.getElementById('growthFields{{ $crop->id }}'),
-        'Harvest': document.getElementById('harvestFields{{ $crop->id }}'),
-        'Treatment': document.getElementById('treatmentFields{{ $crop->id }}'),
-        'Irrigation': document.getElementById('irrigationFields{{ $crop->id }}'),
-    };
-
-    function updateFields() {
-        Object.values(fields).forEach(f => f.classList.add('hidden'));
-        const selected = select.value;
-        if(fields[selected]) fields[selected].classList.remove('hidden');
-    }
-
-    select.addEventListener('change', updateFields);
-    updateFields(); // initial call
-});
-</script>
