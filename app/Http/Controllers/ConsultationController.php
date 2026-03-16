@@ -73,6 +73,7 @@ class ConsultationController extends Controller
      */
     public function store(Request $request)
     {
+
         // التحقق من البيانات
         $request->validate([
             'subject' => 'required|string|max:255',
@@ -83,14 +84,14 @@ class ConsultationController extends Controller
         ]);
 
         // إنشاء الاستشارة
-        Consultation::create([
-            'user_id' => auth()->id(),
-            'crop_id' => $request->crop_id,
-            'expert_id' => $request->expert_id,
-            'subject' => $request->subject,
-            'question' => $request->question,
-            'category' => $request->category,
-            'status' => 'pending',
+ Consultation::create([
+     'user_id' => auth()->id(),
+    'crop_id' => $request->crop_id,
+    'expert_id' => $request->expert_id ?: null,
+    'subject' => $request->subject,
+    'question' => $request->question,
+    'category' => $request->category,
+    'status' => 'pending',
         ]);
 
         return redirect()->route('consultations.index')->with('success', 'تم إرسال استشارتك بنجاح! سيقوم خبير بالرد عليك قريباً.');
@@ -127,33 +128,38 @@ class ConsultationController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function expertIndex()
-    {
-        $recentConsultations = Consultation::where('status', 'pending')
-        ->where('expert_id', auth()->id())
+public function expertIndex()
+{
+    // جلب الاستشارات المعلقة
+    $consultations = Consultation::where('status', 'pending')
+        ->where(function ($query) {
+            $query->whereNull('expert_id')
+                  ->orWhere('expert_id', auth()->id());
+        })
+        ->with(['user','crop','expert'])
         ->latest()
-        ->take(5)
         ->get();
 
-    $pendingCount = Consultation::where('status','pending')
-        ->where('expert_id', auth()->id())
-        ->count();
+    // عدد الاستشارات المعلقة
+    $pendingCount = $consultations->count();
 
+    // عدد الاستشارات التي تم الرد عليها
     $answeredCount = Consultation::where('status','answered')
         ->where('expert_id', auth()->id())
         ->count();
 
-    $myTips = \App\Models\ExpertTip::where('user_id', auth()->id())->latest()->get();
+    // نصائح الخبير
+    $myTips = \App\Models\ExpertTip::where('user_id', auth()->id())
+        ->latest()
+        ->get();
 
     return view('expert.consultations.index', compact(
-        'recentConsultations',
+        'consultations',
         'pendingCount',
         'answeredCount',
         'myTips'
     ));
-
-    }
-
+}
     /**
      * إضافة رد من الخبير على استشارة
      *
