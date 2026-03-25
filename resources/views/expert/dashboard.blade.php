@@ -75,7 +75,7 @@
 
                 <div class="space-y-4">
     @forelse($recentConsultations as $consultation)
-        @if($consultation->expert_id === auth()->id()) {{-- فقط الاستشارات الخاصة بالخبير الحالي --}}
+        @if($consultation->expert_id === auth()->id() || $consultation->expert_id === null) {{-- فقط الاستشارات الخاصة بالخبير الحالي --}}
             <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm p-6 relative group overflow-hidden">
                 <div class="absolute top-0 right-0 w-1 h-full bg-yellow-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 

@@ -437,7 +437,7 @@
                     .type-radio-{{ $crop->id }}-fertilizer:checked ~ .fields-treatment-{{ $crop->id }} { display: block; }
                     .type-radio-{{ $crop->id }}-pest:checked ~ .fields-treatment-{{ $crop->id }} { display: block; } /* Share treatment fields */
                     .type-radio-{{ $crop->id }}-harvest:checked ~ .fields-harvest-{{ $crop->id }} { display: block; }
-                    
+
                     /* Active Link Styling */
                     .type-radio-{{ $crop->id }}-water:checked ~ .type-grid-{{ $crop->id }} .label-water { background: #2563eb; color: white; border-color: #2563eb; }
                     .type-radio-{{ $crop->id }}-fertilizer:checked ~ .type-grid-{{ $crop->id }} .label-fertilizer { background: #dc2626; color: white; border-color: #dc2626; }
@@ -584,3 +584,37 @@
         </div>
     </div>
 </x-app-layout>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelectorAll('[id^="taskTypeSelect"]').forEach(select => {
+
+        const cropId = select.id.replace('taskTypeSelect','');
+
+        const fields = {
+            Growth: document.getElementById('growthFields' + cropId),
+            Harvest: document.getElementById('harvestFields' + cropId),
+            Treatment: document.getElementById('treatmentFields' + cropId),
+            Irrigation: document.getElementById('irrigationFields' + cropId),
+        };
+
+        function updateFields(){
+            Object.values(fields).forEach(f=>{
+                if(f) f.classList.add('hidden');
+            });
+
+            const selected = select.value;
+
+            if(fields[selected]){
+                fields[selected].classList.remove('hidden');
+            }
+        }
+
+        select.addEventListener('change', updateFields);
+
+        updateFields();
+
+    });
+
+});
+</script>

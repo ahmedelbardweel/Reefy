@@ -42,16 +42,19 @@ class AppServiceProvider extends ServiceProvider
         }
 
 
-        View::composer('*', function ($view) {
-
-        if(auth()->check()){
-            $unreadCount = Notification::where('user_id', auth()->id())
-                ->where('is_read', false)
-                ->count();
-        } else {
-            $unreadCount = 0;
-        }
-        $view->with('unreadCount', $unreadCount);
-    });
+View::composer('*', function ($view) {
+    if(auth()->check()){
+        $notifications = Notification::where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10); // أو get() حسب ما تحتاج
+        $unreadCount = $notifications->where('is_read', false)->count();
+    } else {
+        $notifications = collect(); // مجموعة فارغة
+        $unreadCount = 0;
     }
-}
+
+    $view->with(compact('notifications', 'unreadCount'));
+});
+    }
+     }
+
