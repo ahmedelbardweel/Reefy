@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use Illuminate\Support\Facades\DB;
+use Gemini\Laravel\Facades\Gemini;
+use Gemini\Data\Blob;
+
 
 /**
  * كونترولر أنظمة المزارع - Farmer System Controller
@@ -176,3 +179,5 @@ class FarmerSystemController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 }
+
+

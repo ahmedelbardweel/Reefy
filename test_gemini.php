@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; require 'bootstrap/app.php'; \ = \->make(Illuminate\Contracts\Console\Kernel::class); \->bootstrap(); \ = Gemini\Laravel\Facades\Gemini::models()->list(); foreach(\->models as \) echo \->name . ' - ' . implode(',', \->supportedGenerationMethods) . PHP_EOL;

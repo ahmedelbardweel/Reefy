@@ -75,23 +75,33 @@ class CropController extends Controller
             'status' => 'pending',
         ]);
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Crop added successfully!',
+                'crop' => $crop
+            ]);
+        }
+
         return redirect()->route('crops.index')->with('success', 'Crop added and smart tasks generated!');
     }
 
     public function show(string $id)
     {
-        //
+    //
     }
 
     public function edit(Crop $crop)
     {
-        if ($crop->user_id !== auth()->id()) abort(403);
+        if ($crop->user_id !== auth()->id())
+            abort(403);
         return view('crops.edit', compact('crop'));
     }
 
     public function update(Request $request, Crop $crop)
     {
-        if ($crop->user_id !== auth()->id()) abort(403);
+        if ($crop->user_id !== auth()->id())
+            abort(403);
 
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
@@ -124,7 +134,8 @@ class CropController extends Controller
 
     public function destroy(Crop $crop)
     {
-        if ($crop->user_id !== auth()->id()) abort(403);
+        if ($crop->user_id !== auth()->id())
+            abort(403);
         $crop->delete();
         return redirect()->route('crops.index')->with('success', 'Crop removed.');
     }
@@ -132,16 +143,17 @@ class CropController extends Controller
     public function destroyImage(CropImage $image)
     {
 
-    if (Storage::disk('public')->exists($image->image_path)) {
-        Storage::disk('public')->delete($image->image_path);
-    }
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
         $image->delete();
         return back()->with('success', 'Image deleted successfully');
-        }
+    }
 
     public function storeTask(Request $request, Crop $crop)
     {
-        if ($crop->user_id !== auth()->id()) abort(403);
+        if ($crop->user_id !== auth()->id())
+            abort(403);
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -188,7 +200,7 @@ class CropController extends Controller
             \App\Models\Notification::create([
                 'user_id' => auth()->id(),
                 'task_id' => $task->id,
-                'title' => '✅ تمت إضافة مهمة جديدة',
+                'title' => ' تمت إضافة مهمة جديدة',
                 'message' => "تم جدولة المهمة '{$task->title}' للمحصول '{$crop->name}' - التذكير {$dueDate->format('Y-m-d')} الساعة {$task->reminder_time}.",
                 'type' => 'task_due',
             ]);
@@ -196,6 +208,16 @@ class CropController extends Controller
 
         if ($validated['type'] === 'harvest') {
             $crop->update(['status' => 'harvested']);
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $validated['type'] === 'harvest'
+                ? 'تم تسجيل الحصاد وتحديث حالة المحصول بنجاح!'
+                : 'New task added successfully!',
+                'task' => $task
+            ]);
         }
 
         return back()->with('success', $validated['type'] === 'harvest'
@@ -206,7 +228,8 @@ class CropController extends Controller
     public function completeTask(Request $request, $taskId)
     {
         $task = \App\Models\Task::findOrFail($taskId);
-        if ($task->crop->user_id !== auth()->id()) abort(403);
+        if ($task->crop->user_id !== auth()->id())
+            abort(403);
 
         $task->update(['status' => 'completed']);
 
@@ -222,7 +245,8 @@ class CropController extends Controller
 
     public function updateGrowth(Request $request, Crop $crop)
     {
-        if ($crop->user_id !== auth()->id()) abort(403);
+        if ($crop->user_id !== auth()->id())
+            abort(403);
 
         $validated = $request->validate([
             'growth_percentage' => 'required|integer|min:0|max:100',
@@ -232,7 +256,8 @@ class CropController extends Controller
 
         if ($validated['growth_percentage'] == 100) {
             $data['status'] = 'harvested';
-        } elseif ($validated['growth_percentage'] > 0) {
+        }
+        elseif ($validated['growth_percentage'] > 0) {
             $data['status'] = 'growing';
         }
 

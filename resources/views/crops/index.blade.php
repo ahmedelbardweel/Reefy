@@ -186,7 +186,7 @@
        bg-green-600 hover:bg-green-700 text-white
        text-xs font-semibold rounded transition">
         <i class="bi bi-plus-lg"></i>
-        Add Task
+        {{ __('Add Task') }}
     </a>
 
     {{-- Edit Button --}}

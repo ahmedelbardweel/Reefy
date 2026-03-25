@@ -86,6 +86,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Crops
         Route::get('crops/suggestions-data', [CropController::class, 'getAjaxSuggestions'])->name('crops.ajax_suggestions');
         Route::resource('crops', CropController::class);
+//        Route::delete('/crops/images/{image}', [CropController::class, 'destroyImage'])->name('crops.images.destroy');
         Route::delete('/crops/images/{image}', [CropController::class, 'destroyImage'])->name('crops.images.destroy');
         Route::post('/crops/{crop}/tasks', [CropController::class, 'storeTask'])->name('crops.tasks.store');
         Route::post('/crops/{crop}/update-growth', [CropController::class, 'updateGrowth'])->name('crops.updateGrowth');
@@ -97,6 +98,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/treatment', 'treatment')->name('farmer.systems.treatment');
             Route::get('/harvesting', 'harvesting')->name('farmer.systems.harvesting');
             Route::get('/harvesting/export', 'exportHarvesting')->name('farmer.systems.harvesting.export');
+        });
+
+        // AI Assistant
+        Route::controller(\App\Http\Controllers\Farmer\AiAssistantController::class)->prefix('/farmer/ai')->group(function () {
+            Route::get('/', 'index')->name('farmer.ai.index');
+            Route::post('/chat', 'chat')->name('farmer.ai.chat');
+            Route::post('/chat-api', 'chatApi')->name('farmer.ai.chat_api');
+            Route::post('/clear', 'clear')->name('farmer.ai.clear');
+            Route::post('/action', 'executeAction')->name('farmer.ai.action');
         });
     });
 

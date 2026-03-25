@@ -30,6 +30,11 @@
                                 {{ __('Crops') }}
                             </x-nav-link>
 
+                            <x-nav-link :href="route('farmer.ai.index')" :active="request()->routeIs('farmer.ai.*')">
+                                <i class="bi bi-robot mr-1"></i> {{ __('Reefy AI') }}
+                            </x-nav-link>
+
+
                             <!-- Systems Dropdown -->
                             <div class="relative flex items-center">
                                 <x-dropdown align="right" width="48">
@@ -180,6 +185,11 @@ w-3 h-3 flex items-center justify-center rounded-full font-bold">
                     <x-responsive-nav-link :href="route('crops.index')" :active="request()->routeIs('crops.*')">
                         {{ __('Crops') }}
                     </x-responsive-nav-link>
+
+                    <x-responsive-nav-link :href="route('farmer.ai.index')" :active="request()->routeIs('farmer.ai.*')">
+                        <i class="bi bi-robot mr-1"></i> {{ __('Reefy AI') }}
+                    </x-responsive-nav-link>
+
 
                     <div class="px-4 pt-2 pb-1 border-t border-gray-200 dark:border-gray-600">
                         <div class="text-xs font-semibold text-gray-500 uppercase">{{ __('Smart Systems') }}</div>

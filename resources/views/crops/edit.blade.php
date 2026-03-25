@@ -14,15 +14,47 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <!-- Edit Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700">
                         <div class="p-6">
+
+                            <div class="mb-8">
+                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    {{ __('Manage Existing Images') }}
+                                </h3>
+                                @if($crop->images && count($crop->images))
+                                    <div id="images-container" class="flex gap-4 mt-3 flex-wrap">
+                                        @foreach($crop->images as $image)
+                                            <div class="relative w-24 h-24 group">
+                                                <img src="{{ asset('storage/'.$image->image_path) }}"
+                                                     class="w-full h-full object-cover rounded-lg border shadow-sm">
+
+                                                <form action="{{ route('crops.images.destroy', $image->id) }}" method="POST" class="absolute -top-2 -right-2">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            onclick="return confirm('{{ __('Are you sure you want to delete this image?') }}')"
+                                                            class="bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow-lg transition-transform transform group-hover:scale-110">
+                                                        ×
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 italic">{{ __('No images uploaded yet.') }}</p>
+                                @endif
+                            </div>
+
+                            <hr class="my-6 border-gray-100 dark:border-gray-700">
+
                             <form action="{{ route('crops.update', $crop) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                                 @csrf
                                 @method('PUT')
 
-                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">{{ __('Basic Information') }}</h3>
+                                <h3 class="text-base font-bold text-gray-700 dark:text-gray-300 mb-4 pb-2 border-b border-gray-100 dark:border-gray-700">
+                                    {{ __('Basic Information') }}
+                                </h3>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -40,10 +72,6 @@
                                     <div>
                                         <x-input-label for="planting_date" :value="__('Planting Date')" />
                                         <x-text-input id="planting_date" name="planting_date" type="date" class="mt-1 block w-full" value="{{ $crop->planting_date ? $crop->planting_date->format('Y-m-d') : '' }}"/>
-                                    </div>
-                                    <div>
-                                        <x-input-label for="expected_harvest_date" :value="__('Expected Harvest Date')" />
-                                        <x-text-input id="expected_harvest_date" name="expected_harvest_date" type="date" class="mt-1 block w-full" value="{{ $crop->expected_harvest_date ? $crop->expected_harvest_date->format('Y-m-d') : '' }}" required />
                                     </div>
                                 </div>
 
@@ -63,91 +91,48 @@
                                     <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-green-500 focus:ring-green-500 rounded-md shadow-sm">{{ old('notes', $crop->notes) }}</textarea>
                                 </div>
 
-                                <!-- Existing Images with Delete -->
-                                <div>
-                  @if($crop->images && count($crop->images))
-<div id="images-container" class="flex gap-2 mt-3 flex-wrap">
-
-@foreach($crop->images as $image)
-
-<div class="relative w-20 h-20">
-
-<img src="{{ asset('storage/'.$image->image_path) }}"
-class="w-full h-full object-cover rounded border">
-</div>
-                        {{-- <form action="{{ route('crops.images.destroy', $image->id) }}"
-method="POST"
-class="absolute -top-1 -right-1">
-@csrf
-@method('DELETE')
-<button type="submit"
-onclick="return confirm('Delete image?')"
-class="bg-red-600 text-white w-5 h-5 rounded-full text-xs">
-×
-</button>
-</form> --}}
-@endforeach
-
-</div>
-@endif
-                                </div>
-                                <!-- Upload New Images -->
-                                <div>
+                                <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                                    <x-input-label :value="__('Upload New Images')" class="mb-2" />
                                     <input type="file" name="images[]" multiple accept="image/*" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
                                 </div>
 
-                                <!-- Save Changes Button -->
                                 <div class="pt-4">
-                                    <x-primary-button type="submit" class="w-full justify-center bg-green-600 hover:bg-green-700">{{ __('Save Changes') }}</x-primary-button>
+                                    <x-primary-button type="submit" class="w-full justify-center bg-green-600 hover:bg-green-700 shadow-md transition-all">
+                                        {{ __('Save Changes') }}
+                                    </x-primary-button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Sidebar -->
                 <div class="space-y-6">
-                    <!-- Growth Status -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-6 text-center">
                         <h3 class="text-sm font-bold text-gray-500 mb-4">{{ __('Manual Growth Update') }}</h3>
                         <div class="text-3xl font-bold text-green-600 mb-2">{{ $crop->growth_percentage }}%</div>
                         <p class="text-xs text-gray-400 mb-6">{{ __($crop->growth_stage_label) }}</p>
-
                         <form action="{{ route('crops.updateGrowth', $crop) }}" method="POST">
                             @csrf
                             <input type="range" name="growth_percentage" min="0" max="100" value="{{ $crop->growth_percentage }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600">
-                            <div class="flex justify-between text-[10px] text-gray-400 mt-1 mb-4">
-                                <span>0%</span>
-                                <span>50%</span>
-                                <span>100%</span>
-                            </div>
-                            <x-secondary-button type="submit" class="w-full justify-center">{{ __('Update Progress') }}</x-secondary-button>
+                            <x-secondary-button type="submit" class="w-full justify-center mt-4">{{ __('Update Progress') }}</x-secondary-button>
                         </form>
                     </div>
 
-                    <!-- Add Quick Task -->
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-100 dark:border-gray-700 p-6">
                         <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-4">{{ __('Add Quick Task') }}</h3>
                         <form action="{{ route('crops.tasks.store', $crop) }}" method="POST" class="space-y-4">
                             @csrf
-                            <div>
-                                <x-text-input name="title" :placeholder="__('Task Title')" class="w-full text-sm" required />
-                            </div>
-                            <div>
-                                <select name="type" class="w-full text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-md shadow-sm">
-                                    <option value="water">{{ __('Irrigation') }}</option>
-                                    <option value="fertilizer">{{ __('Fertilization') }}</option>
-                                    <option value="pest">{{ __('Pest Control') }}</option>
-                                    <option value="harvest">{{ __('Harvest') }}</option>
-                                </select>
-                            </div>
-                            <div>
-                                <x-text-input name="due_date" type="datetime-local" class="w-full text-sm" required />
-                            </div>
-                            <x-primary-button class="w-full justify-center bg-gray-800 hover:bg-gray-900">{{ __('Add') }}</x-primary-button>
+                            <x-text-input name="title" :placeholder="__('Task Title')" class="w-full text-sm" required />
+                            <select name="type" class="w-full text-sm border-gray-300 dark:border-gray-700 dark:bg-gray-900 rounded-md shadow-sm">
+                                <option value="water">{{ __('Irrigation') }}</option>
+                                <option value="fertilizer">{{ __('Fertilization') }}</option>
+                            </select>
+                            <x-text-input name="due_date" type="datetime-local" class="w-full text-sm" required />
+                            <x-primary-button class="w-full justify-center">{{ __('Add') }}</x-primary-button>
                         </form>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
