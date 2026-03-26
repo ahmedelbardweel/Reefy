@@ -61,7 +61,7 @@ class AiAssistantController extends Controller
                - رد بجملة تأكيد.
                - ثم ضع الأمر التالي في سطر جديد تماماً (بدون أي علامات مقتبسة):
                ACTION:{\"action\":\"CREATE_CROP\",\"data\":{\"name\":\"اسم المحصول\",\"type\":\"نوعه\",\"area\":1,\"planting_date\":\"YYYY-MM-DD\"}}
-            3. إذا أراد إضافة مهمة (مثل 'روي الذرة غدا'): 
+            3. إذا أراد إضافة مهمة (مثل 'روي الذرة غدا'):
                - ابحث عن ID المحصول.
                - ثم ضع الأمر في سطر منفصل:
                ACTION:{\"action\":\"CREATE_TASK\",\"data\":{\"crop_id\":ID,\"title\":\"عنوان المهمة\",\"type\":\"water|fertilizer|pest|harvest|other\",\"due_date\":\"YYYY-MM-DD\",\"notes\":\"..\"}}
@@ -138,7 +138,7 @@ class AiAssistantController extends Controller
                - رد بجملة تأكيد.
                - ثم ضع الأمر التالي في سطر جديد تماماً (بدون أي علامات مقتبسة):
                ACTION:{\"action\":\"CREATE_CROP\",\"data\":{\"name\":\"اسم المحصول\",\"type\":\"نوعه\",\"area\":1,\"planting_date\":\"YYYY-MM-DD\"}}
-            3. إذا أراد إضافة مهمة (مثل 'روي الذرة غدا'): 
+            3. إذا أراد إضافة مهمة (مثل 'روي الذرة غدا'):
                - ابحث عن ID المحصول.
                - ثم ضع الأمر في سطر منفصل:
                ACTION:{\"action\":\"CREATE_TASK\",\"data\":{\"crop_id\":ID,\"title\":\"عنوان المهمة\",\"type\":\"water|fertilizer|pest|harvest|other\",\"due_date\":\"YYYY-MM-DD\",\"notes\":\"..\"}}
@@ -285,12 +285,12 @@ class AiAssistantController extends Controller
                                 <h3 class="text-sm font-black text-slate-800 dark:text-white">' . $title . '</h3>
                             </div>
                         </div>
-                        
+
                         <form action="' . route('farmer.ai.action') . '" method="POST" class="space-y-4">
                             <input type="hidden" name="_token" value="' . csrf_token() . '">
                             <input type="hidden" name="action_type" value="' . $actionName . '">
                             <input type="hidden" name="action_id" value="' . $actionId . '">
-                            
+
                             <div class="grid grid-cols-1 gap-4">';
 
                     if ($isCrop) {

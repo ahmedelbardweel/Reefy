@@ -30,11 +30,6 @@
                                 {{ __('Crops') }}
                             </x-nav-link>
 
-                            <x-nav-link :href="route('farmer.ai.index')" :active="request()->routeIs('farmer.ai.*')">
-                                <i class="bi bi-robot mr-1"></i> {{ __('Reefy AI') }}
-                            </x-nav-link>
-
-
                             <!-- Systems Dropdown -->
                             <div class="relative flex items-center">
                                 <x-dropdown align="right" width="48">
@@ -70,6 +65,10 @@
                         <x-nav-link :href="route($consultRoute)" :active="request()->routeIs('consultations.*') || request()->routeIs('expert.consultations.*')">
                             {{ __('Consultations') }}
                         </x-nav-link>
+
+                            <x-nav-link :href="route('farmer.ai.index')" :active="request()->routeIs('farmer.ai.*')">
+                                <i class="bi bi-robot mr-1 ml-3"></i> {{ __('Reefy') }}
+                            </x-nav-link>
                     @endauth
                 </div>
 
