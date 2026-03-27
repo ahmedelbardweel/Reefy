@@ -16,9 +16,4 @@ class GeneralController extends Controller
         session(['theme' => session('theme', 'light') === 'light' ? 'dark' : 'light']);
         return back();
     }
-
-    public function adminDashboard()
-    {
-        return view('admin.dashboard');
-    }
 }

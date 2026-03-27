@@ -24,7 +24,7 @@
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{{ __('Profile Photo') }}</label>
                     <div class="flex items-center gap-6 p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-none">
                         <div class="w-24 h-24 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shrink-0 overflow-hidden">
-                            <img id="avatar-preview-img" src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=16a34a&color=fff' }}" class="w-full h-full object-cover">
+                            <img id="avatar-preview-img" src="{{ $user->avatar ? asset($user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=16a34a&color=fff' }}" class="w-full h-full object-cover">
                         </div>
                         <div class="flex-grow">
                             <input type="file" name="avatar" id="avatar-input" class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:file:bg-green-900/30 dark:file:text-green-400" accept="image/*">
@@ -39,7 +39,7 @@
                     <div class="p-4 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 rounded-none">
                         <div class="w-full h-32 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-4 overflow-hidden relative">
                              @if($user->cover_image)
-                                <img id="cover-preview-img" src="{{ asset('storage/' . $user->cover_image) }}" class="w-full h-full object-cover">
+                                <img id="cover-preview-img" src="{{ asset($user->cover_image) }}" class="w-full h-full object-cover">
                              @else
                                 <div id="cover-placeholder" class="absolute inset-0 flex items-center justify-center text-xs text-gray-400 font-medium italic">{{ __('No cover image currently') }}</div>
                              @endif
