@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen font-sans" dir="rtl">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm overflow-hidden mb-8 border border-gray-100 dark:border-gray-700">
                 <div class="h-48 bg-gradient-to-l from-emerald-600 to-green-400 relative">
                     @if(Auth::user()->cover_image)

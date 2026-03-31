@@ -103,7 +103,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // AI Assistant
         Route::controller(\App\Http\Controllers\Farmer\AiAssistantController::class)->prefix('/farmer/ai')->group(function () {
             Route::get('/', 'index')->name('farmer.ai.index');
-            Route::post('/chat', 'chat')->name('farmer.ai.chat');
             Route::post('/chat-api', 'chatApi')->name('farmer.ai.chat_api');
             Route::post('/clear', 'clear')->name('farmer.ai.clear');
             Route::post('/action', 'executeAction')->name('farmer.ai.action');
