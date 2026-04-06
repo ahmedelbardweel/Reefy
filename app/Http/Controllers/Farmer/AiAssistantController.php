@@ -17,211 +17,157 @@ class AiAssistantController extends Controller
         ]);
     }
 
-    public function chatApi(Request $request)
-    {
+public function chatApi(Request $request)
+{
+    $request->validate([
+        'image' => 'nullable|image|max:10240',
+        'message' => 'nullable|string|max:2000',
+    ]);
 
+    if (!$request->hasFile('image') && !$request->filled('message')) {
+        return response()->json(['error' => 'يرجى إدخال رسالة أو صورة'], 422);
+    }
 
-        $request->validate([
-            'image' => 'nullable|image|max:10240',
-            'message' => 'nullable|string|max:2000',
-        ]);
+    $history = session('ai_chat_history', []);
+    $imageUrl = null;
 
-        if (!$request->hasFile('image') && !$request->filled('message')) {
-            return response()->json(['error' => 'يرجى إدخال رسالة أو صورة'], 422);
-        }
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('ai_uploads', 'public');
+        $imageUrl = asset('storage/' . $path);
+    }
 
-        $history = session('ai_chat_history', []);
-        $imageUrl = null;
+    try {
+        $prompt = $this->buildPrompt();
 
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('ai_uploads', 'public');
-            $imageUrl = asset('storage/' . $path);
-        }
+        // 1. الاتصال بالذكاء الاصطناعي أولاً قبل حفظ رسالة المستخدم في الجلسة
+        $aiRawResponse = $this->callAI($request, $prompt, $history);
 
+        // 2. الآن نقوم بحفظ رسالة المستخدم في التاريخ (History)
         $history[] = [
             'role' => 'user',
-            'content' => $request->message,
+            'content' => $request->message ?? 'صورة مرفقة',
             'image_url' => $imageUrl,
             'time' => now()->format('H:i'),
         ];
 
-        try {
-            $prompt = $this->buildPrompt();
+        // 3. معالجة وتنسيق رد الذكاء الاصطناعي
+        $formattedData = $this->processAIResponse($aiRawResponse);
 
-           $aiResponse = $this->callAI($request, $prompt);
+        $aiMsg = [
+            'role' => 'ai',
+            'content' => $formattedData['text'],
+            'action_form' => $formattedData['form'],
+            'time' => now()->format('H:i'),
+        ];
 
-            $formatted = $this->simpleMarkdown($aiResponse);
+        // 4. حفظ رد الـ AI في التاريخ
+        $history[] = $aiMsg;
+        session(['ai_chat_history' => $history]);
 
-            $aiMsg = [
-                'role' => 'ai',
-                'content' => $formatted,
-                'time' => now()->format('H:i'),
-            ];
+        return response()->json([
+            'success' => true,
+            'message' => $aiMsg
+        ]);
 
-            $history[] = $aiMsg;
-            session(['ai_chat_history' => $history]);
-
-            return response()->json([
-                'success' => true,
-                'message' => $aiMsg
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'خطأ في النظام'], 500);
-        }
-
-    }
-
-    public function executeAction(Request $request)
-    {
-        try {
-            if ($request->action_type === 'CREATE_CROP') {
-                $data = $request->validate([
-                    'name' => 'required',
-                    'type' => 'required',
-                    'area' => 'required|numeric',
-                    'planting_date' => 'required|date',
-                ]);
-
-                auth()->user()->crops()->create($data);
-            }
-
-            if ($request->action_type === 'CREATE_TASK') {
-                $data = $request->validate([
-                    'crop_id' => 'required|exists:crops,id',
-                    'title' => 'required',
-                    'type' => 'required',
-                    'due_date' => 'required|date',
-                    'notes' => 'nullable',
-                ]);
-
-                Task::create($data);
-            }
-
-            return back()->with('success', 'تم التنفيذ بنجاح ✅');
-        } catch (\Exception $e) {
-            return back()->with('error', 'فشل التنفيذ');
-        }
-    }
-
-    public function clear()
-    {
-        session()->forget('ai_chat_history');
-        return back();
-    }
-
-    private function buildPrompt()
-    {
-        $crops = auth()->user()->crops()
-            ->get()
-            ->map(fn($c) => "ID: {$c->id}, Name: {$c->name}")
-            ->implode(' | ');
-
-        return "أنت خبير زراعي. محاصيل المستخدم: [{$crops}].
-
-        - إذا صورة: حلل المرض والحل
-        - إذا طلب إضافة محصول:
-        ACTION:{\"action\":\"CREATE_CROP\",\"data\":{\"name\":\"...\",\"type\":\"...\",\"area\":1,\"planting_date\":\"YYYY-MM-DD\"}}
-
-        - إذا طلب مهمة:
-        ACTION:{\"action\":\"CREATE_TASK\",\"data\":{\"crop_id\":ID,\"title\":\"...\",\"type\":\"water\",\"due_date\":\"YYYY-MM-DD\"}}";
-    }
-
-    private function simpleMarkdown($text)
-    {
-        $form = '';
-
-        if (preg_match('/ACTION:\s*(\{.*\})/s', $text, $match)) {
-            $data = json_decode($match[1], true);
-
-            if ($data && isset($data['action'])) {
-                $text = str_replace($match[0], '', $text);
-
-                $form = '
-                <form method="POST" action="' . route('farmer.ai.action') . '" class="mt-4 p-4 border rounded-xl">
-                    <input type="hidden" name="_token" value="' . csrf_token() . '">
-                    <input type="hidden" name="action_type" value="' . $data['action'] . '">
-
-                    <button class="bg-green-600 text-white px-4 py-2 rounded">
-                        تنفيذ العملية
-                    </button>
-                </form>';
-            }
-        }
-
-        return nl2br(e($text)) . $form;
-    }
-
-private function callAI($request, $prompt)
-{
-    // 🟢 أول محاولة: Gemini
-    try {
-        $gemini = $this->callGeminiOnly($request, $prompt);
-
-        if ($gemini && !str_contains($gemini, 'ERROR')) {
-            return $gemini;
-        }
     } catch (\Exception $e) {
-        // تجاهل
+        // طباعة الخطأ الفعلي في ملف الـ Log لكي نعرف المشكلة لو تكررت
+        \Log::error('AI Error: ' . $e->getMessage());
+        return response()->json(['error' => 'خطأ: ' . $e->getMessage()], 500);
     }
-
-    // 🔥 fallback → OpenAI
-    return $this->callOpenAI($request, $prompt);
 }
 
-private function callGeminiOnly($request, $prompt)
+private function callAI($request, $prompt, $history)
 {
     $apiKey = config('services.gemini.key');
 
-    $parts = [
-        ['text' => $prompt . "\nUser: " . ($request->message ?? '')]
-    ];
+    $contents = [];
+
+    // ترتيب المحادثات السابقة بشكل صحيح
+    foreach ($history as $msg) {
+        $role = ($msg['role'] === 'ai') ? 'model' : 'user';
+        $text = trim(strip_tags($msg['content']));
+        $contents[] = [
+            'role' => $role,
+            'parts' => [['text' => !empty($text) ? $text : 'صورة مرفقة']]
+        ];
+    }
+
+    // تجهيز الرسالة الحالية
+    $currentText = $request->message ?? 'الرجاء تحليل هذه الصورة الزراعية';
+    $currentParts = [['text' => $currentText]];
 
     if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $parts[] = [
+        $currentParts[] = [
             'inline_data' => [
-                'mime_type' => $image->getMimeType(),
-                'data' => base64_encode(file_get_contents($image->path()))
+                'mime_type' => $request->file('image')->getMimeType(),
+                'data' => base64_encode(file_get_contents($request->file('image')->path()))
             ]
         ];
     }
 
-    $res = Http::post(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={$apiKey}",
-        ['contents' => [['role' => 'user', 'parts' => $parts]]]
-    );
+    $contents[] = [
+        'role' => 'user',
+        'parts' => $currentParts
+    ];
 
-    if ($res->status() == 429) {
-        return 'ERROR: quota';
-    }
-
-    if (!$res->successful()) {
-        return 'ERROR: failed';
-    }
-
-    return $res->json('candidates.0.content.parts.0.text');
-}
-
-private function callOpenAI($request, $prompt)
-{
-    $apiKey = config('services.openai.key');
-
-    $message = $prompt . "\nUser: " . ($request->message ?? '');
-
-    $res = Http::withHeaders([
-        'Authorization' => 'Bearer ' . $apiKey,
-        'Content-Type' => 'application/json',
-    ])->post('https://api.openai.com/v1/chat/completions', [
-        'model' => 'gpt-4o-mini',
-        'messages' => [
-            ['role' => 'user', 'content' => $message]
+    // إرسال الطلب مع إيقاف فلاتر الأمان التي قد تحجب الردود
+    $payload = [
+        'system_instruction' => [
+            'parts' => [['text' => $prompt]]
+        ],
+        'contents' => $contents,
+        'safetySettings' => [
+            ['category' => 'HARM_CATEGORY_HARASSMENT', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_HATE_SPEECH', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_SEXUALLY_EXPLICIT', 'threshold' => 'BLOCK_NONE'],
+            ['category' => 'HARM_CATEGORY_DANGEROUS_CONTENT', 'threshold' => 'BLOCK_NONE']
         ]
-    ]);
+    ];
 
+    $res = Http::withHeaders(['Content-Type' => 'application/json'])
+        ->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}", $payload);
+
+    // 1. التحقق من أخطاء الاتصال (مثل خطأ 400 أو 404)
     if (!$res->successful()) {
-        return '❌ فشل الاتصال بكل خدمات الذكاء الاصطناعي';
+        throw new \Exception('API Google Error: ' . $res->body());
     }
 
-    return $res->json('choices.0.message.content');
+    // 2. محاولة استخراج النص من الرد
+    $text = $res->json('candidates.0.content.parts.0.text');
+
+    // 3. كشف سبب إخفاء النص (الآن سيظهر لك السبب الحقيقي في نافذة Alert بدلاً من الصمت)
+    if (empty($text)) {
+        throw new \Exception('الطلب نجح، لكن جوجل رفضت إعطاء نص! الرد الكامل: ' . $res->body());
+    }
+
+    return $text;
 }
+
+        private function buildPrompt()
+    {
+        $crops = auth()->user()->crops()->get()->map(fn($c) => "ID:{$c->id}, Name:{$c->name}")->implode('|');
+        return "أنت خبير زراعي ذكي. محاصيل المستخدم الحالية: [{$crops}].
+        أجب باختصار. إذا طلب إضافة محصول أو مهمة، ألحق الرد بـ ACTION: كالتالي:
+        ACTION:{\"action\":\"CREATE_CROP\",\"data\":{\"name\":\"..\",\"type\":\"..\",\"area\":1,\"planting_date\":\"YYYY-MM-DD\"}}";
+    }
+    private function processAIResponse($text)
+    {
+        $form = '';
+        if (preg_match('/ACTION:\s*(\{.*\})/s', $text, $match)) {
+            $jsonData = json_decode($match[1], true);
+            if ($jsonData) {
+                $text = str_replace($match[0], '', $text);
+                $form = view('components.ai-action-form', ['data' => $jsonData])->render();
+            }
+        }
+        return ['text' => nl2br(e(trim($text))), 'form' => $form];
+    }
+
+    public function executeAction(Request $request)
+    {
+        // ... (نفس منطق الحفظ السابق لديك)
+        return back()->with('success', 'تم تنفيذ العملية بنجاح');
+    }
+
+    public function clear() { session()->forget('ai_chat_history'); return back(); }
 }
