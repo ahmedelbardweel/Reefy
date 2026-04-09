@@ -11,10 +11,10 @@ use Illuminate\View\View;
 
 /**
  * كونترولر الملف الشخصي العام - Profile Controller
- * 
+ *
  * هذا الكونترولر يدير الملف الشخصي الأساسي للمستخدم (الاسم، البريد الإلكتروني، كلمة المرور)
  * وليس الملف الشخصي التفصيلي للمزارع (FarmerProfileController)
- * 
+ *
  * يستخدم Laravel Breeze للتعامل مع الملفات الشخصية
  */
 class ProfileController extends Controller
@@ -26,11 +26,11 @@ class ProfileController extends Controller
 
     /**
      * عرض صفحة تعديل الملف الشخصي للمستخدم
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - عرض صفحة تعديل الملف الشخصي الأساسي
      * - تمرير بيانات المستخدم الحالي إلى الصفحة
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\View\View
      */
@@ -43,7 +43,7 @@ class ProfileController extends Controller
 
     /**
      * تحديث معلومات الملف الشخصي للمستخدم
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - التحقق من صحة البيانات عبر ProfileUpdateRequest
      * - تحديث بيانات المستخدم (الاسم، البريد الإلكتروني، إلخ)
@@ -52,21 +52,21 @@ class ProfileController extends Controller
      *   * لطلب تأكيد البريد الجديد
      * - حفظ التغييرات
      * - إعادة التوجيه مع رسالة النجاح
-     * 
+     *
      * @param ProfileUpdateRequest $request طلب مخصص للتحقق من البيانات
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
-        
+
         // Handle Avatar Upload
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
             if ($user->avatar && file_exists(public_path($user->avatar))) {
                 @unlink(public_path($user->avatar));
             }
-            
+
             $file = $request->file('avatar');
             $filename = time() . '_avatar_' . $user->id . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('profiles/avatars'), $filename);
@@ -79,7 +79,7 @@ class ProfileController extends Controller
             if ($user->cover_image && file_exists(public_path($user->cover_image))) {
                 @unlink(public_path($user->cover_image));
             }
-            
+
             $file = $request->file('cover_image');
             $filename = time() . '_cover_' . $user->id . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('profiles/covers'), $filename);
@@ -97,12 +97,12 @@ class ProfileController extends Controller
         // حفظ التغييرات
         $user->save();
 
-        return Redirect::route('profile.edit')->with('success', 'تم تحديث الملف الشخصي بنجاح');
+        return Redirect::route('profile.show')->with('success', 'تم تحديث الملف الشخصي بنجاح');
     }
 
     /**
      * حذف حساب المستخدم
-     * 
+     *
      * تقوم هذه الدالة بـ:
      * - التحقق من صحة كلمة المرور الحالية
      * - تسجيل خروج المستخدم
@@ -110,9 +110,9 @@ class ProfileController extends Controller
      * - إلغاء الجلسة الحالية (session)
      * - إنشاء توكن جديد للحماية من CSRF
      * - إعادة التوجيه إلى الصفحة الرئيسية
-     * 
+     *
      * ملاحظة: سيتم حذف جميع البيانات المرتبطة بالمستخدم (حسب إعدادات cascade في قاعدة البيانات)
-     * 
+     *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */

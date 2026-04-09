@@ -1,148 +1,129 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="font-semibold text-xl leading-tight mb-0" style="color: var(--heading-color);">
-                {{ __('الملف الشخصي') }}
-            </h2>
-            <a href="{{ route('profile.edit') }}" class="btn btn-success shadow-sm">
-                <i class="bi bi-pencil-square me-1"></i> تعديل الملف
-            </a>
-        </div>
-    </x-slot>
+    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen font-sans" dir="rtl">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm overflow-hidden mb-8 border border-gray-100 dark:border-gray-700">
+                <div class="h-48 bg-gradient-to-l from-emerald-600 to-green-400 relative">
+                    @if(Auth::user()->cover_image)
+                        <img src="{{ asset(Auth::user()->cover_image) }}" class="w-full h-full object-cover opacity-60">
+                    @endif
 
-    <div class="profile-container mb-5">
-        <!-- Cover Image Section -->
-        <div class="profile-cover position-relative overflow-hidden" style="height: 300px; background: var(--bg-secondary); border-bottom: 3px solid var(--reefy-success);">
-            @if(Auth::user()->cover_image)
-                <img src="{{ asset(Auth::user()->cover_image) }}" alt="Cover" class="w-100 h-100 object-fit-cover">
-            @else
-                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-reefy-soft">
-                    <i class="bi bi-image text-success opacity-25" style="font-size: 5rem;"></i>
+                    <a href="{{ route('profile.edit') }}" class="absolute top-4 left-4 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white px-5 py-2 rounded-2xl text-sm font-bold transition-all flex items-center gap-2">
+                        <i class="bi bi-pencil-square"></i>
+                        {{ __('Edit Profile') }}
+                    </a>
                 </div>
-            @endif
-        </div>
 
-        <div class="container position-relative" style="margin-top: -80px; z-index: 10;">
-            <div class="row align-items-end px-4">
-                <div class="col-auto">
-                    <!-- Avatar Section -->
-                    <div class="profile-avatar-wrapper p-1 bg-white" style="border-radius: 0; width: 160px; height: 160px; border: 4px solid var(--bg-secondary);">
-                        @if(Auth::user()->avatar)
-                            <img src="{{ asset(Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="w-100 h-100 object-fit-cover">
-                        @else
-                            <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
-                                <span class="fs-1 fw-bold text-success">{{ substr(Auth::user()->name, 0, 1) }}</span>
+             <div class="px-8 pb-8">
+                <div class="flex flex-col md:flex-row items-end -mt-12 gap-6">
+                        <div class="relative">
+                          <div class="w-32 h-32 rounded-3xl bg-emerald-500 border-4 border-white dark:border-gray-800 shadow-xl overflow-hidden flex items-center justify-center">
+                     @if(Auth::user()->avatar)
+                         <img src="{{ asset(Auth::user()->avatar) }}" class="w-full h-full object-cover">
+                    @else
+                      <span class="text-white text-4xl font-black">
+                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                      </span>
+                   @endif
+               </div>
+          </div>
+
+                        <div class="flex-1 pb-2 text-right">
+                            <h1 class="text-3xl font-black text-gray-900 dark:text-white">{{ Auth::user()->name }}</h1>
+                            <div class="flex flex-wrap items-center gap-3 mt-2">
+                                <span class="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    @if(Auth::user()->role == 'farmer')
+                                        <i class="bi bi-tree-fill"></i> {{ __('Farmer') }}
+                                    @else
+                                        <i class="bi bi-patch-check-fill"></i> {{ __('Expert') }}
+                                    @endif
+                                </span>
+                                <span class="text-gray-500 dark:text-gray-400 text-sm flex items-center gap-1">
+                                    <i class="bi bi-envelope-at"></i>
+                                    {{ Auth::user()->email }}
+                                </span>
                             </div>
-                        @endif
-                    </div>
-                </div>
-                <div class="col mb-3">
-                    <h1 class="fw-bold mb-1" style="color: var(--heading-color);">{{ Auth::user()->name }}</h1>
-                    <div class="d-flex align-items-center gap-3">
-                        <span class="badge bg-success-subtle text-success border border-success px-3 py-2">
-                             @if(Auth::user()->role == 'farmer') <i class="bi bi-tree-fill me-1"></i> مزارع 
-                             @elseif(Auth::user()->role == 'expert') <i class="bi bi-patch-check-fill me-1"></i> خبير 
-                             @else {{ Auth::user()->role }} @endif
-                        </span>
-                        <span class="text-muted"><i class="bi bi-envelope me-1"></i> {{ Auth::user()->email }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Profile Info Content -->
-            <div class="row mt-5 g-4">
-                <div class="col-lg-8">
-                    <!-- Stats / Overview Card -->
-                    <div class="card border-0 p-4 mb-4">
-                        <h5 class="fw-bold mb-4 border-bottom pb-2">نظرة عامة</h5>
-                        <div class="row g-4 text-center">
-                            @if(Auth::user()->role == 'farmer')
-                                <div class="col-md-4">
-                                    <div class="p-3 border">
-                                        <div class="text-muted small mb-1">المحاصيل</div>
-                                        <div class="fs-4 fw-bold text-success">{{ Auth::user()->crops()->count() }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="p-3 border">
-                                        <div class="text-muted small mb-1">المهام القادمة</div>
-                                        <div class="fs-4 fw-bold text-success">
-                                            @php 
-                                                $pendingTasks = 0;
-                                                foreach(Auth::user()->crops as $crop) {
-                                                    $pendingTasks += $crop->tasks()->where('status', 'pending')->count();
-                                                }
-                                            @endphp
-                                            {{ $pendingTasks }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="p-3 border">
-                                        <div class="text-muted small mb-1">الاستشارات</div>
-                                        <div class="fs-4 fw-bold text-success">{{ Auth::user()->consultations()->count() }}</div>
-                                    </div>
-                                </div>
-                            @elseif(Auth::user()->role == 'expert')
-                                <div class="col-md-6">
-                                    <div class="p-3 border">
-                                        <div class="text-muted small mb-1">الاستشارات التي قدمتها</div>
-                                        <div class="fs-4 fw-bold text-success">{{ Auth::user()->expertAdvice()->count() }}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="p-3 border">
-                                        <div class="text-muted small mb-1">النصائح المنشورة</div>
-                                        <div class="fs-4 fw-bold text-success">{{ Auth::user()->expertTips()->count() }}</div>
-                                    </div>
-                                </div>
-                            @endif
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 text-right">
+
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:shadow-md transition-all">
+                            <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl text-emerald-600 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                                <i class="bi bi-flower1 text-2xl"></i>
+                            </div>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold mb-1">{{ __('Total Crops') }}</p>
+                            <p class="text-2xl font-black text-gray-900 dark:text-white">{{ Auth::user()->crops()->count() }}</p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:shadow-md transition-all">
+                            <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 rounded-2xl text-amber-600 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                                <i class="bi bi-calendar2-check text-2xl"></i>
+                            </div>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold mb-1">{{ __('Pending Tasks') }}</p>
+                            <p class="text-2xl font-black text-gray-900 dark:text-white">
+                                {{ Auth::user()->crops->sum(fn($c) => $c->tasks()->where('status','pending')->count()) }}
+                            </p>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:shadow-md transition-all">
+                            <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600 flex items-center justify-center mb-4 transition-transform group-hover:scale-110">
+                                <i class="bi bi-chat-text text-2xl"></i>
+                            </div>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs font-bold mb-1">{{ __('Consultations') }}</p>
+                            <p class="text-2xl font-black text-gray-900 dark:text-white">{{ Auth::user()->consultations()->count() }}</p>
                         </div>
                     </div>
 
-                    <!-- Profile Details -->
-                    <div class="card border-0 p-4">
-                         <h5 class="fw-bold mb-4 border-bottom pb-2">التفاصيل الشخصية</h5>
-                         <div class="space-y-4">
-                             <div class="d-flex justify-content-between align-items-center p-3 border-bottom border-light">
-                                 <span class="text-muted">الاسم الكامل</span>
-                                 <span class="fw-semibold">{{ Auth::user()->name }}</span>
-                             </div>
-                             <div class="d-flex justify-content-between align-items-center p-3 border-bottom border-light">
-                                 <span class="text-muted">البريد الإلكتروني</span>
-                                 <span class="fw-semibold">{{ Auth::user()->email }}</span>
-                             </div>
-                             <div class="d-flex justify-content-between align-items-center p-3">
-                                 <span class="text-muted">تاريخ الانضمام</span>
-                                 <span class="fw-semibold">{{ Auth::user()->created_at->format('Y/m/d') }}</span>
-                             </div>
-                         </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <!-- Quick Actions / Sidebar Info -->
-                    <div class="card border-0 p-4 mb-4 bg-success text-white">
-                        <h5 class="fw-bold mb-3">حالة الحساب</h5>
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <div class="ripple-status bg-white" style="width: 12px; height: 12px;"></div>
-                            <span class="fw-bold">نشط</span>
+                    <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div class="p-6 border-b border-gray-50 dark:border-gray-700">
+                            <h3 class="font-bold text-gray-900 dark:text-white text-lg">{{ __('Personal Details') }}</h3>
                         </div>
-                        <p class="small opacity-75">حسابك مفعل وجاهز للاستخدام. يمكنك دائماً تحديث بياناتك من خلال زر التعديل.</p>
-                    </div>
-
-                    <div class="card border-0 p-4 mb-4">
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">تأمين الحساب</h5>
-                        <p class="small text-muted">ينصح بتغيير كلمة المرور بشكل دوري لضمان أمان حسابك.</p>
-                        <a href="{{ route('profile.edit') }}#update-password" class="btn btn-outline-success btn-sm w-100">تغيير كلمة المرور</a>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-gray-400 uppercase">{{ __('Full Name') }}</label>
+                                <p class="text-gray-900 dark:text-white font-semibold">{{ Auth::user()->name }}</p>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-gray-400 uppercase">{{ __('Email Address') }}</label>
+                                <p class="text-gray-900 dark:text-white font-semibold">{{ Auth::user()->email }}</p>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-gray-400 uppercase">{{ __('Joined At') }}</label>
+                                <p class="text-gray-900 dark:text-white font-semibold">{{ Auth::user()->created_at->format('d M Y') }}</p>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-xs font-bold text-gray-400 uppercase">{{ __('Account Status') }}</label>
+                                <p class="text-emerald-500 font-bold flex items-center gap-1">
+                                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                                    {{ __('Active') }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div class="space-y-6 text-center">
+                    <div class="bg-gradient-to-br from-emerald-600 to-green-700 rounded-3xl p-8 text-white shadow-xl shadow-emerald-200 dark:shadow-none relative overflow-hidden group">
+                        <i class="bi bi-shield-lock text-6xl mb-4 block opacity-20 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="text-xl font-black mb-2">{{ __('Security Priority') }}</h4>
+                        <p class="text-emerald-100 text-sm mb-6 leading-relaxed">{{ __('Security Description') }}</p>
+                        <a href="{{ route('profile.edit') }}#update-password" class="block w-full py-3 bg-white text-emerald-700 font-black rounded-2xl hover:bg-emerald-50 transition-all shadow-lg active:scale-95">
+                            {{ __('Update Password') }}
+                        </a>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm border-b-4 border-b-emerald-500">
+                        <p class="text-gray-500 dark:text-gray-400 text-sm italic">
+                            "{{ __('Reefy Quote') }}"
+                        </p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
-
-    <style>
-        .bg-reefy-soft { background-color: var(--reefy-primary-soft); }
-        .object-fit-cover { object-fit: cover; }
-    </style>
 </x-app-layout>

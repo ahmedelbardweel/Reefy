@@ -42,5 +42,9 @@ return [
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
     ],
+     'huggingface' => [
+    'key' => env('HUGGINGFACE_API_KEY'),
+],
+
 
 ];
