@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\ExpertDashboardController;
 use App\Http\Controllers\Api\ExpertTipController;
 use App\Http\Controllers\Api\FarmerProfileController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\AiAssistantController;
 
 Route::prefix('{lang?}')->where(['lang' => 'ar|en'])->name('api.')->group(function () {
     // Public Routes (Auth)
@@ -89,6 +90,9 @@ Route::prefix('{lang?}')->where(['lang' => 'ar|en'])->name('api.')->group(functi
             Route::get('systems/irrigation', [FarmerSystemController::class, 'irrigation']);
             Route::get('systems/treatment', [FarmerSystemController::class, 'treatment']);
             Route::get('systems/harvesting', [FarmerSystemController::class, 'harvesting']);
+
+            // AI Assistant
+            Route::post('ai/chat', [AiAssistantController::class, 'chat']);
         });
 
         // --- Expert Dashboard & Tips ---
