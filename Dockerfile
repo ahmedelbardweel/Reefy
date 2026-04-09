@@ -17,7 +17,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Enable Apache mod_rewrite
+# Fix Apache MPM conflict: disable event/worker, keep only prefork (required for PHP mod)
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
 RUN a2enmod rewrite
 
 # Install Composer
