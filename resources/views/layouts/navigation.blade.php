@@ -18,28 +18,28 @@
                     @if(request()->routeIs('admin.dashboard'))
                         <!-- Unified Admin Tabs (Matching Nav Link Style) -->
                         <div class="flex items-center gap-6 h-16">
-                            <button @click="$store.admin.activeTab = 'overview'; console.log('Tab changed to:', $store.admin.activeTab)" 
-                                    :class="$store.admin.activeTab === 'overview' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                            <button @click="$store.admin.activeTab = 'overview'; console.log('Tab changed to:', $store.admin.activeTab)"
+                                    :class="$store.admin.activeTab === 'overview' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'"
                                     class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
                                 {{ __('Overview') }}
                             </button>
-                            <button @click="$store.admin.activeTab = 'farmers'; console.log('Tab changed to:', $store.admin.activeTab)" 
-                                    :class="$store.admin.activeTab === 'farmers' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                            <button @click="$store.admin.activeTab = 'farmers'; console.log('Tab changed to:', $store.admin.activeTab)"
+                                    :class="$store.admin.activeTab === 'farmers' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'"
                                     class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
                                 {{ __('Farmers') }}
                             </button>
-                            <button @click="$store.admin.activeTab = 'experts'; console.log('Tab changed to:', $store.admin.activeTab)" 
-                                    :class="$store.admin.activeTab === 'experts' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                            <button @click="$store.admin.activeTab = 'experts'; console.log('Tab changed to:', $store.admin.activeTab)"
+                                    :class="$store.admin.activeTab === 'experts' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'"
                                     class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
                                 {{ __('Experts') }}
                             </button>
-                            <button @click="$store.admin.activeTab = 'moderation'; console.log('Tab changed to:', $store.admin.activeTab)" 
-                                    :class="$store.admin.activeTab === 'moderation' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                            <button @click="$store.admin.activeTab = 'moderation'; console.log('Tab changed to:', $store.admin.activeTab)"
+                                    :class="$store.admin.activeTab === 'moderation' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'"
                                     class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
-                                {{ __('Moderation') }}
+                                {{ __('Content Moderation') }}
                             </button>
-                            <button @click="$store.admin.activeTab = 'publishing'; console.log('Tab changed to:', $store.admin.activeTab)" 
-                                    :class="$store.admin.activeTab === 'publishing' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'text-amber-600 hover:bg-amber-50'" 
+                            <button @click="$store.admin.activeTab = 'publishing'; console.log('Tab changed to:', $store.admin.activeTab)"
+                                    :class="$store.admin.activeTab === 'publishing' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'text-amber-600 hover:bg-amber-50'"
                                     class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-transparent">
                                 <i class="fas fa-plus-circle me-1.5"></i> {{ __('Publish Content') }}
                             </button>
