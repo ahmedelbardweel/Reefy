@@ -4,15 +4,6 @@
             <h2 class="h4 font-weight-bold mb-0 text-gray-800 dark:text-gray-200">
                 <i class="fas fa-chart-line me-2 text-green-500"></i> {{ __('Comprehensive Admin Center') }}
             </h2>
-            
-            <!-- Global Search -->
-            <form action="{{ route('admin.dashboard') }}" method="GET" class="relative">
-                <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="{{ __('Search for farmer, expert or content...') }}" 
-                       class="w-full md:w-80 pl-10 pr-4 py-2 rounded-2xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:ring-green-500 text-sm">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-            </form>
         </div>
     </x-slot>
 
