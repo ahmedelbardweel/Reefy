@@ -14,62 +14,65 @@
                 </a>
             </div>
 
-            <!-- Navigation Links (Absolute Center) -->
-            <div class="hidden sm:flex items-center sm:gap-10">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
-                    <x-nav-link :href="route('community.index')" :active="request()->routeIs('community.*')">
-                        {{ __('Community') }}
-                    </x-nav-link>
-
-                    @auth
-                        @if(auth()->user()->role === 'farmer')
-                            <x-nav-link :href="route('crops.index')" :active="request()->routeIs('crops.*')">
-                                {{ __('Crops') }}
-                            </x-nav-link>
-
-                            <!-- Systems Dropdown -->
-                            <div class="relative flex items-center">
-                                <x-dropdown align="right" width="48">
-                                    <x-slot name="trigger">
-                                        <div class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150 cursor-pointer" tabindex="0">
-                                            <div>{{ __('Smart Systems') }}</div>
-                                            <div class="ms-1">
-                                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </x-slot>
-
-                                    <x-slot name="content">
-                                        <x-dropdown-link :href="route('farmer.systems.irrigation')">
-                                            <i class="bi bi-water text-blue-500 mr-2"></i> {{ __('Irrigation System') }}
-                                        </x-dropdown-link>
-                                        <x-dropdown-link :href="route('farmer.systems.treatment')">
-                                            <i class="bi bi-shield-plus text-red-500 mr-2"></i> {{ __('Treatment Center') }}
-                                        </x-dropdown-link>
-                                        <x-dropdown-link :href="route('farmer.systems.harvesting')">
-                                            <i class="bi bi-box-seam text-yellow-500 mr-2"></i> {{ __('Harvest Tracking') }}
-                                        </x-dropdown-link>
-                                    </x-slot>
-                                </x-dropdown>
-                            </div>
-                        @endif
-
-                        @php
-                            $consultRoute = auth()->user()->role === 'expert' ? 'expert.consultations.index' : 'consultations.index';
-                        @endphp
-                        <x-nav-link :href="route($consultRoute)" :active="request()->routeIs('consultations.*') || request()->routeIs('expert.consultations.*')">
-                            {{ __('Consultations') }}
+                <div class="hidden sm:flex items-center sm:gap-8">
+                    @if(request()->routeIs('admin.dashboard'))
+                        <!-- Unified Admin Tabs (Matching Nav Link Style) -->
+                        <div class="flex items-center gap-6 h-16">
+                            <button @click="$store.admin.activeTab = 'overview'; console.log('Tab changed to:', $store.admin.activeTab)" 
+                                    :class="$store.admin.activeTab === 'overview' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
+                                {{ __('Overview') }}
+                            </button>
+                            <button @click="$store.admin.activeTab = 'farmers'; console.log('Tab changed to:', $store.admin.activeTab)" 
+                                    :class="$store.admin.activeTab === 'farmers' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
+                                {{ __('Farmers') }}
+                            </button>
+                            <button @click="$store.admin.activeTab = 'experts'; console.log('Tab changed to:', $store.admin.activeTab)" 
+                                    :class="$store.admin.activeTab === 'experts' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
+                                {{ __('Experts') }}
+                            </button>
+                            <button @click="$store.admin.activeTab = 'moderation'; console.log('Tab changed to:', $store.admin.activeTab)" 
+                                    :class="$store.admin.activeTab === 'moderation' ? 'border-b-2 border-green-500 text-green-700 font-bold' : 'text-gray-500 hover:text-green-600 hover:border-b-2 hover:border-gray-200'" 
+                                    class="inline-flex items-center px-1 pt-1 text-sm font-medium leading-5 transition-all h-full">
+                                {{ __('Moderation') }}
+                            </button>
+                            <button @click="$store.admin.activeTab = 'publishing'; console.log('Tab changed to:', $store.admin.activeTab)" 
+                                    :class="$store.admin.activeTab === 'publishing' ? 'bg-amber-50 text-amber-600 border-amber-200' : 'text-amber-600 hover:bg-amber-50'" 
+                                    class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-transparent">
+                                <i class="fas fa-plus-circle me-1.5"></i> {{ __('Publish Content') }}
+                            </button>
+                        </div>
+                    @else
+                        <!-- Original Navbar Content -->
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('community.index')" :active="request()->routeIs('community.*')">
+                            {{ __('Community') }}
+                        </x-nav-link>
+
+                        @auth
+                            @if(auth()->user()->role === 'farmer')
+                                <x-nav-link :href="route('crops.index')" :active="request()->routeIs('crops.*')">
+                                    {{ __('Crops') }}
+                                </x-nav-link>
+                            @endif
+
+                            @php
+                                $consultRoute = auth()->user()->role === 'expert' ? 'expert.consultations.index' : 'consultations.index';
+                            @endphp
+                            <x-nav-link :href="route($consultRoute)" :active="request()->routeIs('consultations.*') || request()->routeIs('expert.consultations.*')">
+                                {{ __('Consultations') }}
+                            </x-nav-link>
 
                             <x-nav-link :href="route('farmer.ai.index')" :active="request()->routeIs('farmer.ai.*')">
                                 <i class="bi bi-robot mr-1 ml-3"></i> {{ __('Reefy') }}
                             </x-nav-link>
-                    @endauth
+                        @endauth
+                    @endif
                 </div>
 
             <!-- Settings Section -->

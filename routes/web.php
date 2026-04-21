@@ -13,6 +13,8 @@ use App\Http\Controllers\Farmer\FarmerDashboardController;
 use App\Http\Controllers\Farmer\FarmerSystemController;
 use App\Http\Controllers\Expert\ExpertDashboardController;
 use App\Http\Controllers\GeneralController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ExpertProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +34,7 @@ Route::get('/community', [CommunityController::class, 'index'])->name('community
 Route::get('/community/post/{post}', [CommunityController::class, 'show'])->name('community.show');
 
 Route::get('/farmer/profile/{id}', [FarmerProfileController::class, 'show'])->name('farmer.profile.public');
+Route::get('/expert/profile/{id}', [ExpertProfileController::class, 'show'])->name('expert.profile.public');
 
 // ─── Authenticated Routes ──────────────────────────────────────────────────────
 
@@ -73,6 +76,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ─── Admin ────────────────────────────────────────────────────────────────
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/dashboard', [GeneralController::class, 'adminDashboard'])->name('admin.dashboard');
+
+        // User & Post Management
+        Route::delete('/admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.destroy');
+        Route::delete('/admin/posts/{post}', [AdminController::class, 'deletePost'])->name('admin.posts.destroy');
+
+        // Publishing
+        Route::post('/admin/publish-post', [AdminController::class, 'storeAdminPost'])->name('admin.publish_post');
+        Route::post('/admin/publish-instruction', [AdminController::class, 'storeInstruction'])->name('admin.publish_instruction');
     });
 
     // ─── Farmer ───────────────────────────────────────────────────────────────

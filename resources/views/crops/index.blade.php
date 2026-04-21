@@ -11,39 +11,39 @@
     </x-slot>
 
     {{-- CSS-only modal styles --}}
-    <style>
-        .css-modal { display: none; position: fixed; inset: 0; z-index: 50; overflow-y: auto; padding: 1rem; }
-        .css-modal:target { display: flex; align-items: center; justify-content: center; }
-        .css-modal__overlay { position: fixed; inset: 0; background-color: rgba(100,116,139,0.75); }
-        .css-modal__dialog { position: relative; z-index: 10; background: white; width: 100%; max-width: 42rem; margin: auto; }
-        .dark .css-modal__dialog { background: #1f2937; }
+                <style>
+                    .css-modal { display: none; position: fixed; inset: 0; z-index: 50; overflow-y: auto; padding: 1rem; }
+                    .css-modal:target { display: flex; align-items: center; justify-content: center; }
+                    .css-modal__overlay { position: fixed; inset: 0; background-color: rgba(100,116,139,0.75); }
+                    .css-modal__dialog { position: relative; z-index: 10; background: white; width: 100%; max-width: 42rem; margin: auto; }
+                    .dark .css-modal__dialog { background: #1f2937; }
 
-        /* Hide crop images beyond the first without JS */
-        .crop-img-wrap > *:not(:first-child) { display: none; }
-    </style>
+                    /* Hide crop images beyond the first without JS */
+                    .crop-img-wrap > *:not(:first-child) { display: none; }
+                </style>
 
-    <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-9xl mx-auto">
-        <div class="flex flex-wrap justify-start gap-6">
-            @forelse($crops as $crop)
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700 flex flex-col shrink-0" style="width: 320px; max-width: 320px;">
+                        <div class="py-6 px-4 sm:px-6 lg:px-8 max-w-9xl mx-auto">
+                            <div class="flex flex-wrap justify-start gap-6">
+                                @forelse($crops as $crop)
+                                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-md transition border border-gray-200 dark:border-gray-700 flex flex-col shrink-0" style="width: 320px; max-width: 320px;">
 
-             {{-- Image Section --}}
-            <div class="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                                {{-- Image Section --}}
+                                <div class="relative h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
 
-             @if($crop->images->count() > 0)
+                                @if($crop->images->count() > 0)
 
-    <div class="flex overflow-x-auto snap-x snap-mandatory h-full scroll-smooth">
-         @foreach($crop->images as $index => $image)
-            <div id="crop{{$crop->id}}img{{$index}}"  class="min-w-full h-full snap-center relative">
-                 <img src="{{ $image->image_url }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
-            </div>
-        @endforeach
-     </div>
-@else
-<div class="absolute inset-0 flex items-center justify-center text-gray-400">
-<i class="bi bi-image-fill text-3xl opacity-30"></i>
-</div>
-@endif
+                        <div class="flex overflow-x-auto snap-x snap-mandatory h-full scroll-smooth">
+                            @foreach($crop->images as $index => $image)
+                                <div id="crop{{$crop->id}}img{{$index}}"  class="min-w-full h-full snap-center relative">
+                                    <img src="{{ $image->image_url }}" class="w-full h-full object-cover" alt="{{ $crop->name }}">
+                                </div>
+                            @endforeach
+                        </div>
+                        @else
+                                <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                <i class="bi bi-image-fill text-3xl opacity-30"></i>
+                                </div>
+                        @endif
 
                         {{-- Status Badge --}}
                         <div class="absolute top-2 left-2 z-10">
