@@ -162,12 +162,26 @@ private function callAI($request, $prompt, $history)
         }
         return ['text' => nl2br(e(trim($text))), 'form' => $form];
     }
+    public function clear() { session()->forget('ai_chat_history'); return back(); }
 
     public function executeAction(Request $request)
     {
-        // ... (نفس منطق الحفظ السابق لديك)
-        return back()->with('success', 'تم تنفيذ العملية بنجاح');
-    }
+        $actionType = $request->input('action_type');
+        $data = $request->input('data');
 
-    public function clear() { session()->forget('ai_chat_history'); return back(); }
+        if ($actionType === 'CREATE_CROP') {
+            // إضافة المحصول لقاعدة البيانات وربطه بالمستخدم المسجل دخول حالياً
+            auth()->user()->crops()->create([
+                'name'          => $data['name'],
+                'type'          => $data['type'] ?? 'general',
+                'area'          => $data['area'] ?? 0,
+                'planting_date' => $data['planting_date'] ?? now(),
+            ]);
+
+            return back()->with('success', 'تم إضافة محصول ' . $data['name'] . ' بنجاح!');
+        }
+
+        // يمكنك إضافة حالات أخرى هنا مثل CREATE_TASK
+        return back()->with('error', 'إجراء غير معروف');
+    }
 }

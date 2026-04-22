@@ -89,6 +89,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ─── Farmer ───────────────────────────────────────────────────────────────
     Route::middleware('role:farmer')->group(function () {
 
+        Route::post('/ai/execute', [App\Http\Controllers\Farmer\AiAssistantController::class, 'executeAction'])->name('farmer.ai.execute');
+
         // Farmer Dashboard & Profile
         Route::get('/farmer/dashboard', [FarmerDashboardController::class, 'index'])->name('farmer.dashboard');
         Route::get('/farmer/profile/verification', [FarmerProfileController::class, 'edit'])->name('farmer.profile.edit');

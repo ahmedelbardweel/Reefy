@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\ExpertTipController;
 use App\Http\Controllers\Api\FarmerProfileController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AiAssistantController;
+use App\Http\Controllers\Api\AdminController;
 
 Route::prefix('{lang?}')->where(['lang' => 'ar|en'])->name('api.')->group(function () {
     // Public Routes (Auth)
@@ -100,6 +101,20 @@ Route::prefix('{lang?}')->where(['lang' => 'ar|en'])->name('api.')->group(functi
             Route::get('dashboard', [ExpertDashboardController::class, 'index']);
             
             Route::apiResource('tips', ExpertTipController::class);
+        });
+
+        // --- Admin Management ---
+        Route::middleware('role:admin')->prefix('admin')->group(function () {
+            Route::get('dashboard', [AdminController::class, 'dashboard']);
+            
+            Route::get('users', [AdminController::class, 'users']);
+            Route::delete('users/{user}', [AdminController::class, 'deleteUser']);
+            
+            Route::get('posts', [AdminController::class, 'posts']);
+            Route::delete('posts/{post}', [AdminController::class, 'deletePost']);
+            
+            Route::post('announcements', [AdminController::class, 'storeAnnouncement']);
+            Route::post('instructions', [AdminController::class, 'storeInstruction']);
         });
     });
 });
