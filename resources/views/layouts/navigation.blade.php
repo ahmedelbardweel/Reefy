@@ -59,6 +59,30 @@
                                 <x-nav-link :href="route('crops.index')" :active="request()->routeIs('crops.*')">
                                     {{ __('Crops') }}
                                 </x-nav-link>
+
+                                <!-- Smart Systems Dropdown -->
+                                <x-dropdown align="right" width="48">
+                                    <x-slot name="trigger">
+                                        <div class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('farmer.systems.*') ? 'border-green-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700' }} text-sm font-medium leading-5 transition duration-150 ease-in-out cursor-pointer h-16">
+                                            <span>{{ __('Smart Systems') }}</span>
+                                            <svg class="ms-1 h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </x-slot>
+
+                                    <x-slot name="content">
+                                        <x-dropdown-link :href="route('farmer.systems.irrigation')">
+                                            <i class="bi bi-water text-blue-500 me-2"></i> {{ __('Irrigation System') }}
+                                        </x-dropdown-link>
+                                        <x-dropdown-link :href="route('farmer.systems.treatment')">
+                                            <i class="bi bi-shield-plus text-red-500 me-2"></i> {{ __('Treatment Center') }}
+                                        </x-dropdown-link>
+                                        <x-dropdown-link :href="route('farmer.systems.harvesting')">
+                                            <i class="bi bi-box-seam text-yellow-500 me-2"></i> {{ __('Harvest Tracking') }}
+                                        </x-dropdown-link>
+                                    </x-slot>
+                                </x-dropdown>
                             @endif
 
                             @php
